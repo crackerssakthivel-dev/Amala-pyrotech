@@ -1,99 +1,119 @@
 async function loadCatalogBackend() {
-  // Load Logo + Hero Banners from Supabase
-  const { data: settings, error: settingsError } = await sb
-    .from('site_settings')
-    .select('logo_path')
-    .eq('id', 1)
-    .maybeSingle();
 
-  if (settingsError) {
-    console.error('Site settings error:', settingsError);
-  }
+    const chips = document.getElementById('categoryChipsContainer');
 
-  const { data: banners, error: bannersError } = await sb
-    .from('hero_banners')
-    .select('storage_path')
-    .order('sort_order')
-    .order('id');
-
-  if (bannersError) {
-    console.error('Hero banners error:', bannersError);
-  }
-
-  // Show Admin Logo in Catalog Header
-  const headerLogo = document.getElementById('headerLogo');
-
-  if (headerLogo && settings?.logo_path) {
-    headerLogo.src = mediaUrl(settings.logo_path);
-  }
-
-  // Show Admin Hero Banners in Catalog
-  const heroCarousel = document.getElementById('heroCarousel');
-
-  if (heroCarousel && banners) {
-    heroCarousel.innerHTML = '';
-
-    banners.forEach((banner, index) => {
-      const slide = document.createElement('div');
-
-      slide.className = `hero-slide ${index === 0 ? 'active' : ''}`;
-
-      slide.style.backgroundImage =
-        `url('${mediaUrl(banner.storage_path)}')`;
-
-      heroCarousel.appendChild(slide);
-    });
-  }
-
-  // Load Products
-  const { data, error } = await sb
-    .from('products')
-    .select('id,code,name,pack,mrp,price,image_path,category_id,categories(name,offer_percent)')
-    .eq('active', true)
-    .order('id');
-
-  if (error) throw error;
-
-  productsData = (data || []).map(p => {
-    const mrp = Number(p.mrp);
-    const price = Number(p.price);
-
-    // Discount is calculated ONLY from MRP and Net Rate.
-    // Net Rate (price) is never changed.
-    let discountPercent = 0;
-
-    if (mrp > 0 && price < mrp) {
-      discountPercent =
-        Math.round(((mrp - price) / mrp) * 10000) / 100;
+    // Show only the correct current category button immediately
+    if (chips) {
+        chips.innerHTML =
+            `<div class="cat-chip active" onclick="filterCategory('All')">All Products</div>`;
     }
 
-    return {
-      id: p.id,
-      code: p.code,
-      name: p.name,
-      cat: p.categories?.name || 'Uncategorized',
-      offerPercent: discountPercent,
-      pack: p.pack || '1 Pkt',
-      mrp: Number.isFinite(mrp) ? mrp : 0,
-      price: Number.isFinite(price) ? price : 0,
-      img: mediaUrl(p.image_path) || 'https://via.placeholder.com/200'
-    };
-  });
+    // Load Logo, Hero and Products at the same time
+    const settingsPromise = sb
+        .from('site_settings')
+        .select('logo_path')
+        .eq('id', 1)
+        .maybeSingle();
 
-  const cats = [...new Set(productsData.map(p => p.cat))];
+    const bannersPromise = sb
+        .from('hero_banners')
+        .select('storage_path')
+        .order('sort_order')
+        .order('id');
 
-  const chips =
-    document.getElementById('categoryChipsContainer');
+    const productsPromise = sb
+        .from('products')
+        .select('id,code,name,pack,mrp,price,image_path,category_id,categories(name,offer_percent)')
+        .eq('active', true)
+        .order('id');
 
-  if (chips) {
-    chips.innerHTML =
-      `<div class="cat-chip active" onclick="filterCategory('All')">All Products</div>` +
-      cats
-        .map(c =>
-          `<div class="cat-chip" onclick="filterCategory('${String(c).replace(/'/g, "\\'")}')">${c}</div>`
-        )
-        .join('');
-  }
+    const [
+        { data: settings, error: settingsError },
+        { data: banners, error: bannersError },
+        { data, error }
+    ] = await Promise.all([
+        settingsPromise,
+        bannersPromise,
+        productsPromise
+    ]);
+
+    // LOGO
+    if (settingsError) {
+        console.error('Site settings error:', settingsError);
+    }
+
+    const headerLogo = document.getElementById('headerLogo');
+
+    if (headerLogo && settings?.logo_path) {
+        headerLogo.src = mediaUrl(settings.logo_path);
+    }
+
+    // HERO BANNERS
+    if (bannersError) {
+        console.error('Hero banners error:', bannersError);
+    }
+
+    const heroCarousel = document.getElementById('heroCarousel');
+
+    if (heroCarousel && banners) {
+        heroCarousel.innerHTML = '';
+
+        banners.forEach((banner, index) => {
+            const slide = document.createElement('div');
+
+            slide.className =
+                `hero-slide ${index === 0 ? 'active' : ''}`;
+
+            slide.style.backgroundImage =
+                `url('${mediaUrl(banner.storage_path)}')`;
+
+            heroCarousel.appendChild(slide);
+        });
+    }
+
+    // PRODUCTS
+    if (error) {
+        throw error;
+    }
+
+    productsData = (data || []).map(p => {
+
+        const mrp = Number(p.mrp);
+        const price = Number(p.price);
+
+        let discountPercent = 0;
+
+        if (mrp > 0 && price < mrp) {
+            discountPercent =
+                Math.round(((mrp - price) / mrp) * 10000) / 100;
+        }
+
+        return {
+            id: p.id,
+            code: p.code,
+            name: p.name,
+            cat: p.categories?.name || 'Uncategorized',
+            offerPercent: discountPercent,
+            pack: p.pack || '1 Pkt',
+            mrp: Number.isFinite(mrp) ? mrp : 0,
+            price: Number.isFinite(price) ? price : 0,
+            img: mediaUrl(p.image_path) ||
+                'https://via.placeholder.com/200'
+        };
+    });
+
+    // CATEGORIES
+    const cats = [
+        ...new Set(productsData.map(p => p.cat))
+    ];
+
+    if (chips) {
+        chips.innerHTML =
+            `<div class="cat-chip active" onclick="filterCategory('All')">All Products</div>` +
+            cats.map(c =>
+                `<div class="cat-chip" onclick="filterCategory('${String(c).replace(/'/g, "\\'")}')">${c}</div>`
+            ).join('');
+    }
 }
 
 
