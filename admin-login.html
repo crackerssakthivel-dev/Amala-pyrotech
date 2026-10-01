@@ -1,1 +1,142 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>AMALA PYROTECH — Admin Login</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="supabase-client.js"></script></head><body class="min-h-screen bg-[#F5F7F8] flex items-center justify-center p-4"><div class="w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 border border-[#DDE2E6]"><div class="text-center mb-6"><div class="w-16 h-16 mx-auto rounded-full bg-[#064C3A] flex items-center justify-center text-[#FFD000] text-2xl font-extrabold">AP</div><h1 class="text-lg font-extrabold text-[#263447] mt-3">AMALA PYROTECH</h1><p class="text-xs text-[#70777D]">Admin Login</p></div><form id="loginForm" class="space-y-3"><input id="email" type="email" required placeholder="Admin email / username" class="w-full border p-3 rounded-lg text-sm"><input id="password" type="password" required placeholder="Password" class="w-full border p-3 rounded-lg text-sm"><button class="w-full py-3 bg-[#0B6B4F] hover:bg-[#064C3A] text-white rounded-lg font-bold">LOGIN</button></form><p id="msg" class="text-xs text-center mt-3 text-[#D9364F]"></p></div><script>document.getElementById('loginForm').addEventListener('submit',async e=>{e.preventDefault();document.getElementById('msg').innerText='';const {error}=await sb.auth.signInWithPassword({email:document.getElementById('email').value.trim(),password:document.getElementById('password').value});if(error){document.getElementById('msg').innerText=error.message;return}location.href='admin-panel.html';});</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AMALA PYROTECH — Admin Login</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase-config.js"></script>
+
+</head>
+
+<body class="min-h-screen bg-[#F5F7F8] flex items-center justify-center p-4">
+
+<div class="w-full max-w-sm bg-white rounded-2xl shadow-xl p-6 border border-[#DDE2E6]">
+
+    <div class="text-center mb-6">
+
+        <div class="w-16 h-16 mx-auto rounded-full bg-[#064C3A] flex items-center justify-center text-[#FFD000] text-2xl font-extrabold">
+            AP
+        </div>
+
+        <h1 class="text-lg font-extrabold text-[#263447] mt-3">
+            AMALA PYROTECH
+        </h1>
+
+        <p class="text-xs text-[#70777D]">
+            Admin Login
+        </p>
+
+    </div>
+
+    <form id="loginForm" class="space-y-3">
+
+        <input
+            id="email"
+            type="email"
+            required
+            placeholder="Admin email / username"
+            class="w-full border p-3 rounded-lg text-sm"
+        >
+
+        <input
+            id="password"
+            type="password"
+            required
+            placeholder="Password"
+            class="w-full border p-3 rounded-lg text-sm"
+        >
+
+        <button
+            id="loginButton"
+            type="submit"
+            class="w-full py-3 bg-[#0B6B4F] hover:bg-[#064C3A] text-white rounded-lg font-bold"
+        >
+            LOGIN
+        </button>
+
+    </form>
+
+    <p
+        id="msg"
+        class="text-xs text-center mt-3 text-[#D9364F]"
+    ></p>
+
+</div>
+
+
+<script>
+
+const loginForm = document.getElementById("loginForm");
+const msg = document.getElementById("msg");
+const loginButton = document.getElementById("loginButton");
+
+loginForm.addEventListener("submit", async function(e) {
+
+    e.preventDefault();
+
+    msg.innerText = "";
+    loginButton.disabled = true;
+    loginButton.innerText = "LOGINNING...";
+
+    try {
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
+        if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+            throw new Error("Supabase configuration is missing.");
+        }
+
+        const supabaseClient = window.supabase.createClient(
+            window.SUPABASE_URL,
+            window.SUPABASE_ANON_KEY
+        );
+
+        const { data, error } =
+            await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data || !data.session) {
+            throw new Error("Login session was not created.");
+        }
+
+        msg.className =
+            "text-xs text-center mt-3 text-green-600";
+
+        msg.innerText = "Login successful. Opening Admin Panel...";
+
+        setTimeout(function() {
+            window.location.href = "admin-panel.html";
+        }, 500);
+
+    } catch (error) {
+
+        console.error("ADMIN LOGIN ERROR:", error);
+
+        msg.className =
+            "text-xs text-center mt-3 text-[#D9364F]";
+
+        msg.innerText =
+            error.message || "Login failed. Please try again.";
+
+        loginButton.disabled = false;
+        loginButton.innerText = "LOGIN";
+    }
+
+});
+
+</script>
+
+</body>
+</html>
