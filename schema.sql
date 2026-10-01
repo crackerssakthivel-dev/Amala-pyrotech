@@ -216,25 +216,15 @@ as $$
 $$;
 grant execute on function public.track_order(text) to anon, authenticated;
 
--- SAMPLE CATALOG DATA (run once; safe with ON CONFLICT)
-insert into categories (name, offer_percent) values
-('One Sound Crackers', 85),
-('Sparklers', 85),
-('Bijili', 85)
-on conflict (name) do update set offer_percent = excluded.offer_percent;
+-- ============================================================
+-- SAMPLE CATALOG DATA REMOVED
+-- ============================================================
+-- The old sample categories/products are not part of the
+-- AMALA PYROTECH original catalog.
+--
+-- The original 210-category/product catalog will be inserted
+-- separately in the next catalog data file.
+-- ============================================================
 
-insert into products (code,name,category_id,pack,mrp,price,image_path,active)
-select 'OSC-001','2 3/4" Kuruvi Crackers',id,'1 Pkt',150,22.50,null,true from categories where name='One Sound Crackers'
-on conflict (code) do nothing;
-insert into products (code,name,category_id,pack,mrp,price,image_path,active)
-select 'OSC-009','2 Sound Crackers',id,'1 Pkt',234,35.00,null,true from categories where name='One Sound Crackers'
-on conflict (code) do nothing;
-insert into products (code,name,category_id,pack,mrp,price,image_path,active)
-select 'SPK-001','7cm Colour Sparklers',id,'1 Box',80,12.00,null,true from categories where name='Sparklers'
-on conflict (code) do nothing;
-insert into products (code,name,category_id,pack,mrp,price,image_path,active)
-select 'SPK-002','10cm Electric Sparklers',id,'1 Box',127,19.00,null,true from categories where name='Sparklers'
-on conflict (code) do nothing;
-insert into products (code,name,category_id,pack,mrp,price,image_path,active)
-select 'BIJ-001','Standard Bijili Crackers',id,'1 Pkt',100,15.00,null,true from categories where name='Bijili'
-on conflict (code) do nothing;
+delete from products;
+delete from categories;
