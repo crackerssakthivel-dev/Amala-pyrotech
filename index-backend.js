@@ -1,10 +1,13 @@
-async function preloadImage(src, priority = 'auto') {
-  if (!src) return;
+function preloadImage(src, priority = 'auto') {
+  if (!src) return Promise.resolve(false);
 
   return new Promise(resolve => {
     const img = new Image();
-    img.decoding = 'async';
-    img.fetchPriority = priority;
+
+    try {
+      img.decoding = 'async';
+      img.fetchPriority = priority;
+    } catch (e) {}
 
     img.onload = () => resolve(true);
     img.onerror = () => resolve(false);
@@ -13,199 +16,361 @@ async function preloadImage(src, priority = 'auto') {
   });
 }
 
-async function preloadImages(urls) {
+function preloadImages(urls) {
   const list = (urls || []).filter(Boolean);
-  if (!list.length) return;
 
-  await Promise.all(
+  return Promise.all(
     list.map((url, index) =>
       preloadImage(url, index === 0 ? 'high' : 'auto')
     )
   );
 }
 
-async function loadSettings() {
-  const [
-    settingsResult,
-    bannersResult,
-    galleryResult
-  ] = await Promise.all([
-    sb.from('site_settings').select('*').eq('id', 1).maybeSingle(),
-    sb.from('hero_banners').select('*').order('sort_order').order('id'),
-    sb.from('gallery_images').select('*').order('sort_order').order('id')
-  ]);
+async function loadAmalaHome() {
+  try {
+    /*
+     * LOAD SETTINGS + HERO + GALLERY TOGETHER
+     */
+    const [settingsResult, bannersResult, galleryResult] =
+      await Promise.all([
+        sb
+          .from('site_settings')
+          .select('*')
+          .eq('id', 1)
+          .maybeSingle(),
 
-  const { data: s, error } = settingsResult;
-  const { data: banners } = bannersResult;
-  const { data: gallery } = galleryResult;
+        sb
+          .from('hero_banners')
+          .select('*')
+          .order('sort_order')
+          .order('id'),
 
-  if (error) console.error(error);
+        sb
+          .from('gallery_images')
+          .select('*')
+          .order('sort_order')
+          .order('id')
+      ]);
 
-  const settings = s || {};
+    if (settingsResult.error) {
+      console.error(
+        'SITE SETTINGS ERROR:',
+        settingsResult.error
+      );
+    }
 
-  settings.companyName =
-    settings.company_name || 'AMALA PYROTECH';
+    if (bannersResult.error) {
+      console.error(
+        'HERO BANNERS ERROR:',
+        bannersResult.error
+      );
+    }
 
-  settings.logoUrl =
-    mediaUrl(settings.logo_path) ||
-    'https://via.placeholder.com/50';
+    if (galleryResult.error) {
+      console.error(
+        'GALLERY ERROR:',
+        galleryResult.error
+      );
+    }
 
-  settings.announcement =
-    settings.announcement ||
-    'Welcome to Amala Pyrotech! Direct Sivakasi Factory Wholesale Crackers.';
+    const settings = settingsResult.data || {};
+    const banners = bannersResult.data || [];
+    const gallery = galleryResult.data || [];
 
-  settings.whatsappNumber =
-    settings.whatsapp_number || '+919344265054';
+    /*
+     * BASIC SETTINGS
+     */
+    const companyName =
+      settings.company_name || 'AMALA PYROTECH';
 
-  settings.callNumber =
-    settings.call_number || '7780942656';
+    const logoUrl =
+      mediaUrl(settings.logo_path) || '';
 
-  settings.instagramLink =
-    settings.instagram_link ||
-    'https://instagram.com/amalapyrotech';
+    const announcement =
+      settings.announcement ||
+      'Welcome to Amala Pyrotech! Direct Sivakasi Factory Wholesale Crackers.';
 
-  settings.youtubeLink =
-    settings.youtube_link ||
-    'https://youtube.com/@amalapyrotech';
+    const whatsappNumber =
+      settings.whatsapp_number || '+919344265054';
 
-  settings.heroImages =
-    (banners || []).map(x => mediaUrl(x.storage_path)).filter(Boolean);
+    const callNumber =
+      settings.call_number || '7780942656';
 
-  settings.galleryImages =
-    (gallery || []).map(x => mediaUrl(x.storage_path)).filter(Boolean);
+    const instagramLink =
+      settings.instagram_link ||
+      'https://instagram.com/amalapyrotech';
 
-  /*
-   * PRELOAD LOGO + FIRST HERO FIRST
-   * These are the most important images visible immediately.
-   */
-  await Promise.all([
-    preloadImage(settings.logoUrl, 'high'),
-    preloadImage(settings.heroImages[0], 'high')
-  ]);
+    const youtubeLink =
+      settings.youtube_link ||
+      'https://youtube.com/@amalapyrotech';
 
-  document.getElementById('display-company-name').innerText =
-    settings.companyName;
+    /*
+     * REAL SUPABASE HERO IMAGES
+     */
+    const heroImages = banners
+      .map(item => mediaUrl(item.storage_path))
+      .filter(Boolean);
 
-  document.getElementById('footer-company-name').innerText =
-    settings.companyName;
+    /*
+     * REAL SUPABASE GALLERY IMAGES
+     */
+    const galleryImages = gallery
+      .map(item => mediaUrl(item.storage_path))
+      .filter(Boolean);
 
-  document.getElementById('trust-company-title').innerText =
-    settings.companyName;
+    console.log(
+      'AMALA PYROTECH HERO IMAGES:',
+      heroImages
+    );
 
-  document.getElementById('gallery-title-text').innerText =
-    settings.companyName;
+    console.log(
+      'AMALA PYROTECH LOGO:',
+      logoUrl
+    );
 
-  document.getElementById('display-logo').src =
-    settings.logoUrl;
+    /*
+     * SET COMPANY TEXT
+     */
+    const companyElements = [
+      'display-company-name',
+      'footer-company-name',
+      'trust-company-title',
+      'gallery-title-text'
+    ];
 
-  document.getElementById('trust-card-logo').src =
-    settings.logoUrl;
+    companyElements.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerText = companyName;
+    });
 
-  document.getElementById('footer-logo').src =
-    settings.logoUrl;
+    /*
+     * SET LOGO
+     * Do NOT wait for preload.
+     */
+    if (logoUrl) {
+      const logoIds = [
+        'display-logo',
+        'trust-card-logo',
+        'footer-logo'
+      ];
 
-  document.getElementById('display-announcement').innerText =
-    settings.announcement;
+      logoIds.forEach(id => {
+        const el = document.getElementById(id);
 
-  const cleanWa =
-    settings.whatsappNumber.replace(/[^0-9]/g, '');
+        if (el) {
+          el.src = logoUrl;
+          el.removeAttribute('data-src');
 
-  document.getElementById('header-whatsapp-btn').href =
-    `https://wa.me/${cleanWa}`;
+          el.onload = () => {
+            el.style.visibility = 'visible';
+            el.style.opacity = '1';
+          };
+        }
+      });
 
-  document.getElementById('header-call-btn').href =
-    `tel:${settings.callNumber}`;
+      /*
+       * Start logo preload in background.
+       */
+      preloadImage(logoUrl, 'high');
+    }
 
-  document.getElementById('float-call-link').href =
-    `tel:${settings.callNumber}`;
+    /*
+     * ANNOUNCEMENT
+     */
+    const announcementEl =
+      document.getElementById('display-announcement');
 
-  document.getElementById('float-whatsapp-link').href =
-    `https://wa.me/${cleanWa}`;
+    if (announcementEl) {
+      announcementEl.innerText = announcement;
+    }
 
-  document.getElementById('nav-whatsapp-link').href =
-    `https://wa.me/${cleanWa}`;
+    /*
+     * CONTACT LINKS
+     */
+    const cleanWa =
+      String(whatsappNumber).replace(/[^0-9]/g, '');
 
-  document.getElementById('nav-call-link').href =
-    `tel:${settings.callNumber}`;
+    const links = {
+      'header-whatsapp-btn':
+        `https://wa.me/${cleanWa}`,
 
-  document.getElementById('float-insta-link').href =
-    settings.instagramLink;
+      'header-call-btn':
+        `tel:${callNumber}`,
 
-  document.getElementById('float-youtube-link').href =
-    settings.youtubeLink;
+      'float-call-link':
+        `tel:${callNumber}`,
 
-  document.getElementById('footer-phone-display').innerText =
-    settings.whatsappNumber;
+      'float-whatsapp-link':
+        `https://wa.me/${cleanWa}`,
 
-  document.getElementById('footer-call-display').innerText =
-    settings.callNumber;
+      'nav-whatsapp-link':
+        `https://wa.me/${cleanWa}`,
 
-  /*
-   * HERO SLIDER
-   */
-  const sliderContainer =
-    document.getElementById('hero-slider-container');
+      'nav-call-link':
+        `tel:${callNumber}`,
 
-  let slidesHTML = '';
+      'float-insta-link':
+        instagramLink,
 
-  settings.heroImages.forEach((imgSrc, index) => {
-    slidesHTML += `
-      <div class="hero-slide ${index === 0 ? 'active' : ''}">
-        <img
-          src="${imgSrc}"
-          alt="AMALA PYROTECH"
-          loading="${index === 0 ? 'eager' : 'lazy'}"
-          fetchpriority="${index === 0 ? 'high' : 'auto'}"
-          decoding="async"
+      'float-youtube-link':
+        youtubeLink
+    };
+
+    Object.keys(links).forEach(id => {
+      const el = document.getElementById(id);
+
+      if (el) {
+        el.href = links[id];
+      }
+    });
+
+    /*
+     * FOOTER CONTACT
+     */
+    const phoneDisplay =
+      document.getElementById('footer-phone-display');
+
+    if (phoneDisplay) {
+      phoneDisplay.innerText = whatsappNumber;
+    }
+
+    const callDisplay =
+      document.getElementById('footer-call-display');
+
+    if (callDisplay) {
+      callDisplay.innerText = callNumber;
+    }
+
+    /*
+     * HERO SLIDER
+     *
+     * IMPORTANT:
+     * Remove the random/static hero completely
+     * and replace it with Supabase images.
+     */
+    const sliderContainer =
+      document.getElementById('hero-slider-container');
+
+    if (sliderContainer && heroImages.length > 0) {
+
+      let slidesHTML = '';
+
+      heroImages.forEach((imgSrc, index) => {
+
+        slidesHTML += `
+          <div
+            class="hero-slide ${index === 0 ? 'active' : ''}"
+            style="background-image: url('${imgSrc}');"
+          ></div>
+        `;
+
+      });
+
+      const arrowsHTML = `
+        <button
+          class="slider-arrow prev"
+          onclick="changeSlide(-1)"
         >
-      </div>
-    `;
-  });
+          <i class="fas fa-chevron-left"></i>
+        </button>
 
-  sliderContainer.innerHTML =
-    slidesHTML +
-    `
-      <button class="slider-arrow prev"
-        onclick="changeSlide(-1)">
-        <i class="fas fa-chevron-left"></i>
-      </button>
+        <button
+          class="slider-arrow next"
+          onclick="changeSlide(1)"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      `;
 
-      <button class="slider-arrow next"
-        onclick="changeSlide(1)">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-    `;
+      sliderContainer.innerHTML =
+        slidesHTML + arrowsHTML;
+
+      /*
+       * Make sure the first real Supabase hero
+       * is immediately available.
+       */
+      sliderContainer
+        .querySelectorAll('.hero-slide')
+        .forEach((slide, index) => {
+
+          slide.style.backgroundImage =
+            `url("${heroImages[index]}")`;
+
+        });
+
+    } else {
+
+      console.warn(
+        'No Hero Banner found in Supabase.'
+      );
+
+    }
+
+    /*
+     * GALLERY
+     */
+    const galleryContainer =
+      document.getElementById(
+        'dynamic-gallery-container'
+      );
+
+    if (
+      galleryContainer &&
+      galleryImages.length > 0
+    ) {
+
+      galleryContainer.innerHTML =
+        galleryImages
+          .map(img => `
+            <div class="dynamic-gallery-item">
+              <img
+                src="${img}"
+                alt="Fireworks Gallery"
+                loading="lazy"
+                decoding="async"
+              >
+            </div>
+          `)
+          .join('');
+
+    }
+
+    /*
+     * BACKGROUND PRELOAD
+     *
+     * First hero + logo were already started above.
+     * Remaining images load without blocking the page.
+     */
+    setTimeout(() => {
+
+      preloadImages([
+        ...heroImages,
+        ...galleryImages
+      ]);
+
+    }, 50);
+
+  } catch (error) {
+
+    console.error(
+      'AMALA PYROTECH HOME LOAD ERROR:',
+      error
+    );
+
+  }
 
   /*
-   * GALLERY
+   * Keep existing fireworks animation.
    */
-  document.getElementById('dynamic-gallery-container').innerHTML =
-    settings.galleryImages.map(img => `
-      <img
-        src="${img}"
-        alt="AMALA PYROTECH"
-        loading="lazy"
-        decoding="async"
-      >
-    `).join('');
-
-  /*
-   * PRELOAD ALL REMAINING IMAGES IN BACKGROUND
-   * This does not block the visible page.
-   */
-  setTimeout(() => {
-    preloadImages([
-      ...settings.heroImages.slice(1),
-      ...settings.galleryImages
-    ]);
-  }, 0);
+  if (typeof animateFireworks === 'function') {
+    animateFireworks();
+  }
 }
 
-window.addEventListener('load', async () => {
-  try {
-    await loadSettings();
-  } catch (e) {
-    console.error(e);
-    animateFirework();
-  }
+
+/*
+ * START AFTER PAGE LOAD
+ */
+window.addEventListener('load', () => {
+  loadAmalaHome();
 });
