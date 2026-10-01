@@ -282,6 +282,45 @@ async function loadAmalaHome() {
 
     }
 
+        /*
+     * PRELOAD CATALOG DATA IN BACKGROUND
+     * Catalog should be ready before customer clicks it.
+     */
+    setTimeout(async () => {
+
+      try {
+
+        const { data: products, error } =
+          await sb
+            .from('products')
+            .select('id,code,name,pack,mrp,price,image_path,category_id,categories(name,offer_percent)')
+            .eq('active', true)
+            .order('id');
+
+        if (error) {
+          console.error(
+            'CATALOG PRELOAD ERROR:',
+            error
+          );
+          return;
+        }
+
+        sessionStorage.setItem(
+          'amala_catalog_products',
+          JSON.stringify(products || [])
+        );
+
+      } catch (error) {
+
+        console.error(
+          'CATALOG PRELOAD FAILED:',
+          error
+        );
+
+      }
+
+    }, 0);
+    
     /*
      * LOAD GALLERY SEPARATELY.
      * Gallery must NOT block Logo or Hero.
