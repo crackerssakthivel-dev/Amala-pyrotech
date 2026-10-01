@@ -306,9 +306,14 @@ async function loadAmalaHome() {
         }
 
         sessionStorage.setItem(
-          'amala_catalog_products',
-          JSON.stringify(products || [])
-        );
+  'amala_catalog_cache',
+  JSON.stringify({
+    settings: null,
+    banners: [],
+    products: products || [],
+    savedAt: Date.now()
+  })
+);
 
       } catch (error) {
 
