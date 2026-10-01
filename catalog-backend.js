@@ -321,257 +321,142 @@ async function downloadInvoiceBill() {
 
 async function renderInvoicePdf(s) {
   const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
-  const doc =
-    new jsPDF({
-      unit: 'mm',
-      format: 'a4'
-    });
-
-  const pageWidth = 210;
   const left = 14;
   const right = 196;
   let y = 16;
 
-  /* =========================
-     COMPANY HEADER
-  ========================= */
+  // Clean PDF amount format.
+  // Using Rs. avoids broken ₹ glyphs in jsPDF built-in fonts.
+  const pdfMoney = (value) => {
+    const n = Number(value || 0);
+    return `Rs.${n.toFixed(2)}`;
+  };
 
-  doc.setFont(
-    'helvetica',
-    'bold'
-  );
-
+  // =========================
+  // COMPANY HEADER
+  // =========================
+  doc.setFont('helvetica', 'bold');
   doc.setFontSize(18);
-
-  doc.setTextColor(
-    169,
-    0,
-    90
-  );
-
-  doc.text(
-    s.company_name,
-    pageWidth / 2,
-    y,
-    {
-      align: 'center'
-    }
-  );
-
-  y += 6;
-
-  doc.setFont(
-    'helvetica',
-    'normal'
-  );
-
-  doc.setFontSize(9);
-
-  doc.setTextColor(
-    70,
-    70,
-    70
-  );
-
-  doc.text(
-    s.tagline,
-    pageWidth / 2,
-    y,
-    {
-      align: 'center'
-    }
-  );
-
-  y += 4.5;
-
-  doc.text(
-    s.address,
-    pageWidth / 2,
-    y,
-    {
-      align: 'center'
-    }
-  );
-
-  y += 4.5;
-
-  doc.text(
-    `WhatsApp: ${s.whatsapp} | Phone: ${s.phone}`,
-    pageWidth / 2,
-    y,
-    {
-      align: 'center'
-    }
-  );
-
-  y += 6;
-
-  /* =========================
-     PINK HORIZONTAL LINE
-  ========================= */
-
-  doc.setDrawColor(
-    169,
-    0,
-    90
-  );
-
-  doc.setLineWidth(0.6);
-
-  doc.line(
-    left,
-    y,
-    right,
-    y
-  );
+  doc.setTextColor(169, 0, 90);
+  doc.text(String(s.company_name || 'AMALA PYROTECH'), 105, y, {
+    align: 'center'
+  });
 
   y += 7;
 
-  /* =========================
-     CUSTOMER / ORDER DETAILS
-  ========================= */
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+  doc.setTextColor(70, 70, 70);
 
-  doc.setFont(
-    'helvetica',
-    'bold'
-  );
-
-  doc.setFontSize(10);
-
-  doc.setTextColor(
-    40,
-    40,
-    40
-  );
-
-  doc.text(
-    'Customer Details',
-    left,
-    y
-  );
-
-  doc.text(
-    'Order Invoice',
-    right,
-    y,
-    {
-      align: 'right'
-    }
-  );
+  doc.text(String(s.tagline || ''), 105, y, {
+    align: 'center'
+  });
 
   y += 5;
 
-  doc.setFont(
-    'helvetica',
-    'normal'
-  );
+  doc.text(String(s.address || ''), 105, y, {
+    align: 'center'
+  });
 
-  doc.setFontSize(8.5);
-
-  doc.text(
-    `Name: ${s.customer.name}`,
-    left,
-    y
-  );
+  y += 5;
 
   doc.text(
-    `Order ID: ${s.order_id}`,
-    right,
+    `WhatsApp: ${s.whatsapp || ''} | Phone: ${s.phone || ''}`,
+    105,
     y,
-    {
-      align: 'right'
-    }
+    { align: 'center' }
   );
 
-  y += 4.5;
+  y += 8;
 
-  doc.text(
-    `Mobile: ${s.customer.mobile}`,
-    left,
-    y
-  );
+  // Pink separator
+  doc.setDrawColor(169, 0, 90);
+  doc.setLineWidth(0.5);
+  doc.line(left, y, right, y);
 
-  doc.text(
-    `Date: ${new Date(s.date).toLocaleDateString('en-IN')}`,
-    right,
-    y,
-    {
-      align: 'right'
-    }
-  );
+  y += 8;
 
-  y += 4.5;
+  // =========================
+  // CUSTOMER / ORDER DETAILS
+  // =========================
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(10);
+  doc.setTextColor(40, 40, 40);
+
+  doc.text('Customer Details:', left, y);
+  doc.text('Order Invoice', 130, y);
+
+  y += 5;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(9);
+
+  doc.text(`Name: ${s.customer?.name || ''}`, left, y);
+  doc.text(`Order ID: ${s.order_id || ''}`, 130, y);
+
+  y += 5;
+
+  doc.text(`Mobile: ${s.customer?.mobile || ''}`, left, y);
+
+  const invoiceDate = s.date
+    ? new Date(s.date).toLocaleDateString('en-IN')
+    : '';
+
+  doc.text(`Date: ${invoiceDate}`, 130, y);
+
+  y += 5;
 
   const customerAddress =
-    `Address: ${s.customer.address}, ${s.customer.town}, ${s.customer.district}, ${s.customer.state} - ${s.customer.pincode}`;
+    `${s.customer?.address || ''}, ` +
+    `${s.customer?.town || ''}, ` +
+    `${s.customer?.district || ''}, ` +
+    `${s.customer?.state || ''} - ` +
+    `${s.customer?.pincode || ''}`;
 
-  const addressLines =
-    doc.splitTextToSize(
-      customerAddress,
-      110
-    );
+  doc.text(`Address: ${customerAddress}`, left, y, {
+    maxWidth: 180
+  });
 
-  doc.text(
-    addressLines,
-    left,
-    y
-  );
+  y += 9;
 
-  y +=
-    (addressLines.length * 4) + 6;
+  // =========================
+  // PRODUCT TABLE
+  // =========================
+  const head = [[
+    'S.No',
+    'Code',
+    'Product Name',
+    'MRP',
+    'Qty',
+    'Offer Price',
+    'Subtotal'
+  ]];
 
-  /* =========================
-     PRODUCT TABLE
-     GREEN HEADER + WHITE ROWS
-  ========================= */
-
-  const head = [
-    [
-      'S.No',
-      'Code',
-      'Product Name',
-      'MRP',
-      'Qty',
-      'Offer Price',
-      'Subtotal'
-    ]
-  ];
-
-  const body =
-    s.items.map(
-      (i, n) => [
-        String(n + 1),
-        i.code,
-        `${i.name}${i.pack ? ` (${i.pack})` : ''}`,
-        Number(i.mrp) > 0
-          ? money(i.mrp)
-          : '',
-        String(i.qty),
-        money(i.price),
-        money(i.amount)
-      ]
-    );
+  const body = (s.items || []).map((i, n) => [
+    String(n + 1),
+    String(i.code || ''),
+    `${i.name || ''}${i.pack ? ` (${i.pack})` : ''}`,
+    Number(i.mrp) > 0 ? pdfMoney(i.mrp) : '',
+    String(i.qty || 0),
+    pdfMoney(i.price),
+    pdfMoney(i.amount)
+  ]);
 
   doc.autoTable({
     startY: y,
     head,
     body,
-
     theme: 'grid',
-
-    margin: {
-      left,
-      right: 14
-    },
 
     styles: {
       font: 'helvetica',
-      fontSize: 7.6,
+      fontSize: 8,
+      cellPadding: 2,
       textColor: [45, 45, 45],
-      cellPadding: 1.8,
-      lineColor: [220, 220, 220],
-      lineWidth: 0.2,
+      lineColor: [210, 210, 210],
+      lineWidth: 0.25,
       valign: 'middle'
     },
 
@@ -579,18 +464,11 @@ async function renderInvoicePdf(s) {
       fillColor: [0, 91, 72],
       textColor: [255, 255, 255],
       fontStyle: 'bold',
-      fontSize: 7.5,
       halign: 'center',
-      valign: 'middle',
-      cellPadding: 2
+      valign: 'middle'
     },
 
     bodyStyles: {
-      fillColor: [255, 255, 255],
-      textColor: [45, 45, 45]
-    },
-
-    alternateRowStyles: {
       fillColor: [255, 255, 255]
     },
 
@@ -612,215 +490,156 @@ async function renderInvoicePdf(s) {
 
       3: {
         cellWidth: 22,
-        halign: 'right'
+        halign: 'right',
+        fontStyle: 'bold'
       },
 
       4: {
         cellWidth: 12,
-        halign: 'center'
+        halign: 'center',
+        fontStyle: 'bold'
       },
 
       5: {
         cellWidth: 27,
-        halign: 'right'
+        halign: 'right',
+        fontStyle: 'bold'
       },
 
       6: {
         cellWidth: 29,
-        halign: 'right'
+        halign: 'right',
+        fontStyle: 'bold'
       }
     },
 
-    didDrawPage: function () {
-      doc.setFont(
-        'helvetica',
-        'normal'
-      );
+    margin: {
+      left: 14,
+      right: 14
     }
   });
 
-  y =
-    doc.lastAutoTable.finalY + 7;
+  y = doc.lastAutoTable.finalY + 8;
 
-  /* =========================
-     TOTALS
-  ========================= */
+  // =========================
+  // TOTALS
+  // =========================
+  const packingText =
+    s.totals?.packing_display ||
+    (
+      typeof s.totals?.packing === 'number'
+        ? pdfMoney(s.totals.packing)
+        : String(s.totals?.packing || '')
+    );
 
   const rows = [
     [
       'Total MRP',
-      money(s.totals.mrp_total)
+      pdfMoney(s.totals?.mrp_total)
     ],
-
     [
       'Special Savings',
-      `- ${money(s.totals.savings)}`
+      `- ${pdfMoney(s.totals?.savings)}`
     ],
-
     [
       'Product Net Total',
-      money(s.totals.net_total)
+      pdfMoney(s.totals?.net_total)
     ],
-
     [
       'Packing Charges',
-      s.totals.packing_display ||
-      (
-        typeof s.totals.packing === 'number'
-          ? money(s.totals.packing)
-          : String(s.totals.packing)
-      )
+      packingText
     ],
-
     [
       'Transport',
-      s.totals.transport
+      String(s.totals?.transport || '')
     ],
-
     [
       'Grand Total',
-      money(s.totals.grand_total)
+      pdfMoney(s.totals?.grand_total)
     ]
   ];
 
   doc.autoTable({
     startY: y,
     body: rows,
-
     theme: 'plain',
-
-    tableWidth: 82,
+    tableWidth: 80,
 
     margin: {
-      left: 114
+      left: 116
     },
 
     styles: {
       font: 'helvetica',
-      fontSize: 8.5,
+      fontSize: 9,
+      cellPadding: 2,
       textColor: [45, 45, 45],
-      cellPadding: 1.8,
       valign: 'middle'
     },
 
     columnStyles: {
       0: {
+        cellWidth: 40,
         fontStyle: 'bold',
-        halign: 'left',
-        cellWidth: 43
+        halign: 'left'
       },
 
       1: {
-        halign: 'right',
-        cellWidth: 39
+        cellWidth: 40,
+        fontStyle: 'bold',
+        halign: 'right'
       }
     },
 
     didParseCell: function (data) {
-      if (
-        data.section === 'body' &&
-        data.row.index === 5
-      ) {
-        data.cell.styles.fillColor = [
-          169,
-          0,
-          90
-        ];
+      if (data.section !== 'body') return;
 
-        data.cell.styles.textColor = [
-          255,
-          255,
-          255
-        ];
+      // Special Savings - exact website green
+      if (data.row.index === 1) {
+        data.cell.styles.textColor = [39, 174, 96];
+      }
 
+      // Transport - exact website blue
+      if (data.row.index === 4) {
+        data.cell.styles.textColor = [22, 118, 210];
+      }
+
+      // Grand Total - exact website --discount-red = #D9364F
+      if (data.row.index === 5) {
+        data.cell.styles.fillColor = [217, 54, 79];
+        data.cell.styles.textColor = [255, 255, 255];
         data.cell.styles.fontStyle = 'bold';
-
-        data.cell.styles.fontSize = 9;
+        data.cell.styles.cellPadding = 3;
       }
     }
   });
 
-  y =
-    doc.lastAutoTable.finalY + 8;
+  y = doc.lastAutoTable.finalY + 10;
 
-  /* =========================
-     FOOTER LINE
-  ========================= */
-
-  doc.setDrawColor(
-    169,
-    0,
-    90
-  );
-
-  doc.setLineWidth(0.5);
-
-  doc.line(
-    left,
-    y,
-    right,
-    y
-  );
+  // =========================
+  // FOOTER
+  // =========================
+  doc.setDrawColor(169, 0, 90);
+  doc.setLineWidth(0.4);
+  doc.line(left, y, right, y);
 
   y += 6;
 
-  /* =========================
-     THANK YOU FOOTER
-  ========================= */
-
-  doc.setFont(
-    'helvetica',
-    'bold'
-  );
-
-  doc.setFontSize(8.5);
-
-  doc.setTextColor(
-    80,
-    80,
-    80
-  );
-
-  doc.text(
-    'Thank you for shopping with AMALA PYROTECH!',
-    pageWidth / 2,
-    y,
-    {
-      align: 'center'
-    }
-  );
-
-  y += 4.5;
-
-  doc.setFont(
-    'helvetica',
-    'normal'
-  );
-
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(8);
-
-  doc.setTextColor(
-    110,
-    110,
-    110
-  );
+  doc.setTextColor(120, 120, 120);
 
   doc.text(
-    'Have a Safe and Happy Diwali.',
-    pageWidth / 2,
+    'Thank you for shopping with AMALA PYROTECH! Have a Safe and Happy Diwali.',
+    105,
     y,
-    {
-      align: 'center'
-    }
+    { align: 'center' }
   );
 
-  /* =========================
-     SAVE PDF
-  ========================= */
-
-  doc.save(
-    `${s.order_id}-invoice.pdf`
-  );
+  // =========================
+  // DOWNLOAD
+  // =========================
+  doc.save(`${s.order_id}-invoice.pdf`);
 }
 
 
