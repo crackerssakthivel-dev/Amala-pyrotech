@@ -331,8 +331,8 @@ async function renderInvoicePdf(s) {
   // Using Rs. avoids broken ₹ glyphs in jsPDF built-in fonts.
   const pdfMoney = (value) => {
     const n = Number(value || 0);
-    return `Rs.${n.toFixed(2)}`;
-  };
+    return n.toFixed(2);
+};
 
   // =========================
   // COMPANY HEADER
