@@ -13,15 +13,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-                /* Remove mobile tap highlight */
-        a,
-        button,
-        input,
-        select,
-        textarea {
-            -webkit-tap-highlight-color: transparent;
-            tap-highlight-color: transparent;
+        /* Remove mobile tap highlight */
+        * {
+            -webkit-tap-highlight-color: transparent !important;
+            tap-highlight-color: transparent !important;
         }
+
+        a:focus,
+        a:active,
+        button:focus,
+        button:active {
+            outline: none !important;
+        }
+
         :root {
             --magenta-dark: #B0005A;
             --magenta-light: #C00063;
