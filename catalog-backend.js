@@ -97,8 +97,7 @@ async function loadCatalogBackend() {
             pack: p.pack || '1 Pkt',
             mrp: Number.isFinite(mrp) ? mrp : 0,
             price: Number.isFinite(price) ? price : 0,
-            img: mediaUrl(p.image_path) ||
-                'https://via.placeholder.com/200'
+            img: mediaUrl(p.image_path) || ''
         };
     });
 
