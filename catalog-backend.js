@@ -1,118 +1,188 @@
 async function loadCatalogBackend() {
 
+    const CACHE_KEY = 'amala_catalog_cache';
     const chips = document.getElementById('categoryChipsContainer');
 
-    // Show only the correct current category button immediately
-    if (chips) {
-        chips.innerHTML =
-            `<div class="cat-chip active" onclick="filterCategory('All')">All Products</div>`;
-    }
+    function applyProducts(rawProducts) {
 
-    // Load Logo, Hero and Products at the same time
-    const settingsPromise = sb
-        .from('site_settings')
-        .select('logo_path')
-        .eq('id', 1)
-        .maybeSingle();
+        productsData = (rawProducts || []).map(p => {
 
-    const bannersPromise = sb
-        .from('hero_banners')
-        .select('storage_path')
-        .order('sort_order')
-        .order('id');
+            const mrp = Number(p.mrp);
+            const price = Number(p.price);
 
-    const productsPromise = sb
-        .from('products')
-        .select('id,code,name,pack,mrp,price,image_path,category_id,categories(name,offer_percent)')
-        .eq('active', true)
-        .order('id');
+            let discountPercent = 0;
 
-    const [
-        { data: settings, error: settingsError },
-        { data: banners, error: bannersError },
-        { data, error }
-    ] = await Promise.all([
-        settingsPromise,
-        bannersPromise,
-        productsPromise
-    ]);
+            if (mrp > 0 && price < mrp) {
+                discountPercent =
+                    Math.round(((mrp - price) / mrp) * 10000) / 100;
+            }
 
-    // LOGO
-    if (settingsError) {
-        console.error('Site settings error:', settingsError);
-    }
-
-    const headerLogo = document.getElementById('headerLogo');
-
-    if (headerLogo && settings?.logo_path) {
-        headerLogo.src = mediaUrl(settings.logo_path);
-    }
-
-    // HERO BANNERS
-    if (bannersError) {
-        console.error('Hero banners error:', bannersError);
-    }
-
-    const heroCarousel = document.getElementById('heroCarousel');
-
-    if (heroCarousel && banners) {
-        heroCarousel.innerHTML = '';
-
-        banners.forEach((banner, index) => {
-            const slide = document.createElement('div');
-
-            slide.className =
-                `hero-slide ${index === 0 ? 'active' : ''}`;
-
-            slide.style.backgroundImage =
-                `url('${mediaUrl(banner.storage_path)}')`;
-
-            heroCarousel.appendChild(slide);
+            return {
+                id: p.id,
+                code: p.code,
+                name: p.name,
+                cat: p.categories?.name || 'Uncategorized',
+                offerPercent: discountPercent,
+                pack: p.pack || '1 Pkt',
+                mrp: Number.isFinite(mrp) ? mrp : 0,
+                price: Number.isFinite(price) ? price : 0,
+                img: mediaUrl(p.image_path) || ''
+            };
         });
+
+        const cats = [
+            ...new Set(productsData.map(p => p.cat))
+        ];
+
+        if (chips) {
+            chips.innerHTML =
+                `<div class="cat-chip active" onclick="filterCategory('All')">All Products</div>` +
+                cats.map(c =>
+                    `<div class="cat-chip" onclick="filterCategory('${String(c).replace(/'/g, "\\'")}')">${c}</div>`
+                ).join('');
+        }
     }
 
-    // PRODUCTS
-    if (error) {
-        throw error;
-    }
+    async function refreshFromSupabase() {
 
-    productsData = (data || []).map(p => {
+        const settingsPromise = sb
+            .from('site_settings')
+            .select('logo_path')
+            .eq('id', 1)
+            .maybeSingle();
 
-        const mrp = Number(p.mrp);
-        const price = Number(p.price);
+        const bannersPromise = sb
+            .from('hero_banners')
+            .select('storage_path')
+            .order('sort_order')
+            .order('id');
 
-        let discountPercent = 0;
+        const productsPromise = sb
+            .from('products')
+            .select('id,code,name,pack,mrp,price,image_path,category_id,categories(name,offer_percent)')
+            .eq('active', true)
+            .order('id');
 
-        if (mrp > 0 && price < mrp) {
-            discountPercent =
-                Math.round(((mrp - price) / mrp) * 10000) / 100;
+        const [
+            { data: settings, error: settingsError },
+            { data: banners, error: bannersError },
+            { data, error }
+        ] = await Promise.all([
+            settingsPromise,
+            bannersPromise,
+            productsPromise
+        ]);
+
+        if (settingsError) {
+            console.error('Site settings error:', settingsError);
         }
 
-        return {
-            id: p.id,
-            code: p.code,
-            name: p.name,
-            cat: p.categories?.name || 'Uncategorized',
-            offerPercent: discountPercent,
-            pack: p.pack || '1 Pkt',
-            mrp: Number.isFinite(mrp) ? mrp : 0,
-            price: Number.isFinite(price) ? price : 0,
-            img: mediaUrl(p.image_path) || ''
+        if (bannersError) {
+            console.error('Hero banners error:', bannersError);
+        }
+
+        if (error) {
+            throw error;
+        }
+
+        const cacheData = {
+            settings: settings || null,
+            banners: banners || [],
+            products: data || [],
+            savedAt: Date.now()
         };
-    });
 
-    // CATEGORIES
-    const cats = [
-        ...new Set(productsData.map(p => p.cat))
-    ];
+        sessionStorage.setItem(
+            CACHE_KEY,
+            JSON.stringify(cacheData)
+        );
 
-    if (chips) {
-        chips.innerHTML =
-            `<div class="cat-chip active" onclick="filterCategory('All')">All Products</div>` +
-            cats.map(c =>
-                `<div class="cat-chip" onclick="filterCategory('${String(c).replace(/'/g, "\\'")}')">${c}</div>`
-            ).join('');
+        const headerLogo = document.getElementById('headerLogo');
+
+        if (headerLogo && settings?.logo_path) {
+            headerLogo.src = mediaUrl(settings.logo_path);
+        }
+
+        const heroCarousel = document.getElementById('heroCarousel');
+
+        if (heroCarousel && banners) {
+
+            heroCarousel.innerHTML = '';
+
+            banners.forEach((banner, index) => {
+
+                const slide = document.createElement('div');
+
+                slide.className =
+                    `hero-slide ${index === 0 ? 'active' : ''}`;
+
+                slide.style.backgroundImage =
+                    `url('${mediaUrl(banner.storage_path)}')`;
+
+                heroCarousel.appendChild(slide);
+            });
+        }
+
+        applyProducts(data || []);
     }
+
+    // FIRST: Try instant cache
+    let cached = null;
+
+    try {
+        cached = JSON.parse(
+            sessionStorage.getItem(CACHE_KEY) || 'null'
+        );
+    } catch (e) {
+        cached = null;
+    }
+
+    if (cached && Array.isArray(cached.products)) {
+
+        // Show cached products/categories immediately
+        applyProducts(cached.products);
+
+        // Show cached logo immediately
+        const headerLogo = document.getElementById('headerLogo');
+
+        if (headerLogo && cached.settings?.logo_path) {
+            headerLogo.src =
+                mediaUrl(cached.settings.logo_path);
+        }
+
+        // Show cached hero immediately
+        const heroCarousel =
+            document.getElementById('heroCarousel');
+
+        if (heroCarousel && Array.isArray(cached.banners)) {
+
+            heroCarousel.innerHTML = '';
+
+            cached.banners.forEach((banner, index) => {
+
+                const slide = document.createElement('div');
+
+                slide.className =
+                    `hero-slide ${index === 0 ? 'active' : ''}`;
+
+                slide.style.backgroundImage =
+                    `url('${mediaUrl(banner.storage_path)}')`;
+
+                heroCarousel.appendChild(slide);
+            });
+        }
+
+        // Refresh latest Supabase data in background
+        refreshFromSupabase()
+            .catch(e =>
+                console.error('Catalog background refresh failed:', e)
+            );
+
+        return;
+    }
+
+    // No cache: first visit loads normally
+    await refreshFromSupabase();
 }
 
 
