@@ -29,9 +29,10 @@ function preloadImages(urls) {
 async function loadAmalaHome() {
   try {
     /*
-     * LOAD SETTINGS + HERO + GALLERY TOGETHER
+     * LOAD SETTINGS + HERO IMAGES FIRST
+     * Gallery must NOT block Logo or Hero.
      */
-    const [settingsResult, bannersResult, galleryResult] =
+    const [settingsResult, bannersResult] =
       await Promise.all([
         sb
           .from('site_settings')
@@ -41,12 +42,6 @@ async function loadAmalaHome() {
 
         sb
           .from('hero_banners')
-          .select('*')
-          .order('sort_order')
-          .order('id'),
-
-        sb
-          .from('gallery_images')
           .select('*')
           .order('sort_order')
           .order('id')
@@ -66,16 +61,8 @@ async function loadAmalaHome() {
       );
     }
 
-    if (galleryResult.error) {
-      console.error(
-        'GALLERY ERROR:',
-        galleryResult.error
-      );
-    }
-
     const settings = settingsResult.data || {};
     const banners = bannersResult.data || [];
-    const gallery = galleryResult.data || [];
 
     /*
      * BASIC SETTINGS
@@ -111,13 +98,6 @@ async function loadAmalaHome() {
       .map(item => mediaUrl(item.storage_path))
       .filter(Boolean);
 
-    /*
-     * REAL SUPABASE GALLERY IMAGES
-     */
-    const galleryImages = gallery
-      .map(item => mediaUrl(item.storage_path))
-      .filter(Boolean);
-
     console.log(
       'AMALA PYROTECH HERO IMAGES:',
       heroImages
@@ -127,6 +107,18 @@ async function loadAmalaHome() {
       'AMALA PYROTECH LOGO:',
       logoUrl
     );
+
+    /*
+     * START LOGO + FIRST HERO REQUEST
+     * IMMEDIATELY.
+     */
+    if (logoUrl) {
+      preloadImage(logoUrl, 'high');
+    }
+
+    if (heroImages.length > 0) {
+      preloadImage(heroImages[0], 'high');
+    }
 
     /*
      * SET COMPANY TEXT
@@ -161,17 +153,18 @@ async function loadAmalaHome() {
           el.src = logoUrl;
           el.removeAttribute('data-src');
 
+          try {
+            el.fetchPriority = 'high';
+            el.loading = 'eager';
+            el.decoding = 'async';
+          } catch (e) {}
+
           el.onload = () => {
             el.style.visibility = 'visible';
             el.style.opacity = '1';
           };
         }
       });
-
-      /*
-       * Start logo preload in background.
-       */
-      preloadImage(logoUrl, 'high');
     }
 
     /*
@@ -243,10 +236,6 @@ async function loadAmalaHome() {
 
     /*
      * HERO SLIDER
-     *
-     * IMPORTANT:
-     * Remove the random/static hero completely
-     * and replace it with Supabase images.
      */
     const sliderContainer =
       document.getElementById('hero-slider-container');
@@ -285,19 +274,6 @@ async function loadAmalaHome() {
       sliderContainer.innerHTML =
         slidesHTML + arrowsHTML;
 
-      /*
-       * Make sure the first real Supabase hero
-       * is immediately available.
-       */
-      sliderContainer
-        .querySelectorAll('.hero-slide')
-        .forEach((slide, index) => {
-
-          slide.style.backgroundImage =
-            `url("${heroImages[index]}")`;
-
-        });
-
     } else {
 
       console.warn(
@@ -307,48 +283,79 @@ async function loadAmalaHome() {
     }
 
     /*
-     * GALLERY
+     * LOAD GALLERY SEPARATELY.
+     * Gallery must NOT block Logo or Hero.
      */
-    const galleryContainer =
-      document.getElementById(
-        'dynamic-gallery-container'
-      );
+    setTimeout(async () => {
 
-    if (
-      galleryContainer &&
-      galleryImages.length > 0
-    ) {
+      try {
 
-      galleryContainer.innerHTML =
-        galleryImages
-          .map(img => `
-            <div class="dynamic-gallery-item">
-              <img
-                src="${img}"
-                alt="Fireworks Gallery"
-                loading="lazy"
-                decoding="async"
-              >
-            </div>
-          `)
-          .join('');
+        const { data: gallery, error } =
+          await sb
+            .from('gallery_images')
+            .select('*')
+            .order('sort_order')
+            .order('id');
 
-    }
+        if (error) {
+          console.error(
+            'GALLERY ERROR:',
+            error
+          );
+          return;
+        }
 
-    /*
-     * BACKGROUND PRELOAD
-     *
-     * First hero + logo were already started above.
-     * Remaining images load without blocking the page.
-     */
-    setTimeout(() => {
+        const galleryImages = (gallery || [])
+          .map(item => mediaUrl(item.storage_path))
+          .filter(Boolean);
 
-      preloadImages([
-        ...heroImages,
-        ...galleryImages
-      ]);
+        /*
+         * GALLERY
+         */
+        const galleryContainer =
+          document.getElementById(
+            'dynamic-gallery-container'
+          );
 
-    }, 50);
+        if (
+          galleryContainer &&
+          galleryImages.length > 0
+        ) {
+
+          galleryContainer.innerHTML =
+            galleryImages
+              .map(img => `
+                <div class="dynamic-gallery-item">
+                  <img
+                    src="${img}"
+                    alt="Fireworks Gallery"
+                    loading="eager"
+                    decoding="async"
+                  >
+                </div>
+              `)
+              .join('');
+
+        }
+
+        /*
+         * BACKGROUND PRELOAD
+         */
+        preloadImages([
+          ...heroImages,
+          ...galleryImages
+        ]);
+
+      } catch (error) {
+
+        console.error(
+          'GALLERY LOAD ERROR:',
+          error
+        );
+
+      }
+
+    }, 0);
 
   } catch (error) {
 
@@ -369,8 +376,21 @@ async function loadAmalaHome() {
 
 
 /*
- * START AFTER PAGE LOAD
+ * START AS SOON AS HTML IS READY.
+ * Do NOT wait for window load.
  */
-window.addEventListener('load', () => {
+if (document.readyState === 'loading') {
+
+  document.addEventListener(
+    'DOMContentLoaded',
+    () => {
+      loadAmalaHome();
+    },
+    { once: true }
+  );
+
+} else {
+
   loadAmalaHome();
-});
+
+}
