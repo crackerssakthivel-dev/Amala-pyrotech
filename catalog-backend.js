@@ -447,17 +447,212 @@ async function renderInvoicePdf(s) {
   );
 
   y += 5;
+async function renderInvoicePdf(s) {
+  const { jsPDF } = window.jspdf;
+
+  const doc =
+    new jsPDF({
+      unit: 'mm',
+      format: 'a4'
+    });
+
+  const pageWidth = 210;
+  const left = 14;
+  const right = 196;
+  let y = 16;
+
+  /* =========================
+     COMPANY HEADER
+  ========================= */
+
+  doc.setFont(
+    'helvetica',
+    'bold'
+  );
+
+  doc.setFontSize(18);
+
+  doc.setTextColor(
+    169,
+    0,
+    90
+  );
 
   doc.text(
-    `Address: ${s.customer.address}, ${s.customer.town}, ${s.customer.district}, ${s.customer.state} - ${s.customer.pincode}`,
-    left,
+    s.company_name,
+    pageWidth / 2,
     y,
     {
-      maxWidth: 180
+      align: 'center'
     }
   );
 
-  y += 9;
+  y += 6;
+
+  doc.setFont(
+    'helvetica',
+    'normal'
+  );
+
+  doc.setFontSize(9);
+
+  doc.setTextColor(
+    70,
+    70,
+    70
+  );
+
+  doc.text(
+    s.tagline,
+    pageWidth / 2,
+    y,
+    {
+      align: 'center'
+    }
+  );
+
+  y += 4.5;
+
+  doc.text(
+    s.address,
+    pageWidth / 2,
+    y,
+    {
+      align: 'center'
+    }
+  );
+
+  y += 4.5;
+
+  doc.text(
+    `WhatsApp: ${s.whatsapp} | Phone: ${s.phone}`,
+    pageWidth / 2,
+    y,
+    {
+      align: 'center'
+    }
+  );
+
+  y += 6;
+
+  /* =========================
+     PINK HORIZONTAL LINE
+  ========================= */
+
+  doc.setDrawColor(
+    169,
+    0,
+    90
+  );
+
+  doc.setLineWidth(0.6);
+
+  doc.line(
+    left,
+    y,
+    right,
+    y
+  );
+
+  y += 7;
+
+  /* =========================
+     CUSTOMER / ORDER DETAILS
+  ========================= */
+
+  doc.setFont(
+    'helvetica',
+    'bold'
+  );
+
+  doc.setFontSize(10);
+
+  doc.setTextColor(
+    40,
+    40,
+    40
+  );
+
+  doc.text(
+    'Customer Details',
+    left,
+    y
+  );
+
+  doc.text(
+    'Order Invoice',
+    right,
+    y,
+    {
+      align: 'right'
+    }
+  );
+
+  y += 5;
+
+  doc.setFont(
+    'helvetica',
+    'normal'
+  );
+
+  doc.setFontSize(8.5);
+
+  doc.text(
+    `Name: ${s.customer.name}`,
+    left,
+    y
+  );
+
+  doc.text(
+    `Order ID: ${s.order_id}`,
+    right,
+    y,
+    {
+      align: 'right'
+    }
+  );
+
+  y += 4.5;
+
+  doc.text(
+    `Mobile: ${s.customer.mobile}`,
+    left,
+    y
+  );
+
+  doc.text(
+    `Date: ${new Date(s.date).toLocaleDateString('en-IN')}`,
+    right,
+    y,
+    {
+      align: 'right'
+    }
+  );
+
+  y += 4.5;
+
+  const customerAddress =
+    `Address: ${s.customer.address}, ${s.customer.town}, ${s.customer.district}, ${s.customer.state} - ${s.customer.pincode}`;
+
+  const addressLines =
+    doc.splitTextToSize(
+      customerAddress,
+      110
+    );
+
+  doc.text(
+    addressLines,
+    left,
+    y
+  );
+
+  y +=
+    (addressLines.length * 4) + 6;
+
+  /* =========================
+     PRODUCT TABLE
+     GREEN HEADER + WHITE ROWS
+  ========================= */
 
   const head = [
     [
@@ -476,8 +671,10 @@ async function renderInvoicePdf(s) {
       (i, n) => [
         String(n + 1),
         i.code,
-        `${i.name} (${i.pack || ''})`,
-        money(i.mrp),
+        `${i.name}${i.pack ? ` (${i.pack})` : ''}`,
+        Number(i.mrp) > 0
+          ? money(i.mrp)
+          : '',
         String(i.qty),
         money(i.price),
         money(i.amount)
@@ -488,33 +685,111 @@ async function renderInvoicePdf(s) {
     startY: y,
     head,
     body,
+
     theme: 'grid',
-    styles: {
-      fontSize: 8,
-      cellPadding: 2
+
+    margin: {
+      left,
+      right: 14
     },
+
+    styles: {
+      font: 'helvetica',
+      fontSize: 7.6,
+      textColor: [45, 45, 45],
+      cellPadding: 1.8,
+      lineColor: [220, 220, 220],
+      lineWidth: 0.2,
+      valign: 'middle'
+    },
+
     headStyles: {
       fillColor: [0, 91, 72],
-      textColor: 255
+      textColor: [255, 255, 255],
+      fontStyle: 'bold',
+      fontSize: 7.5,
+      halign: 'center',
+      valign: 'middle',
+      cellPadding: 2
+    },
+
+    bodyStyles: {
+      fillColor: [255, 255, 255],
+      textColor: [45, 45, 45]
+    },
+
+    alternateRowStyles: {
+      fillColor: [255, 255, 255]
+    },
+
+    columnStyles: {
+      0: {
+        cellWidth: 10,
+        halign: 'center'
+      },
+
+      1: {
+        cellWidth: 20,
+        halign: 'center'
+      },
+
+      2: {
+        cellWidth: 66,
+        halign: 'left'
+      },
+
+      3: {
+        cellWidth: 22,
+        halign: 'right'
+      },
+
+      4: {
+        cellWidth: 12,
+        halign: 'center'
+      },
+
+      5: {
+        cellWidth: 27,
+        halign: 'right'
+      },
+
+      6: {
+        cellWidth: 29,
+        halign: 'right'
+      }
+    },
+
+    didDrawPage: function () {
+      doc.setFont(
+        'helvetica',
+        'normal'
+      );
     }
   });
 
   y =
-    doc.lastAutoTable.finalY + 8;
+    doc.lastAutoTable.finalY + 7;
+
+  /* =========================
+     TOTALS
+  ========================= */
 
   const rows = [
     [
       'Total MRP',
       money(s.totals.mrp_total)
     ],
+
     [
       'Special Savings',
       `- ${money(s.totals.savings)}`
     ],
+
     [
       'Product Net Total',
       money(s.totals.net_total)
     ],
+
     [
       'Packing Charges',
       s.totals.packing_display ||
@@ -524,10 +799,12 @@ async function renderInvoicePdf(s) {
           : String(s.totals.packing)
       )
     ],
+
     [
       'Transport',
       s.totals.transport
     ],
+
     [
       'Grand Total',
       money(s.totals.grand_total)
@@ -537,38 +814,137 @@ async function renderInvoicePdf(s) {
   doc.autoTable({
     startY: y,
     body: rows,
+
     theme: 'plain',
-    tableWidth: 80,
+
+    tableWidth: 82,
+
     margin: {
-      left: 116
+      left: 114
     },
+
     styles: {
-      fontSize: 9,
-      cellPadding: 2
+      font: 'helvetica',
+      fontSize: 8.5,
+      textColor: [45, 45, 45],
+      cellPadding: 1.8,
+      valign: 'middle'
     },
+
     columnStyles: {
       0: {
-        fontStyle: 'bold'
+        fontStyle: 'bold',
+        halign: 'left',
+        cellWidth: 43
+      },
+
+      1: {
+        halign: 'right',
+        cellWidth: 39
+      }
+    },
+
+    didParseCell: function (data) {
+      if (
+        data.section === 'body' &&
+        data.row.index === 5
+      ) {
+        data.cell.styles.fillColor = [
+          169,
+          0,
+          90
+        ];
+
+        data.cell.styles.textColor = [
+          255,
+          255,
+          255
+        ];
+
+        data.cell.styles.fontStyle = 'bold';
+
+        data.cell.styles.fontSize = 9;
       }
     }
   });
 
   y =
-    doc.lastAutoTable.finalY + 10;
+    doc.lastAutoTable.finalY + 8;
+
+  /* =========================
+     FOOTER LINE
+  ========================= */
+
+  doc.setDrawColor(
+    169,
+    0,
+    90
+  );
+
+  doc.setLineWidth(0.5);
+
+  doc.line(
+    left,
+    y,
+    right,
+    y
+  );
+
+  y += 6;
+
+  /* =========================
+     THANK YOU FOOTER
+  ========================= */
+
+  doc.setFont(
+    'helvetica',
+    'bold'
+  );
+
+  doc.setFontSize(8.5);
+
+  doc.setTextColor(
+    80,
+    80,
+    80
+  );
+
+  doc.text(
+    'Thank you for shopping with AMALA PYROTECH!',
+    pageWidth / 2,
+    y,
+    {
+      align: 'center'
+    }
+  );
+
+  y += 4.5;
+
+  doc.setFont(
+    'helvetica',
+    'normal'
+  );
 
   doc.setFontSize(8);
 
   doc.setTextColor(
-    120,
-    120,
-    120
+    110,
+    110,
+    110
   );
 
   doc.text(
-    'Thank you for shopping with AMALA PYROTECH! Have a Safe and Happy Diwali.',
-    left,
-    y
+    'Have a Safe and Happy Diwali.',
+    pageWidth / 2,
+    y,
+    {
+      align: 'center'
+    }
   );
+
+  /* =========================
+     SAVE PDF
+  ========================= */
 
   doc.save(
     `${s.order_id}-invoice.pdf`
