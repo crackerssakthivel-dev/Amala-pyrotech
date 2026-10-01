@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order | AMALA PYROTECH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="supabase-config.js"></script><script src="supabase-client.js"></script>
+    <style>
+        body { background: #f8f9fa; font-family: 'Poppins', sans-serif; padding: 20px; color: #202838; }
+        .track-container { max-width: 500px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
+        h2 { color: #A9005A; margin-bottom: 10px; font-size: 22px; }
+        p { font-size: 13px; color: #666; margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; margin-bottom: 15px; box-sizing: border-box; text-align: center; }
+        button { background: #B0005A; color: #fff; border: none; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 8px; width: 100%; cursor: pointer; }
+        button:hover { background: #A9005A; }
+        .result-box { margin-top: 20px; padding: 15px; background: #FFF0F7; border: 1px solid #FFD1EA; border-radius: 8px; display: none; font-size: 13px; text-align: left; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none; font-size: 13px; }
+    </style>
+</head>
+<body>
+
+    <div class="track-container">
+        <h2>Track Your Order</h2>
+        <p>Enter your Order ID or Mobile Number to check delivery status.</p>
+        <input type="text" id="order-input" placeholder="Enter Order ID / Mobile Number">
+        <button onclick="trackOrder()">Track Status</button>
+
+        <div class="result-box" id="resultBox">
+            <strong>Order Status:</strong> <span id="statusText" style="color: #28A745; font-weight: 600;">Dispatch Ready / Lorry Receipt (LR) Generated. Will be delivered soon!</span>
+        </div>
+
+        <a href="index.html" class="back-link">← Back to Home Page</a>
+    </div>
+
+    <script>
+        async function trackOrder() {
+            const val=document.getElementById('order-input').value.trim(); const res=document.getElementById('resultBox');
+            if(!val){alert('Please enter Order ID or Mobile Number');res.style.display='none';return;}
+            const {data,error}=await sb.rpc('track_order',{p_value:val});
+            if(error){console.error(error);alert('Unable to check order status right now.');return;}
+            if(!data||!data.length){res.style.display='block';document.getElementById('statusText').innerText='Order not found. Please check your Order ID / Mobile Number.';return;}
+            const o=data[0]; const labels={pending:'Order Received / Pending Confirmation',confirmed:'Order Confirmed / Processing',cancelled:'Order Cancelled'};
+            res.style.display='block'; document.getElementById('statusText').innerText=labels[o.status]||o.status;
+        }
+    </script>
+</body>
+</html>

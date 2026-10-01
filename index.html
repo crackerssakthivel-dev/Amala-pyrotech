@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMALA PYROTECH | Direct Sivakasi Factory Crackers Wholesale</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Amala Pyrotech - Sivakasi's leading factory-direct wholesale fireworks destination with authentic Sivakasi quality, massive discounts up to 85% off MRP, and direct transport booking.">
+    <meta name="keywords" content="Amala Pyrotech, Sivakasi Crackers, Direct Factory Wholesale Fireworks, Online Crackers Shopping, Diwali Crackers">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --magenta-dark: #B0005A;
+            --magenta-light: #C00063;
+            --berry: #A9005A;
+            --wine: #8F003D;
+            --wine-light: #A60048;
+            --navy-dark: #080318;
+            --navy-footer: #0F0371;
+            --gold: #FFD000;
+            --white: #FFFFFF;
+            --charcoal: #202838;
+            --gray-light: #E5E5E5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: var(--charcoal);
+            overflow-x: hidden;
+            padding-bottom: 70px;
+        }
+
+        /* --- RESPONSIVE LAYOUT --- */
+        .main-container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 25px rgba(0,0,0,0.15);
+        }
+
+        @media (min-width: 1024px) {
+            .main-container {
+                max-width: 1200px;
+            }
+        }
+
+        /* --- FIREWORKS CANVAS --- */
+        #fireworks-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        /* --- 1. TOP ANNOUNCEMENT BAR --- */
+        .announcement-bar {
+            background: linear-gradient(90deg, var(--magenta-dark), var(--magenta-light));
+            color: var(--white);
+            padding: 6px 0;
+            font-size: 12px;
+            font-weight: 600;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* --- 2. MAIN HEADER --- */
+        .main-header {
+            background: var(--white);
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo-area img {
+            height: 35px;
+            width: 35px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 2px solid var(--berry);
+        }
+        .logo-area h1 {
+            font-size: 16px;
+            color: var(--berry);
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+        .header-btns {
+            display: flex;
+            gap: 6px;
+        }
+        .h-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 15px;
+        }
+        .h-whatsapp { background: #25D366; color: var(--white); }
+        .h-call, .h-menu { background: #F2F2F2; color: var(--berry); }
+
+        /* --- SIDE MENU OVERLAY --- */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100%;
+            background: var(--white);
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            z-index: 2000;
+            transition: 0.3s ease;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .side-menu.open {
+            right: 0;
+        }
+        .side-menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--gray-light);
+            padding-bottom: 10px;
+        }
+        .side-menu-header h3 {
+            color: var(--berry);
+            font-size: 16px;
+        }
+        .close-menu {
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--charcoal);
+        }
+        .side-menu-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .side-menu-links a {
+            text-decoration: none;
+            color: var(--charcoal);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .side-menu-links a:hover {
+            background: #FFF0F7;
+            color: var(--berry);
+        }
+        .side-menu-links a i {
+            color: var(--berry);
+            width: 20px;
+        }
+
+        /* --- 3. HERO BANNER / SLIDER --- */
+        .hero-slider {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            z-index: 4;
+        }
+        @media (min-width: 1024px) {
+            .hero-slider { height: 380px; }
+        }
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-slide.active {
+            opacity: 1;
+        }
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.5);
+            color: var(--white);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .slider-arrow.prev { left: 10px; }
+        .slider-arrow.next { right: 10px; }
+
+        /* --- 4. WELCOME SECTION --- */
+        .welcome-section {
+            background: var(--white);
+            padding: 25px 16px;
+            text-align: center;
+            position: relative;
+            z-index: 4;
+        }
+        .festive-greeting {
+            font-size: 13px;
+            font-weight: 700;
+            color: #FF6600;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .welcome-badge {
+            display: inline-block;
+            background: #FFF0F7;
+            border: 1px solid #FFD1EA;
+            color: var(--berry);
+            padding: 5px 14px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .welcome-section h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--berry);
+            font-size: 22px;
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+        .welcome-section p {
+            font-size: 12px;
+            color: var(--charcoal);
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .pill-btn {
+            background: var(--magenta-dark);
+            color: var(--white);
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(176, 0, 90, 0.3);
+            transition: 0.3s;
+        }
+        .pill-btn:hover {
+            background: var(--berry);
+        }
+
+        /* --- 6. OUR SPECIALITIES --- */
+        .specialities-section {
+            background: var(--navy-dark);
+            color: var(--white);
+            padding: 30px 16px;
+            text-align: center;
+            position: relative;
+            z-index: 4;
+        }
+        .specialities-section h2 {
+            font-size: 22px;
+            margin-bottom: 8px;
+            font-family: 'Playfair Display', serif;
+        }
+        .specialities-section p {
+            font-size: 12px;
+            color: #D0D0D0;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            line-height: 1.5;
+        }
+
+        /* --- 7 & 8. STATISTICS CARDS & ICON CIRCLES --- */
+        .stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            padding: 5px 0;
+        }
+        @media (min-width: 1024px) {
+            .stats-container {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+            }
+        }
+        .stat-card {
+            background: var(--white);
+            color: var(--charcoal);
+            border-radius: 14px;
+            padding: 22px 15px 15px 15px;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-top: 4px solid var(--berry);
+            margin-top: 12px;
+        }
+        .stat-icon-circle {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: var(--berry);
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+        }
+        .stat-number {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--berry);
+            margin-top: 4px;
+        }
+        .stat-number span {
+            color: var(--gold);
+        }
+        .stat-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-top: 4px;
+        }
+
+        /* --- 9. FIREWORKS GALLERY --- */
+        .gallery-section {
+            background: var(--white);
+            padding: 25px 16px;
+            position: relative;
+            z-index: 4;
+        }
+        .gallery-grid-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        @media (min-width: 1024px) {
+            .gallery-grid-wrapper {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .main-gallery-card {
+            background: #000;
+            border-radius: 14px;
+            overflow: hidden;
+            text-align: center;
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .gallery-img-container {
+            height: 180px;
+            position: relative;
+            overflow: hidden;
+        }
+        .gallery-img-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-text-overlay {
+            padding: 15px;
+            background: #000000;
+        }
+        .gallery-text-overlay h3 {
+            font-size: 18px;
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 4px;
+        }
+        .gallery-text-overlay p {
+            font-size: 11px;
+            color: #CCCCCC;
+        }
+        
+        .dynamic-gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .dynamic-gallery-item {
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+        .dynamic-gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* --- 11 & 12. FEATURE CARDS & ICONS --- */
+        .features-section {
+            padding: 20px 16px;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            position: relative;
+            z-index: 4;
+        }
+        @media (min-width: 1024px) {
+            .features-section {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        .feature-card {
+            background: var(--white);
+            border: 1px solid var(--gray-light);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 16px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #FFF;
+        }
+        .fi-1 { background: var(--berry); }
+        .fi-2 { background: #0099FF; }
+        .fi-3 { background: #FF9900; }
+        .fi-4 { background: #28A745; }
+        
+        .feature-content h4 {
+            font-size: 15px;
+            color: var(--berry);
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+        .feature-content p {
+            font-size: 11px;
+            color: #707070;
+            line-height: 1.5;
+        }
+
+        /* --- 13. BRAND / TRUST CARD --- */
+        .trust-section {
+            padding: 20px 16px;
+            background: var(--white);
+            position: relative;
+            z-index: 4;
+        }
+        .trust-card {
+            background: var(--white);
+            border: 2px solid var(--gold);
+            border-radius: 14px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .trust-logo {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            margin: 0 auto 12px auto;
+            display: block;
+        }
+        .trust-badge {
+            background: var(--gold);
+            color: var(--charcoal);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* --- 14. PROMOTIONAL GRADIENT SECTION --- */
+        .promo-gradient-section {
+            background: linear-gradient(135deg, #6D0B6A, #370768, #0F0371);
+            padding: 35px 16px;
+            text-align: center;
+            color: var(--white);
+            position: relative;
+            z-index: 4;
+        }
+        .promo-gradient-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        .promo-gradient-section p {
+            font-size: 12px;
+            margin-bottom: 15px;
+            color: #E0E0E0;
+        }
+        .yellow-btn {
+            background: var(--gold);
+            color: var(--charcoal);
+            padding: 10px 25px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 13px;
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(255, 208, 0, 0.3);
+        }
+
+        /* --- 15. WHY CHOOSE SECTION --- */
+        .why-choose-section {
+            background: var(--white);
+            padding: 25px 16px;
+            text-align: center;
+            position: relative;
+            z-index: 4;
+        }
+        .why-badge {
+            background: #FFF9E6;
+            border: 1px solid var(--gold);
+            color: var(--charcoal);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        .why-choose-section h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--berry);
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .why-points {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--berry);
+            margin-bottom: 10px;
+        }
+        .why-desc {
+            font-size: 11px;
+            color: #707070;
+            line-height: 1.6;
+        }
+
+        /* --- 16 & 17. FOOTER & CONTACT --- */
+        .footer {
+            background: linear-gradient(180deg, #0C0170, #18006F);
+            color: var(--white);
+            padding: 30px 16px 20px 16px;
+            text-align: center;
+            position: relative;
+            z-index: 4;
+        }
+        .footer-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            object-fit: contain;
+            margin: 0 auto 10px auto;
+            display: block;
+        }
+        .footer h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--white);
+        }
+        .quick-links-title {
+            color: var(--gold);
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+        .quick-links-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        .quick-link-pill {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            color: var(--white);
+            text-decoration: none;
+        }
+        .footer-contact-info {
+            font-size: 11px;
+            line-height: 1.6;
+            color: #E0E0E0;
+            margin-top: 12px;
+        }
+        .footer-contact-info i {
+            color: var(--gold);
+            margin-right: 6px;
+        }
+
+        /* --- 18. FLOATING INSTAGRAM / YOUTUBE --- */
+        .float-social {
+            position: fixed;
+            right: 10px;
+            top: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 999;
+        }
+        .social-ico {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 16px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            text-decoration: none;
+        }
+        .s-insta { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+        .s-youtube { background: #FF0000; }
+
+        /* --- 19. FLOATING CALL / WHATSAPP --- */
+        .float-contact {
+            position: fixed;
+            left: 10px;
+            bottom: 90px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 999;
+        }
+        .contact-ico {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 18px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            text-decoration: none;
+        }
+        .c-call { background: linear-gradient(135deg, #0072FF, #00C6FF); }
+        .c-whatsapp { background: #25D366; }
+
+        /* --- 20. QUICK PURCHASE --- */
+        .quick-purchase-float {
+            position: fixed;
+            right: 10px;
+            bottom: 75px;
+            background: linear-gradient(135deg, #FF9900, #FF3300);
+            color: var(--white);
+            padding: 7px 12px;
+            border-radius: 25px;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(255, 102, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 998;
+            text-decoration: none;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-5px);}
+            60% {transform: translateY(-3px);}
+        }
+
+        /* --- 21. FIXED MOBILE BOTTOM NAVIGATION --- */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--white);
+            display: flex;
+            justify-content: space-around;
+            padding: 6px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+            z-index: 1000;
+        }
+        .nav-item {
+            text-align: center;
+            text-decoration: none;
+            font-size: 9px;
+            font-weight: 600;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .nav-item i { font-size: 15px; }
+        .n-home { color: var(--magenta-dark); }
+        .n-products { color: #505868; }
+        .n-pricelist { color: #FF9900; }
+        .n-whatsapp { color: #25D366; }
+        .n-call { color: #505868; }
+        .n-track { color: #8F003D; }
+
+        @media (min-width: 1024px) {
+            .mobile-bottom-nav {
+                max-width: 1200px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+
+        <!-- FIREWORKS CANVAS -->
+        <canvas id="fireworks-canvas"></canvas>
+
+        <!-- 1. TOP ANNOUNCEMENT BAR -->
+        <div class="announcement-bar">
+            <marquee scrollamount="5" id="display-announcement">Welcome to Amala Pyrotech! Direct Sivakasi Factory Wholesale Crackers. Massive discounts up to 85% OFF!</marquee>
+        </div>
+
+        <!-- 2. MAIN HEADER -->
+        <header class="main-header">
+            <div class="logo-area">
+                <img id="display-logo" src="https://via.placeholder.com/50" alt="Logo">
+                <h1 id="display-company-name">AMALA PYROTECH</h1>
+            </div>
+            <div class="header-btns">
+                <a href="https://wa.me/919344265054" id="header-whatsapp-btn" class="h-btn h-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="tel:7780942656" id="header-call-btn" class="h-btn h-call"><i class="fas fa-phone-alt"></i></a>
+                <button onclick="toggleSideMenu()" class="h-btn h-menu" style="border:none; cursor:pointer;" title="Menu"><i class="fas fa-bars"></i></button>
+            </div>
+        </header>
+
+        <!-- SIDE MENU -->
+        <div class="side-menu" id="sideMenu">
+            <div class="side-menu-header">
+                <h3>Menu</h3>
+                <i class="fas fa-times close-menu" onclick="toggleSideMenu()"></i>
+            </div>
+            <div class="side-menu-links">
+                <a href="index.html"><i class="fas fa-home"></i> Home</a>
+                <a href="catalog.html"><i class="fas fa-th-large"></i> Categories & Products</a>
+                <a href="catalog.html"><i class="fas fa-file-invoice-dollar"></i> Price List</a>
+                <a href="track.html"><i class="fas fa-shipping-fast"></i> Track Order</a>
+                <a href="about.html"><i class="fas fa-info-circle"></i> About Us</a>
+                <a href="contact.html"><i class="fas fa-headset"></i> Contact Us</a>
+            </div>
+        </div>
+
+        <!-- 3. HERO BANNER / SLIDER -->
+        <section class="hero-slider" id="hero-slider-container">
+            <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1498931299472-f7a63a5a1cfa?auto=format&fit=crop&w=800&q=80');"></div>
+            <button class="slider-arrow prev" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+            <button class="slider-arrow next" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
+        </section>
+
+        <!-- 4. WELCOME SECTION -->
+        <section class="welcome-section">
+            <div class="festive-greeting">✨ Happy Diwali • Festival of Lights ✨</div>
+            <div class="welcome-badge">✦ WELCOME TO AMALA PYROTECH</div>
+            <h2>Direct Sivakasi Factory<br>Crackers in Sivakasi</h2>
+            <p>Sivakasi's leading factory-direct wholesale fireworks destination with authentic Sivakasi quality, massive discounts, and direct transport booking.</p>
+            <p>Welcome to AMALA PYROTECH, your trusted destination for authentic Sivakasi fireworks. We bring you quality crackers directly from the Sivakasi manufacturing hub at competitive prices, with reliable service and convenient delivery options.</p>
+            <a href="catalog.html" class="pill-btn">SHOP NOW →</a>
+        </section>
+
+        <!-- 6. OUR SPECIALITIES -->
+        <section class="specialities-section">
+            <h2>Our Specialities</h2>
+            <p>To maintain quality of the product in every aspect by offering safe, unique and environmental-friendly crackers.</p>
+
+            <!-- 7 & 8. STATISTICS CARDS -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-icon-circle"><i class="fas fa-clock"></i></div>
+                    <div class="stat-number">15<span>+</span></div>
+                    <div class="stat-label">Years Of Experience</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-circle"><i class="fas fa-certificate"></i></div>
+                    <div class="stat-number">200<span>+</span></div>
+                    <div class="stat-label">Crackers Varieties</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-circle"><i class="fas fa-users"></i></div>
+                    <div class="stat-number">5000<span>+</span></div>
+                    <div class="stat-label">Happy Customers</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. FIREWORKS GALLERY -->
+        <section class="gallery-section">
+            <div class="gallery-grid-wrapper">
+                <div class="main-gallery-card">
+                    <div class="gallery-img-container">
+                        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80" alt="Fireworks">
+                    </div>
+                    <div class="gallery-text-overlay">
+                        <h3 id="gallery-title-text">AMALA PYROTECH</h3>
+                        <p>Crafted with tradition, delivered with festive care.</p>
+                    </div>
+                </div>
+                <div class="dynamic-gallery-grid" id="dynamic-gallery-container"></div>
+            </div>
+        </section>
+
+        <!-- 10. SECOND SHOP NOW CTA -->
+        <div style="text-align: center; background: var(--white); padding-bottom: 25px; position:relative; z-index:4;">
+            <a href="catalog.html" class="pill-btn">SHOP NOW →</a>
+        </div>
+
+        <!-- 11 & 12. FEATURE CARDS -->
+        <section class="features-section">
+            <div class="feature-card">
+                <div class="feature-icon fi-1"><i class="fas fa-shield-alt"></i></div>
+                <div class="feature-content">
+                    <h4>Direct Factory Wholesale</h4>
+                    <p>No middlemen or dealer margins. Direct factory pricing with discounts up to 85% Off off MRP.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon fi-2"><i class="fas fa-truck"></i></div>
+                <div class="feature-content">
+                    <h4>100% Authentic Sivakasi Stock</h4>
+                    <p>Freshly manufactured genuine fireworks sourced straight from Sivakasi industrial sheds.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon fi-3"><i class="fas fa-box"></i></div>
+                <div class="feature-content">
+                    <h4>Bulk Cartons & Family Packs</h4>
+                    <p>Full cartons available for retailers, institutions, and family festive groups at wholesale rates.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon fi-4"><i class="fas fa-check-circle"></i></div>
+                <div class="feature-content">
+                    <h4>Express Dispatch to Sivakasi</h4>
+                    <p>Direct transport booking with instant Lorry Receipt (LR) tracking provided for every consignment.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 13. BRAND / TRUST CARD -->
+        <section class="trust-section">
+            <div class="trust-card">
+                <img id="trust-card-logo" src="https://via.placeholder.com/70" alt="Trust Logo" class="trust-logo">
+                <h4 style="color: var(--berry); font-weight: 700;" id="trust-company-title">AMALA PYROTECH</h4>
+                <div class="trust-badge">
+                    <i class="fas fa-check-circle" style="color: #28A745;"></i> DIRECT SIVAKASI FACTORY
+                </div>
+            </div>
+        </section>
+
+        <!-- 14. PROMOTIONAL GRADIENT SECTION -->
+        <section class="promo-gradient-section">
+            <h3>We offer the best quality products directly from Sivakasi factory at the lowest price.</h3>
+            <p>Celebrate your festivals with 100% safety and grand excitement.</p>
+            <a href="catalog.html" class="yellow-btn">Shop Online →</a>
+        </section>
+
+        <!-- 15. WHY CHOOSE SECTION -->
+        <section class="why-choose-section">
+            <div class="why-badge">SIVAKASI DIRECT QUALITY ASSURED</div>
+            <h2>Why Choose Direct<br>Sivakasi Factory Deals</h2>
+            <div class="why-points">Direct From Source • Rock Bottom Wholesale Rates • Verified Quality</div>
+            <p class="why-desc">Eliminate middlemen and buy certified Sivakasi crackers straight from the manufacturing hub.</p>
+        </section>
+
+        <!-- 16 & 17. FOOTER & CONTACT -->
+        <footer class="footer">
+            <img id="footer-logo" src="https://via.placeholder.com/50" alt="Footer Logo" class="footer-logo">
+            <h4 id="footer-company-name">AMALA PYROTECH</h4>
+            <p style="font-size: 11px; color: #D0D0D0; margin-bottom: 15px;">AMALA PYROTECH brings you authentic, top-grade Sivakasi fireworks at unbeatable factory pricing with trusted delivery across Sivakasi.</p>
+            
+            <div class="quick-links-title">Quick Links</div>
+            <div class="quick-links-grid">
+                <a href="index.html" class="quick-link-pill">Home</a>
+                <a href="catalog.html" class="quick-link-pill">About</a>
+                <a href="catalog.html" class="quick-link-pill">Price List</a>
+                <a href="track.html" class="quick-link-pill">Track Order</a>
+                <a href="catalog.html" class="quick-link-pill">Safety Tips</a>
+                <a href="contact.html" class="quick-link-pill">Contact Us</a>
+                <a href="catalog.html" class="quick-link-pill">Quick Purchase</a>
+            </div>
+
+            <div style="font-size: 14px; font-weight: 700; color: var(--gold); margin-bottom: 8px;">Contact Us</div>
+            <div class="footer-contact-info">
+                <p><strong>Chat with Us on WhatsApp:</strong><br><i class="fab fa-whatsapp"></i> <span id="footer-phone-display">+91 9344265054</span></p>
+                <p style="margin-top: 6px;"><strong>Give Us a Direct Call:</strong><br><i class="fas fa-phone-alt"></i> <span id="footer-call-display">7780942656</span></p>
+                <p style="margin-top: 6px;"><strong>Location:</strong><br><i class="fas fa-map-marker-alt"></i> TNC Alangulam Main Road, Kundayiruppu, Sivakasi, Tamil Nadu, 626131</p>
+            </div>
+        </footer>
+
+        <!-- 18. FLOATING INSTAGRAM / YOUTUBE -->
+        <div class="float-social">
+            <a href="#" id="float-insta-link" class="social-ico s-insta" target="_blank"><i class="fab fa-instagram"></i></a>
+            <a href="#" id="float-youtube-link" class="social-ico s-youtube" target="_blank"><i class="fab fa-youtube"></i></a>
+        </div>
+
+        <!-- 19. FLOATING CALL / WHATSAPP -->
+        <div class="float-contact">
+            <a href="tel:7780942656" id="float-call-link" class="contact-ico c-call"><i class="fas fa-phone-alt"></i></a>
+            <a href="https://wa.me/919344265054" id="float-whatsapp-link" class="contact-ico c-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        </div>
+
+        <!-- 20. QUICK PURCHASE -->
+        <a href="catalog.html" class="quick-purchase-float">
+            <i class="fas fa-bolt"></i> Quick Purchase
+        </a>
+
+        <!-- 21. FIXED MOBILE BOTTOM NAVIGATION -->
+        <nav class="mobile-bottom-nav">
+            <a href="index.html" class="nav-item n-home">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="catalog.html" class="nav-item n-products">
+                <i class="fas fa-box-open"></i>
+                <span>Products</span>
+            </a>
+            <a href="catalog.html" class="nav-item n-pricelist">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Price List</span>
+            </a>
+            <a href="track.html" class="nav-item n-track">
+                <i class="fas fa-shipping-fast"></i>
+                <span>Track</span>
+            </a>
+            <a href="https://wa.me/919344265054" id="nav-whatsapp-link" class="nav-item n-whatsapp" target="_blank">
+                <i class="fab fa-whatsapp"></i>
+                <span>WhatsApp</span>
+            </a>
+            <a href="tel:7780942656" id="nav-call-link" class="nav-item n-call">
+                <i class="fas fa-phone-alt"></i>
+                <span>Call</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script><script src="supabase-client.js"></script>
+    <script>
+        function toggleSideMenu() {
+            document.getElementById('sideMenu').classList.toggle('open');
+        }
+
+        let currentSlide = 0;
+        function changeSlide(direction) {
+            const slides = document.querySelectorAll('.hero-slide');
+            if(slides.length === 0) return;
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + direction + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+
+        setInterval(() => { changeSlide(1); }, 4000);
+
+        // --- FIREWORKS ANIMATION (Restored: Single Sky Shot every 6-8 seconds) ---
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 5 + 1;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.02 + 0.015;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.vy += 0.05;
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        class Firework {
+            constructor() {
+                this.x = Math.random() * (canvas.width * 0.8) + (canvas.width * 0.1);
+                this.y = canvas.height;
+                this.targetY = Math.random() * (canvas.height * 0.5);
+                this.speed = Math.random() * 3 + 3;
+                this.vy = -Math.abs(this.speed);
+                this.vx = 0;
+                this.exploded = false;
+                this.particles = [];
+                this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+            }
+            update() {
+                if (!this.exploded) {
+                    this.y += this.vy;
+                    if (this.y <= this.targetY) {
+                        this.exploded = true;
+                        for (let i = 0; i < 45; i++) {
+                            this.particles.push(new Particle(this.x, this.y, this.color));
+                        }
+                    }
+                } else {
+                    this.particles.forEach(p => p.update());
+                    this.particles = this.particles.filter(p => p.alpha > 0);
+                }
+            }
+            draw() {
+                if (!this.exploded) {
+                    ctx.fillStyle = this.color;
+                    ctx.fillRect(this.x, this.y, 2, 8);
+                } else {
+                    this.particles.forEach(p => p.draw());
+                }
+            }
+        }
+
+        let currentFirework = null;
+        let fireworkTimer = 0;
+
+        function animateFireworks() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            fireworkTimer++;
+            // Trigger a single sky shot every ~450 frames (approx 7-8 seconds)
+            if (fireworkTimer > 450 && !currentFirework) {
+                currentFirework = new Firework();
+                fireworkTimer = 0;
+            }
+
+            if (currentFirework) {
+                currentFirework.update();
+                currentFirework.draw();
+                if (currentFirework.exploded && currentFirework.particles.length === 0) {
+                    currentFirework = null;
+                }
+            }
+
+            requestAnimationFrame(animateFireworks);
+        }
+
+
+    </script>
+<script src="index-backend.js"></script>
+</body>
+</html>

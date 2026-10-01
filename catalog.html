@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="ta" id="htmlRoot">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Product Catalog | AMALA PYROTECH</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --magenta-dark: #B0005A;
+            --magenta-light: #C00063;
+            --berry: #A9005A;
+            --wine: #8F003D;
+            --navy-dark: #272C31;
+            --deep-green: #005B48;
+            --bright-green: #08B67D;
+            --gold: #FFD000;
+            --white: #FFFFFF;
+            --charcoal: #263447;
+            --gray-text: #70777D;
+            --light-border: #CDD5DD;
+            --card-border: #DDE2E6;
+            --discount-red: #D9364F;
+            --selected-bg: #EFFBF4;
+            --price-orange: #D87900;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f8f9fa;
+            color: var(--charcoal);
+            padding-bottom: 90px;
+        }
+
+        .main-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        @media (min-width: 768px) {
+            .main-container { max-width: 650px; }
+        }
+
+        /* --- ANNOUNCEMENT BAR --- */
+        .announcement-bar {
+            background: linear-gradient(90deg, var(--magenta-dark), var(--magenta-light));
+            color: var(--white);
+            padding: 7px 0;
+            font-size: 11px;
+            font-weight: 600;
+            overflow: hidden;
+            white-space: nowrap;
+            width: 100%;
+        }
+
+        /* --- HEADER --- */
+        .main-header {
+            background: var(--white);
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo-area img {
+            height: 35px;
+            width: 35px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 2px solid var(--berry);
+        }
+        .logo-area h1 {
+            font-size: 15px;
+            color: var(--berry);
+            font-weight: 700;
+        }
+        .header-btns {
+            display: flex;
+            gap: 6px;
+        }
+        .h-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 14px;
+        }
+        .h-whatsapp { background: #25D366; color: var(--white); }
+        .h-call, .h-menu { background: #F2F2F2; color: var(--berry); border: 1px solid var(--light-border); }
+
+        /* --- HERO BANNER --- */
+        .hero-banner {
+            width: 100%;
+            height: 180px;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+        .hero-slide {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-slide.active { opacity: 1; }
+
+        /* --- CATALOG CONTROL BAR --- */
+        .catalog-control-bar {
+            background: var(--navy-dark);
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--white);
+            font-size: 12px;
+        }
+        .layout-pills {
+            display: flex;
+            gap: 5px;
+            background: #1e2226;
+            padding: 3px;
+            border-radius: 6px;
+        }
+        .l-pill {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #1676D2;
+            color: white;
+            border: none;
+        }
+        .l-pill.active {
+            background: #FFD400;
+            color: var(--charcoal);
+        }
+
+        /* --- LANGUAGE SELECTOR --- */
+        .lang-selector {
+            display: flex;
+            gap: 6px;
+            background: #3a4146;
+            padding: 3px;
+            border-radius: 6px;
+        }
+        .lang-btn {
+            padding: 3px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            color: #ccc;
+        }
+        .lang-btn.active {
+            background: #FFD000;
+            color: var(--charcoal);
+        }
+
+        /* --- TEXT SLIDER BANNER --- */
+        .text-slider-banner {
+            background: linear-gradient(135deg, #6D0B6A, #0F0371);
+            color: var(--gold);
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        /* --- MINIMUM ORDER BAR --- */
+        .min-order-bar {
+            background: linear-gradient(90deg, #A90000, #D40000);
+            color: var(--white);
+            text-align: center;
+            padding: 8px;
+            font-weight: 700;
+            font-size: 12px;
+            box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15);
+        }
+
+        /* --- STICKY ORDER SUMMARY BAR --- */
+        .sticky-summary-bar {
+            background: var(--deep-green);
+            color: var(--white);
+            padding: 10px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 55px;
+            z-index: 999;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .summary-item {
+            text-align: center;
+            font-size: 10px;
+        }
+        .summary-item strong {
+            display: block;
+            font-size: 12px;
+            color: var(--gold);
+        }
+        .summary-order-btn {
+            background: var(--gold);
+            color: var(--charcoal);
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* --- SEARCH BAR --- */
+        .search-section {
+            padding: 12px 14px;
+            background: #fff;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .search-box {
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 1px solid var(--light-border);
+            border-radius: 20px;
+            font-size: 12px;
+            outline: none;
+        }
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-text);
+            font-size: 13px;
+        }
+
+        /* --- CATEGORY CHIPS --- */
+        .category-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 14px;
+            background: #fff;
+            border-bottom: 1px solid var(--card-border);
+            white-space: nowrap;
+        }
+        .cat-chip {
+            background: #f0f2f5;
+            border: 1px solid var(--light-border);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--charcoal);
+        }
+        .cat-chip.active {
+            background: var(--berry);
+            color: white;
+            border-color: var(--berry);
+        }
+
+        /* --- CATEGORY BANNER --- */
+        .cat-banner {
+            background: linear-gradient(90deg, #006B52, #A60000, #006B52);
+            color: var(--white);
+            padding: 8px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0 8px 0;
+            font-weight: 700;
+            font-size: 13px;
+            border-left: 5px solid var(--gold);
+        }
+        .cat-offer-badge {
+            background: #08B67D;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+
+        /* --- PRODUCT CARD DESIGN --- */
+        .products-list {
+            padding: 0 10px;
+        }
+        .products-list.table-layout .product-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+        }
+        .products-list.table-layout .prod-main { width: 60%; }
+        .products-list.table-layout .prod-img { width: 45px; height: 45px; }
+
+        .product-card {
+            background: var(--white);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            transition: 0.2s;
+        }
+        .product-card.selected {
+            background-color: var(--selected-bg);
+            border-color: #A3E4D7;
+        }
+        .prod-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .prod-code {
+            background: #f0f2f5;
+            color: var(--charcoal);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .disc-badge {
+            background: var(--discount-red);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+        .prod-main {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .prod-img {
+            width: 70px;
+            height: 70px;
+            aspect-ratio: 1 / 1;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 1px solid var(--card-border);
+            flex-shrink: 0;
+        }
+        .prod-details {
+            flex-grow: 1;
+        }
+        .prod-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 2px;
+        }
+        .prod-pack {
+            font-size: 11px;
+            color: var(--gray-text);
+            margin-bottom: 4px;
+        }
+        .prod-price-row {
+            display: flex;
+            gap: 8px;
+            align-items: baseline;
+        }
+        .mrp-span {
+            font-size: 11px;
+            color: var(--gray-text);
+            text-decoration: line-through;
+        }
+        .offer-span {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--price-orange);
+        }
+        .prod-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            border-top: 1px dashed var(--card-border);
+            padding-top: 6px;
+        }
+        .subtotal-label {
+            font-size: 11px;
+            color: var(--gray-text);
+        }
+        .subtotal-amount {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--price-orange);
+        }
+        .qty-box {
+            display: flex;
+            align-items: center;
+            border: 1px solid var(--light-border);
+            border-radius: 20px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .q-btn {
+            width: 26px; height: 26px;
+            border: none; background: #f8f9fa;
+            font-weight: 700; cursor: pointer; color: #333;
+        }
+        .q-val {
+            width: 28px; text-align: center; font-size: 12px; font-weight: 600;
+        }
+
+        /* --- CHECKOUT & FORMS --- */
+        .checkout-box {
+            background: #fff;
+            padding: 15px 12px;
+            margin-top: 20px;
+            border-top: 2px solid var(--card-border);
+        }
+        .section-hdr {
+            background: linear-gradient(90deg, #B0005A, #D00000);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .f-group {
+            margin-bottom: 10px;
+        }
+        .f-group label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 3px;
+            color: var(--charcoal);
+        }
+        .f-group input, .f-group select, .f-group textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid var(--light-border);
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        .calc-card {
+            background: #fdfefe;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 12px;
+            font-size: 11px;
+        }
+        .c-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .c-row.grand {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--discount-red);
+            border-top: 1px solid var(--light-border);
+            padding-top: 5px;
+            margin-top: 5px;
+        }
+        .progress-card {
+            background: #FFF9E6;
+            border: 1px solid #FFEEBA;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+        .progress-bar-bg {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 8px;
+            width: 100%;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+        .progress-bar-fill {
+            background: var(--gold);
+            height: 100%;
+            width: 4%;
+            transition: 0.3s;
+        }
+        .submit-btn {
+            background: var(--bright-green);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        /* --- FLOATING CART --- */
+        .floating-cart {
+            position: fixed;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bright-green);
+            color: white;
+            padding: 7px 14px;
+            border-radius: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 75%;
+            max-width: 350px;
+            box-shadow: 0 4px 12px rgba(8,182,125,0.4);
+            z-index: 1000;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        .floating-cart.bounce {
+            transform: translateX(-50%) scale(1.1);
+        }
+        .drawer-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 2000; display: none;
+        }
+        .drawer-box {
+            position: fixed; top: 0; right: -100%; width: 280px; height: 100%;
+            background: var(--deep-green); color: white; z-index: 2001;
+            transition: 0.3s ease; padding: 15px; display: flex; flex-direction: column;
+        }
+        .drawer-box.open { right: 0; }
+        .drawer-item-row {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; margin-bottom: 6px; font-size: 11px;
+        }
+
+        /* --- SUCCESS MODAL OVERLAY & BLINKING BUTTON --- */
+        .success-modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 3000; display: none;
+            justify-content: center; align-items: center; padding: 15px;
+        }
+        .success-modal-box {
+            background: white; width: 100%; max-width: 420px; border-radius: 16px;
+            padding: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            animation: popUp 0.3s ease-out;
+        }
+        @keyframes popUp {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .success-icon {
+            font-size: 50px; color: #27AE60; margin-bottom: 10px;
+        }
+        .blink-wa-btn {
+            background: #25D366; color: white; border: none; padding: 12px;
+            border-radius: 8px; font-weight: 700; font-size: 14px; width: 100%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            gap: 8px; margin-top: 15px;
+            animation: blinkingBtn 1.5s infinite;
+        }
+        @keyframes blinkingBtn {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .download-bill-btn {
+            background: #1676D2; color: white; border: none; padding: 10px;
+            border-radius: 8px; font-weight: 600; font-size: 13px; width: 100%;
+            cursor: pointer; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .continue-shop-btn {
+            background: #70777D; color: white; border: none; padding: 10px;
+            border-radius: 8px; font-weight: 600; font-size: 13px; width: 100%;
+            cursor: pointer; margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+
+        <!-- ANNOUNCEMENT BAR -->
+        <div class="announcement-bar">
+            <marquee scrollamount="5" id="runningAnnouncement">🔥 Minimum Order Value : Rs.3000 &nbsp;&nbsp;|&nbsp;&nbsp; <i class="fab fa-whatsapp"></i> +91 9344265054 &nbsp;&nbsp;|&nbsp;&nbsp; 100% Authentic Sivakasi Quality</marquee>
+        </div>
+
+        <!-- HEADER -->
+        <header class="main-header">
+            <div class="logo-area">
+                <img src="https://via.placeholder.com/40" alt="Logo" id="headerLogo">
+                <h1 id="headerShopName">AMALA PYROTECH</h1>
+            </div>
+            <div class="header-btns">
+                <a href="https://wa.me/919344265054" id="hdrWa" class="h-btn h-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i></a>
+                <a href="tel:7780942656" id="hdrCall" class="h-btn h-call"><i class="fas fa-phone-alt"></i></a>
+                <a href="index.html" class="h-btn h-menu"><i class="fas fa-home"></i></a>
+            </div>
+        </header>
+
+        <!-- HERO BANNER -->
+        <div class="hero-banner" id="heroCarousel">
+            <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80');"></div>
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1498931299472-f7a63a5a1cfa?auto=format&fit=crop&w=600&q=80');"></div>
+        </div>
+
+        <!-- CONTROL BAR -->
+        <div class="catalog-control-bar">
+            <div class="layout-pills">
+                <button class="l-pill" onclick="setLayout('table')">Table</button>
+                <button class="l-pill active" id="btnGrid" onclick="setLayout('grid')">Grid</button>
+                <button class="l-pill" onclick="setLayout('card')">Card</button>
+            </div>
+            <div class="lang-selector">
+                <button class="lang-btn active" id="langEn" onclick="setLanguage('en')">English</button>
+                <button class="lang-btn" id="langTa" onclick="setLanguage('ta')">தமிழ்</button>
+            </div>
+        </div>
+
+        <!-- TEXT SLIDER BANNER -->
+        <div class="text-slider-banner" id="adminTextSlider">
+            ✨ Premium Crackers Collection • Diwali Mega Sale • Min Order ₹3000 ✨
+        </div>
+
+        <!-- MINIMUM ORDER BAR -->
+        <div class="min-order-bar" id="lblMinOrderTitle">
+            💣 Minimum Order Value : Rs.3000
+        </div>
+
+        <!-- STICKY ORDER SUMMARY BAR -->
+        <div class="sticky-summary-bar">
+            <div class="summary-item" onclick="window.location.href='index.html'" style="cursor:pointer;"><i class="fas fa-home" style="font-size:14px;"></i><span id="lblHome">HOME</span></div>
+            <div class="summary-item"><span id="lblProducts">PRODUCTS</span><strong id="stickyProdCount">0</strong></div>
+            <div class="summary-item"><span id="lblYouSave">YOU SAVE</span><strong id="stickyYouSave">₹0.00</strong></div>
+            <div class="summary-item"><span id="lblEstTotal">ESTIMATE TOTAL</span><strong id="stickyEstTotal">₹0.00</strong></div>
+            <button class="summary-order-btn" id="lblOrderBtn" onclick="scrollToCheckout()">ORDER</button>
+        </div>
+
+        <!-- SEARCH BAR -->
+        <div class="search-section">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search crackers, sparklers, codes..." onkeyup="renderCatalog()">
+            </div>
+        </div>
+
+        <!-- CATEGORY CHIPS -->
+        <div class="category-chips" id="categoryChipsContainer">
+            <div class="cat-chip active" onclick="filterCategory('All')">All Products</div>
+            <div class="cat-chip" onclick="filterCategory('One Sound Crackers')">One Sound Crackers</div>
+            <div class="cat-chip" onclick="filterCategory('Sparklers')">Sparklers</div>
+            <div class="cat-chip" onclick="filterCategory('Bijili')">Bijili</div>
+        </div>
+
+        <!-- DYNAMIC PRODUCTS AREA -->
+        <div id="dynamicCatalogArea" class="products-list"></div>
+
+        <!-- CHECKOUT & FORMS -->
+        <div class="checkout-box" id="checkoutSection">
+            <div class="section-hdr" id="lblCustInfoHdr"><i class="fas fa-file-invoice"></i> Customer Information & Final Quotation Estimate</div>
+            
+            <div class="f-group"><label id="lblFullName">Full Name *</label><input type="text" id="custName" placeholder="Your Full Name"></div>
+            <div class="f-group"><label id="lblMobile">Mobile Number (WhatsApp) *</label><input type="text" id="custMobile" placeholder="10-Digit WhatsApp Number"></div>
+            <div class="f-group"><label id="lblPincode">Pincode *</label><input type="text" id="custPincode" placeholder="6-Digit Pincode"></div>
+            <div class="f-group"><label id="lblState">State *</label>
+                <select id="custState">
+                    <option value="Tamil Nadu">Tamil Nadu</option>
+                    <option value="Kerala">Kerala</option>
+                    <option value="Telangana">Telangana</option>
+                    <option value="Karnataka">Karnataka</option>
+                    <option value="Andhra Pradesh">Andhra Pradesh</option>
+                    <option value="Puducherry">Puducherry</option>
+                    <option value="Other States">Other States</option>
+                </select>
+            </div>
+            <div class="f-group"><label id="lblDistrict">District *</label><input type="text" id="custDistrict" placeholder="District Name"></div>
+            <div class="f-group"><label id="lblTown">Town / City / Area *</label><input type="text" id="custTown" placeholder="Town / Area / Locality"></div>
+            <div class="f-group"><label id="lblAddress">Delivery Address *</label><textarea id="custAddress" rows="2" placeholder="Delivery street address / nearby landmark"></textarea></div>
+
+            <!-- Security Verification -->
+            <div class="f-group" style="background:#f4f6f9; padding:10px; border-radius:6px;">
+                <label>Security Verification (Anti-Spam) *</label>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span id="mathQuestion" style="font-weight:700;">7 + 8 = ?</span>
+                    <button type="button" onclick="generateMath()" style="padding:4px 8px; font-size:10px; cursor:pointer;"><i class="fas fa-sync"></i></button>
+                    <input type="text" id="mathAnswer" placeholder="Answer" style="width:100px;">
+                </div>
+            </div>
+
+            <!-- Discount Coupon -->
+            <div class="f-group" style="margin-top:12px;">
+                <label>🎟️ Have a Discount Coupon?</label>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="couponCode" placeholder="ENTER COUPON CODE">
+                    <button type="button" onclick="applyCoupon()" style="background:#FFC900; color:var(--charcoal); border:none; padding:8px 15px; border-radius:6px; font-weight:700; cursor:pointer;">Apply</button>
+                </div>
+            </div>
+
+            <!-- Price Calculation Breakdown -->
+            <div class="calc-card">
+                <div class="c-row"><span>Total MRP Value:</span><strong id="calcMrp">₹0.00</strong></div>
+                <div class="c-row" style="color: #27AE60;"><span>Special Savings:</span><strong id="calcSavings">- ₹0.00</strong></div>
+                <div class="c-row"><span>Product Net Total:</span><strong id="calcNet">₹0.00</strong></div>
+                <div class="c-row"><span>Coupon Discount:</span><strong id="calcCoupon">- ₹0.00</strong></div>
+                <div class="c-row"><span>Safe Packing Charges:</span><strong id="calcPacking">₹0.00 (3% / Free if >₹5000)</strong></div>
+                <div class="c-row"><span>Delivery / Transport:</span><strong style="color: #1676D2;">To-Pay at Lorry Hub</strong></div>
+                <div class="c-row grand"><span>Grand Total:</span><strong id="calcGrand">₹0.00</strong></div>
+            </div>
+
+            <!-- 100% Free Packing Progress Bar -->
+            <div class="progress-card">
+                <strong id="packingTitle">🎁 Unlock 100% FREE Packing!</strong>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="packingFill"></div></div>
+                <span id="packingMsg" style="font-size:10px; color:#555;">Orders above ₹5,000 get 100% Free Packing!</span>
+            </div>
+
+            <!-- Minimum Order Progress -->
+            <div class="progress-card" style="background:#FFF3CD; border-color:#FFEEBA;">
+                <strong style="color:#856404;">⚠️ Minimum Order Required: ₹3,000</strong>
+                <div class="progress-bar-bg"><div class="progress-bar-fill" id="minOrderFill" style="background:#ffc107;"></div></div>
+                <span id="minOrderMsg" style="font-size:10px; color:#856404;">Add ₹3,000 more to submit</span>
+            </div>
+
+            <button class="submit-btn" id="finalSubmitBtn" onclick="submitFinalOrder()" style="opacity:0.6; cursor:not-allowed;" disabled>✈ Submit Quotation & Print Estimate</button>
+        </div>
+
+        <!-- FLOATING CART -->
+        <div class="floating-cart" id="floatingCart" onclick="toggleDrawer()">
+            <div><i class="fas fa-shopping-bag"></i> <span id="floatCartCount">0</span> Unique Products</div>
+            <div><span id="floatCartTotal">₹0.00</span> <i class="fas fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Selected Items Drawer -->
+        <div class="drawer-overlay" id="drawerOverlay" onclick="toggleDrawer()"></div>
+        <div class="drawer-box" id="drawerBox">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.2); padding-bottom:10px;">
+                <strong>🛒 Selected Items</strong>
+                <span onclick="toggleDrawer()" style="font-size:18px; cursor:pointer;">×</span>
+            </div>
+            <div id="drawerItemsList" style="flex-grow:1; overflow-y:auto; margin:10px 0;"></div>
+            <div style="background:#FFC900; color:var(--charcoal); padding:10px; border-radius:6px; font-weight:700; text-align:center; margin-bottom:10px;">
+                Estimate Total: <span id="drawerEstimateTotal">₹0.00</span>
+            </div>
+            <button onclick="toggleDrawer(); scrollToCheckout();" style="background:#08B67D; color:white; border:none; padding:10px; border-radius:6px; font-weight:700; cursor:pointer;">↓ Proceed to Checkout</button>
+        </div>
+
+        <!-- SUCCESS MODAL SCREEN (Order Submitted) -->
+        <div class="success-modal-overlay" id="successModal">
+            <div class="success-modal-box">
+                <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+                <h3 style="color: #A9005A; font-family: 'Playfair Display', serif; margin-bottom: 5px;">Order Submitted!</h3>
+                <p id="modalCustGreeting" style="font-size: 13px; font-weight: 600; color: #333; margin-bottom: 5px;"></p>
+                <p style="font-size: 12px; color: #666; margin-bottom: 15px;">Order ID: <strong id="modalOrderId" style="color: #005B48;"></strong></p>
+                
+                <button class="blink-wa-btn" onclick="sendToWhatsApp()"><i class="fab fa-whatsapp"></i> Send to WhatsApp</button>
+                <button class="download-bill-btn" onclick="downloadInvoiceBill()"><i class="fas fa-file-download"></i> Download Your Invoice Bill</button>
+                <button class="continue-shop-btn" onclick="continueShopping()">Continue to Shopping ➔</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <script src="supabase-config.js"></script><script src="supabase-client.js"></script>
+    <script>
+        let currentFilter = 'All';
+        let mathAns = 15;
+        let couponDiscount = 0;
+        let currentLang = 'en';
+        let lastSubmittedOrder = null;
+
+        const translations = {
+            en: {
+                home: "HOME", products: "PRODUCTS", youSave: "YOU SAVE", estTotal: "ESTIMATE TOTAL", order: "ORDER",
+                minOrder: "💣 Minimum Order Value : Rs.3000", searchPH: "Search crackers, sparklers, codes...",
+                custInfo: "Customer Information & Final Quotation Estimate",
+                name: "Full Name *", mobile: "Mobile Number (WhatsApp) *", pincode: "Pincode *",
+                state: "State *", district: "District *", town: "Town / City / Area *", address: "Delivery Address *"
+            },
+            ta: {
+                home: "முகப்பு", products: "பொருட்கள்", youSave: "சேமிப்பு", estTotal: "மதிப்பீடு", order: "ஆர்டர்",
+                minOrder: "💣 குறைந்தபட்ச ஆர்டர் மதிப்பு : ரூ.3000", searchPH: "பட்டாசுகளைத் தேடுங்கள்...",
+                custInfo: "வாடிக்கையாளர் தகவல் & இறுதி விலை மதிப்பீடு",
+                name: "முழு பெயர் *", mobile: "வாட்ஸ்அப் எண் *", pincode: "அஞ்சல் குறியீடு *",
+                state: "மாநிலம் *", district: "மாவட்டம் *", town: "ஊர் / பகுதி *", address: "முகவரி *"
+            }
+        };
+
+        let productsData = [];
+
+        let cart = {};
+
+        function renderCatalog() {
+            const container = document.getElementById('dynamicCatalogArea');
+            container.innerHTML = '';
+
+            let searchKey = document.getElementById('searchInput').value.toLowerCase();
+            let categories = currentFilter === 'All' ? [...new Set(productsData.map(p => p.cat))] : [currentFilter];
+
+            categories.forEach(cat => {
+                let catProds = productsData.filter(p => p.cat === cat && (p.name.toLowerCase().includes(searchKey) || p.code.toLowerCase().includes(searchKey)));
+                if(catProds.length === 0) return;
+
+                let html = `
+                    <div class="cat-banner">
+                        <span>🔥 ${cat.toUpperCase()}</span>
+                        <span class="cat-offer-badge">${catProds[0].offerPercent}% OFF</span>
+                    </div>
+                `;
+
+                catProds.forEach(prod => {
+                    let qty = cart[prod.id] || 0;
+                    let subtotal = qty * prod.price;
+                    let selectedCardClass = qty > 0 ? 'selected' : '';
+
+                    html += `
+                        <div class="product-card ${selectedCardClass}" id="card-${prod.id}">
+                            <div class="prod-top">
+                                <span class="prod-code">${prod.code}</span>
+                                <span class="disc-badge">${prod.offerPercent}% OFF</span>
+                            </div>
+                            <div class="prod-main">
+                                <img src="${prod.img}" class="prod-img" alt="Product">
+                                <div class="prod-details">
+                                    <div class="prod-name">${prod.name}</div>
+                                    <div class="prod-pack">📦 ${prod.pack}</div>
+                                    <div class="prod-price-row">
+                                        <span class="mrp-span">₹${prod.mrp.toFixed(2)}</span>
+                                        <span class="offer-span">₹${prod.price.toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="prod-footer">
+                                <span class="subtotal-label">SUBTOTAL: <span class="subtotal-amount" id="sub-${prod.id}">₹${subtotal.toFixed(2)}</span></span>
+                                <div class="qty-box">
+                                    <button class="q-btn" onclick="updateQty(${prod.id}, -1)">−</button>
+                                    <span class="q-val" id="qty-${prod.id}">${qty}</span>
+                                    <button class="q-btn" style="color: ${qty > 0 ? '#08B67D' : '#333'};" onclick="updateQty(${prod.id}, 1)">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML += html;
+            });
+
+            updateAllCalculations();
+        }
+
+        function updateQty(prodId, change) {
+            if(!cart[prodId]) cart[prodId] = 0;
+            cart[prodId] += change;
+            if(cart[prodId] < 0) cart[prodId] = 0;
+            if(cart[prodId] === 0) delete cart[prodId];
+
+            let prod = productsData.find(p => p.id === prodId);
+            let qty = cart[prodId] || 0;
+            let subtotal = qty * prod.price;
+
+            let qtySpan = document.getElementById(`qty-${prodId}`);
+            let subSpan = document.getElementById(`sub-${prodId}`);
+            let cardDiv = document.getElementById(`card-${prodId}`);
+
+            if(qtySpan) qtySpan.innerText = qty;
+            if(subSpan) subSpan.innerText = `₹${subtotal.toFixed(2)}`;
+            if(cardDiv) {
+                if(qty > 0) cardDiv.classList.add('selected');
+                else cardDiv.classList.remove('selected');
+            }
+
+            triggerCartBlink();
+            updateAllCalculations();
+        }
+
+        function triggerCartBlink() {
+            let cartBar = document.getElementById('floatingCart');
+            cartBar.classList.add('bounce');
+            setTimeout(() => { cartBar.classList.remove('bounce'); }, 200);
+        }
+
+        function updateAllCalculations() {
+            let uniqueProductsCount = Object.keys(cart).length;
+            let netTotal = 0;
+            let totalMrp = 0;
+            let drawerHtml = '';
+
+            for(let id in cart) {
+                let qty = cart[id];
+                if(qty > 0) {
+                    let prod = productsData.find(p => p.id == id);
+                    netTotal += qty * prod.price;
+                    totalMrp += qty * prod.mrp;
+
+                    drawerHtml += `
+                        <div class="drawer-item-row">
+                            <span>${prod.name} (${qty} x ₹${prod.price})</span>
+                            <strong>₹${(qty*prod.price).toFixed(2)}</strong>
+                        </div>
+                    `;
+                }
+            }
+
+            let savings = totalMrp - netTotal;
+            let packing = netTotal >= 5000 ? 0 : netTotal * 0.03;
+            let grandTotal = netTotal - couponDiscount + (netTotal > 0 ? packing : 0);
+            if(grandTotal < 0) grandTotal = 0;
+
+            document.getElementById('stickyProdCount').innerText = uniqueProductsCount;
+            document.getElementById('stickyYouSave').innerText = `₹${savings.toFixed(2)}`;
+            document.getElementById('stickyEstTotal').innerText = `₹${netTotal.toFixed(2)}`;
+
+            document.getElementById('floatCartCount').innerText = uniqueProductsCount;
+            document.getElementById('floatCartTotal').innerText = `₹${netTotal.toFixed(2)}`;
+
+            document.getElementById('drawerItemsList').innerHTML = drawerHtml || '<p style="text-align:center; font-size:11px;">No items selected yet.</p>';
+            document.getElementById('drawerEstimateTotal').innerText = `₹${netTotal.toFixed(2)}`;
+
+            document.getElementById('calcMrp').innerText = `₹${totalMrp.toFixed(2)}`;
+            document.getElementById('calcSavings').innerText = `- ₹${savings.toFixed(2)}`;
+            document.getElementById('calcNet').innerText = `₹${netTotal.toFixed(2)}`;
+            document.getElementById('calcCoupon').innerText = `- ₹${couponDiscount.toFixed(2)}`;
+            
+            if(netTotal >= 5000) {
+                document.getElementById('calcPacking').innerText = `₹0.00 (100% FREE 🎉)`;
+            } else {
+                document.getElementById('calcPacking').innerText = `₹${packing.toFixed(2)} (3%)`;
+            }
+
+            document.getElementById('calcGrand').innerText = `₹${grandTotal.toFixed(2)}`;
+
+            let packingFill = document.getElementById('packingFill');
+            let packingMsg = document.getElementById('packingMsg');
+            let packPercent = (netTotal / 5000) * 100;
+            if(packPercent > 100) packPercent = 100;
+            packingFill.style.width = packPercent + '%';
+
+            if(netTotal >= 5000) {
+                packingMsg.innerHTML = `🎉 Congratulations! 100% Free Packing Unlocked!`;
+            } else {
+                let pDiff = 5000 - netTotal;
+                packingMsg.innerHTML = `Add ₹${pDiff.toFixed(2)} more crackers to get 100% FREE Packing!`;
+            }
+
+            let minFill = document.getElementById('minOrderFill');
+            let minMsg = document.getElementById('minOrderMsg');
+            let submitBtn = document.getElementById('finalSubmitBtn');
+
+            let percent = (netTotal / 3000) * 100;
+            if(percent > 100) percent = 100;
+            minFill.style.width = percent + '%';
+
+            if(netTotal >= 3000) {
+                minMsg.innerHTML = `✅ Minimum Order of ₹3,000 achieved!`;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+                submitBtn.removeAttribute('disabled');
+            } else {
+                let diff = 3000 - netTotal;
+                minMsg.innerHTML = `Add ₹${diff.toFixed(2)} more to submit order`;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.style.cursor = 'not-allowed';
+                submitBtn.setAttribute('disabled', 'true');
+            }
+        }
+
+        function setLayout(mode) {
+            document.querySelectorAll('.l-pill').forEach(p => p.classList.remove('active'));
+            event.target.classList.add('active');
+            let list = document.getElementById('dynamicCatalogArea');
+            if(mode === 'table') list.classList.add('table-layout');
+            else list.classList.remove('table-layout');
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('langEn').classList.remove('active');
+            document.getElementById('langTa').classList.remove('active');
+            if(lang === 'en') document.getElementById('langEn').classList.add('active');
+            else document.getElementById('langTa').classList.add('active');
+
+            let t = translations[lang];
+            document.getElementById('lblHome').innerText = t.home;
+            document.getElementById('lblProducts').innerText = t.products;
+            document.getElementById('lblYouSave').innerText = t.youSave;
+            document.getElementById('lblEstTotal').innerText = t.estTotal;
+            document.getElementById('lblOrderBtn').innerText = t.order;
+            document.getElementById('lblMinOrderTitle').innerText = t.minOrder;
+            document.getElementById('searchInput').placeholder = t.searchPH;
+            document.getElementById('lblCustInfoHdr').innerHTML = `<i class="fas fa-file-invoice"></i> ${t.custInfo}`;
+            document.getElementById('lblFullName').innerText = t.name;
+            document.getElementById('lblMobile').innerText = t.mobile;
+            document.getElementById('lblPincode').innerText = t.pincode;
+            document.getElementById('lblState').innerText = t.state;
+            document.getElementById('lblDistrict').innerText = t.district;
+            document.getElementById('lblTown').innerText = t.town;
+            document.getElementById('lblAddress').innerText = t.address;
+        }
+
+        function filterCategory(cat) {
+            currentFilter = cat;
+            document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            renderCatalog();
+        }
+
+        function toggleDrawer() {
+            let box = document.getElementById('drawerBox');
+            let overlay = document.getElementById('drawerOverlay');
+            if(box.style.right === '0px') {
+                box.style.right = '-100%';
+                overlay.style.display = 'none';
+            } else {
+                box.style.right = '0px';
+                overlay.style.display = 'block';
+            }
+        }
+
+        function scrollToCheckout() {
+            document.getElementById('checkoutSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function generateMath() {
+            let n1 = Math.floor(Math.random() * 10) + 1;
+            let n2 = Math.floor(Math.random() * 10) + 1;
+            mathAns = n1 + n2;
+            document.getElementById('mathQuestion').innerText = `${n1} + ${n2} = ?`;
+        }
+
+        // SUBMIT ORDER -> OPEN SUCCESS POPUP MODAL
+        function sendToWhatsApp() {
+            if(!lastSubmittedOrder) return;
+            let o = lastSubmittedOrder;
+            let msg = `*New Order Quotation - AMALA PYROTECH*\n\n*Order ID:* ${o.orderId}\n*Name:* ${o.name}\n*Mobile:* ${o.mobile}\n*Pincode:* ${o.pincode}\n*Address:* ${o.address}, ${o.town}, ${o.district}, ${o.state}\n\n*Items Ordered:*\n`;
+            for(let id in o.items) {
+                let p = productsData.find(x => x.id == id);
+                msg += `- ${p.name} (${p.code}) x ${o.items[id]} = ₹${(o.items[id]*p.price).toFixed(2)}\n`;
+            }
+            msg += `\n*Grand Total:* ${o.grandTotal}`;
+
+            window.open(`https://wa.me/919344265054?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function continueShopping() {
+            document.getElementById('successModal').style.display = 'none';
+            cart = {};
+            renderCatalog();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        let slideIdx = 0;
+        function autoSlide() {
+            let slides = document.querySelectorAll('.hero-slide');
+            if(slides.length === 0) return;
+            slides[slideIdx].classList.remove('active');
+            slideIdx = (slideIdx + 1) % slides.length;
+            slides[slideIdx].classList.add('active');
+        }
+        setInterval(autoSlide, 3500);
+
+
+    </script>
+<script src="catalog-backend.js"></script>
+</body>
+</html>
