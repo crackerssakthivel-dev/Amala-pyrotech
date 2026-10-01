@@ -868,7 +868,7 @@
                                     <div class="prod-name">${prod.name}</div>
                                     <div class="prod-pack">📦 ${prod.pack}</div>
                                     <div class="prod-price-row">
-                                        <span class="mrp-span">₹${prod.mrp.toFixed(2)}</span>
+                                        <span class="mrp-span">${prod.mrp > 0 ? `₹${prod.mrp.toFixed(2)}` : ''}</span>
                                         <span class="offer-span">₹${prod.price.toFixed(2)}</span>
                                     </div>
                                 </div>
