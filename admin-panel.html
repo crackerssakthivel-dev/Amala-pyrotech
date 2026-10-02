@@ -265,6 +265,7 @@
             contact: "7780942656",
             instagram: "https://instagram.com/amalapyrotech",
             youtube: "https://youtube.com/@amalapyrotech",
+            announcement: "",
             heroBanners: [],
             gallery: [],
             categories: [],
@@ -465,6 +466,17 @@
                         <button onclick="saveLogoFile()" class="px-4 py-2.5 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">Save Logo</button>
                     </div>
                 </div>
+                <!-- RUNNING ANNOUNCEMENT TEXT MANAGEMENT SECTION -->
+                <div class="space-y-3 border-b pb-4">
+                    <h3 class="font-bold text-xs uppercase text-[#70777D]">Running Announcement Text</h3>
+                    <div class="space-y-2">
+                        <textarea id="settingAnnouncement" rows="2" class="w-full border p-2.5 rounded-xl text-xs" placeholder="Enter scrolling announcement text...">${appState.announcement || ''}</textarea>
+                        <div class="flex space-x-2">
+                            <button onclick="saveAnnouncementText()" class="px-4 py-2.5 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">Update Text</button>
+                            <button onclick="clearAnnouncementText()" class="px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold">Clear Text</button>
+                        </div>
+                    </div>
+                </div>
                 <!-- HERO BANNERS MANAGEMENT SECTION -->
                 <div class="space-y-3 border-b pb-4">
                     <h3 class="font-bold text-xs uppercase text-[#70777D]">Hero Banners Management (Home & Catalog Slider)</h3>
@@ -493,6 +505,45 @@
                     <button onclick="saveContactSettings()" class="px-4 py-2.5 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">Save Contact Settings</button>
                 </div>
             </div>`;
+        }
+
+        async function saveAnnouncementText() {
+            const txt = document.getElementById('settingAnnouncement').value;
+            try {
+                const { error } = await sb.from('site_settings').upsert({ 
+                    id: 1, 
+                    announcement: txt,
+                    updated_at: new Date().toISOString()
+                });
+                if(error) throw error;
+                appState.announcement = txt;
+                alert('Announcement text updated successfully.');
+                await refreshAdmin();
+                renderHomeManagement(document.getElementById('dynamicContentArea'));
+            } catch(e) {
+                console.error(e);
+                alert(e.message || 'Failed to update announcement text.');
+            }
+        }
+
+        async function clearAnnouncementText() {
+            if(!confirm('Clear announcement text?')) return;
+            try {
+                const { error } = await sb.from('site_settings').upsert({ 
+                    id: 1, 
+                    announcement: '',
+                    updated_at: new Date().toISOString()
+                });
+                if(error) throw error;
+                appState.announcement = '';
+                document.getElementById('settingAnnouncement').value = '';
+                alert('Announcement text cleared successfully.');
+                await refreshAdmin();
+                renderHomeManagement(document.getElementById('dynamicContentArea'));
+            } catch(e) {
+                console.error(e);
+                alert(e.message || 'Failed to clear announcement text.');
+            }
         }
 
         function renderCatalogManagement(container) {
