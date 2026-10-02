@@ -60,7 +60,6 @@
                 margin: 0 auto !important;
             }
             
-            /* டெஸ்க்டாப் மற்றும் டேப்லெட்டில் அனைத்து பகுதிகளும் நடுவில் நேர்த்தியாக இருக்க */
             .main-header, 
             .announcement-bar,
             .hero-banner, 
@@ -77,7 +76,6 @@
                 margin-right: auto;
             }
 
-            /* லேப்டாப்பில் கீழே உள்ள மொபைல் நேவிகேஷனை மறைக்க */
             .mobile-bottom-nav {
                 display: none !important;
             }
@@ -358,7 +356,7 @@
             padding: 8px 12px;
         }
         .products-list.table-layout .prod-main { width: 60%; }
-        .products-list.table-layout .prod-img { width: 45px; height: 45px; }
+        .products-list.table-layout .prod-img { width: 45px; height: 45px; cursor: pointer; }
 
         .product-card {
             background: var(--white);
@@ -408,6 +406,11 @@
             object-fit: cover;
             border: 1px solid var(--card-border);
             flex-shrink: 0;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+        .prod-img:hover {
+            opacity: 0.9;
         }
         .prod-details {
             flex-grow: 1;
@@ -642,6 +645,85 @@
             border-radius: 8px; font-weight: 600; font-size: 13px; width: 100%;
             cursor: pointer; margin-top: 10px;
         }
+
+        /* --- PRODUCT VIEW POPUP / MODAL --- */
+        .product-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 4000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+        .product-modal-box {
+            background: var(--white);
+            width: 100%;
+            max-width: 380px;
+            border-radius: 16px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: popUp 0.25s ease-out;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            background: #f0f2f5;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--charcoal);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-img-container {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            margin-bottom: 12px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .modal-details-grid {
+            font-size: 12px;
+            margin-bottom: 15px;
+            background: #fdfefe;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .modal-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        .modal-row:last-child {
+            margin-bottom: 0;
+        }
+        .modal-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px dashed var(--card-border);
+            padding-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -826,6 +908,42 @@
             </div>
         </div>
 
+        <!-- PRODUCT VIEW POPUP MODAL -->
+        <div class="product-modal-overlay" id="productModalOverlay" onclick="closeProductModalOutside(event)">
+            <div class="product-modal-box" id="productModalBox">
+                <button class="modal-close-btn" onclick="closeProductModal()">✕</button>
+                <div class="modal-img-container">
+                    <img id="modalProductImg" src="" alt="Product Image" class="modal-img">
+                </div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--charcoal); margin-bottom: 4px;" id="modalProductName"></div>
+                <div style="font-size: 11px; color: var(--gray-text); margin-bottom: 10px;" id="modalProductCodePack"></div>
+                
+                <div class="modal-details-grid">
+                    <div class="modal-row">
+                        <span style="color: var(--gray-text);">MRP Price:</span>
+                        <span class="mrp-span" id="modalProductMrp" style="font-size: 12px;"></span>
+                    </div>
+                    <div class="modal-row">
+                        <span style="color: var(--gray-text);">Selling Price / Net Rate:</span>
+                        <strong class="offer-span" id="modalProductPrice"></strong>
+                    </div>
+                    <div class="modal-row">
+                        <span style="color: var(--gray-text);">Discount:</span>
+                        <span class="disc-badge" id="modalProductDiscount"></span>
+                    </div>
+                </div>
+
+                <div class="modal-footer-row">
+                    <span class="subtotal-label">SUBTOTAL: <span class="subtotal-amount" id="modalProductSubtotal">₹0.00</span></span>
+                    <div class="qty-box">
+                        <button class="q-btn" id="modalMinusBtn" onclick="updateModalQty(-1)">−</button>
+                        <span class="q-val" id="modalProductQty">0</span>
+                        <button class="q-btn" id="modalPlusBtn" onclick="updateModalQty(1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
@@ -839,6 +957,7 @@
         let couponDiscount = 0;
         let currentLang = 'en';
         let lastSubmittedOrder = null;
+        let activeModalProductId = null;
 
         const translations = {
             en: {
@@ -891,7 +1010,7 @@
                                 <span class="disc-badge">${prod.offerPercent}% OFF</span>
                             </div>
                             <div class="prod-main">
-                                <img src="${prod.img}" class="prod-img" alt="Product">
+                                <img src="${prod.img}" class="prod-img" alt="Product" onclick="openProductModal(${prod.id})">
                                 <div class="prod-details">
                                     <div class="prod-name">${prod.name}</div>
                                     <div class="prod-pack">📦 ${prod.pack}</div>
@@ -940,9 +1059,62 @@
                 else cardDiv.classList.remove('selected');
             }
 
+            if(activeModalProductId === prodId) {
+                updateModalContent(prod);
+            }
+
             triggerCartBlink();
             updateAllCalculations();
         }
+
+        // --- PRODUCT VIEW POPUP FUNCTIONS ---
+        function openProductModal(prodId) {
+            activeModalProductId = prodId;
+            let prod = productsData.find(p => p.id === prodId);
+            if(!prod) return;
+
+            updateModalContent(prod);
+            document.getElementById('productModalOverlay').style.display = 'flex';
+        }
+
+        function updateModalContent(prod) {
+            let qty = cart[prod.id] || 0;
+            let subtotal = qty * prod.price;
+
+            document.getElementById('modalProductImg').src = prod.img;
+            document.getElementById('modalProductName').innerText = prod.name;
+            document.getElementById('modalProductCodePack').innerText = `Code: ${prod.code} | Pack: ${prod.pack}`;
+            document.getElementById('modalProductMrp').innerText = prod.mrp > 0 ? `₹${prod.mrp.toFixed(2)}` : '';
+            document.getElementById('modalProductPrice').innerText = `₹${prod.price.toFixed(2)}`;
+            document.getElementById('modalProductDiscount').innerText = `${prod.offerPercent}% OFF`;
+            document.getElementById('modalProductSubtotal').innerText = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('modalProductQty').innerText = qty;
+            document.getElementById('modalMinusBtn').style.color = qty > 0 ? '#333' : '#333';
+        }
+
+        function updateModalQty(change) {
+            if(activeModalProductId !== null) {
+                updateQty(activeModalProductId, change);
+            }
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModalOverlay').style.display = 'none';
+            activeModalProductId = null;
+        }
+
+        function closeProductModalOutside(event) {
+            if(event.target.id === 'productModalOverlay') {
+                closeProductModal();
+            }
+        }
+
+        // Close via Escape key
+        window.addEventListener('keydown', function(e) {
+            if(e.key === 'Escape') {
+                closeProductModal();
+            }
+        });
 
         function triggerCartBlink() {
             let cartBar = document.getElementById('floatingCart');
