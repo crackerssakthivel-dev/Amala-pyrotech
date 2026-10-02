@@ -1205,9 +1205,9 @@
                     this.x += this.vx;
                     this.y += this.vy;
 
-                    // Check exact hit on target coordinates
+                    // Check exact hit on target coordinates using distance only
                     const distToTarget = Math.hypot(this.targetX - this.x, this.targetY - this.y);
-                    if (distToTarget <= 8 || this.y <= this.targetY) {
+                    if (distToTarget <= 8) {
                         this.x = this.targetX;
                         this.y = this.targetY;
                         this.state = 'exploded';
@@ -1293,15 +1293,14 @@
         }
 
         let currentFirework = null;
-        let cycleTimer = performance.now();
-        let cycleInterval = 4000; // Target ~4 seconds complete cycle
+        let lastLaunchTime = performance.now();
+        const cycleDelay = 1500; // Delay between completed cycle and next target appearance
 
         function animateFireworks(timestamp) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (!currentFirework && timestamp - cycleTimer >= cycleInterval) {
+            if (!currentFirework && timestamp - lastLaunchTime >= cycleDelay) {
                 currentFirework = new Firework();
-                cycleTimer = timestamp;
             }
 
             if (currentFirework) {
@@ -1309,7 +1308,7 @@
                 currentFirework.draw(timestamp);
                 if (currentFirework.state === 'fading') {
                     currentFirework = null;
-                    cycleTimer = performance.now();
+                    lastLaunchTime = performance.now();
                 }
             }
 
