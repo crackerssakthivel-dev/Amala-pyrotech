@@ -538,19 +538,18 @@
             </div>`;
         }
 
-        // --- BUG FIX #1: PRESERVE FULL EXISTING PRODUCT NAME AND ALL FIELDS ---
         function openEditProductModal(productId) {
             let p = appState.products.find(x => Number(x.id) === Number(productId));
             if(!p) return;
             showModal(`<div class="space-y-3 text-xs">
-                <h3 class="font-bold text-sm text-[#263447]">Edit Product (#${p.code || ''})</h3>
-                <input type="text" id="editProdCode" value="${p.code || ''}" placeholder="Product Code" class="w-full border p-2.5 rounded-xl">
-                <input type="text" id="editProdName" value="${escapeHtml(p.name || '')}" placeholder="Product Name" class="w-full border p-2.5 rounded-xl">
-                <input type="number" id="editProdMrp" value="${p.mrp || 0}" placeholder="MRP Price" class="w-full border p-2.5 rounded-xl">
-                <input type="number" id="editProdPrice" value="${p.price || 0}" placeholder="Net Price" class="w-full border p-2.5 rounded-xl">
+                <h3 class="font-bold text-sm text-[#263447]">Edit Product (#${p.code})</h3>
+                <input type="text" id="editProdCode" value="${p.code}" placeholder="Product Code" class="w-full border p-2.5 rounded-xl">
+                <input type="text" id="editProdName" value="${p.name}" placeholder="Product Name" class="w-full border p-2.5 rounded-xl">
+                <input type="number" id="editProdMrp" value="${p.mrp}" placeholder="MRP Price" class="w-full border p-2.5 rounded-xl">
+                <input type="number" id="editProdPrice" value="${p.price}" placeholder="Net Price" class="w-full border p-2.5 rounded-xl">
                 <input type="text" id="editProdPack" value="${p.pack || '1 Pkt'}" placeholder="Pack" class="w-full border p-2.5 rounded-xl">
                 <select id="editProdCategory" class="w-full border p-2.5 rounded-xl">
-                    ${appState.categories.map(c => `<option value="${c.id}" ${Number(c.id) === Number(p.category_id \vert{}\vert{} p.cat_id) ? 'selected' : ''}>${c.name}</option>`).join('')}
+                    ${appState.categories.map(c => `<option value="${c.id}" ${c.id === p.category_id ? 'selected' : ''}>${c.name}</option>`).join('')}
                 </select>
                 <div>
                     <label class="block font-semibold text-[#70777D] mb-1">Replace Product Image (Optional)</label>
@@ -561,15 +560,6 @@
                     <button onclick="saveEditedProduct(${p.id})" class="px-4 py-2 bg-[#0B6B4F] text-white rounded-xl font-bold">Update Product</button>
                 </div>
             </div>`);
-        }
-
-        function escapeHtml(str) {
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
         }
 
         async function saveEditedProduct(productId) {
@@ -597,46 +587,6 @@
             } catch(e) {
                 console.error(e);
                 alert(e.message || 'Product update failed.');
-            }
-        }
-
-        // --- BUG FIX #2: CANCEL PENDING ORDER IN SUPABASE ---
-        function promptCancelOrder(id) {
-            let html = `<div class="space-y-4 text-center">
-                <h3 class="font-bold text-base text-[#263447]">Confirm Order Cancellation</h3>
-                <p class="text-xs text-[#70777D]">Are you sure you want to cancel order #${id}?</p>
-                <div class="flex justify-center space-x-3 pt-2">
-                    <button onclick="closeModal()" class="px-4 py-2 bg-[#DDE2E6] text-[#263447] rounded-xl text-xs font-bold">No</button>
-                    <button onclick="executeCancelOrder('${id}')" class="px-4 py-2 bg-[#D9364F] text-white rounded-xl text-xs font-bold">Yes, Cancel Order</button>
-                </div>
-            </div>`;
-            showModal(html);
-        }
-
-        async function executeCancelOrder(id) {
-            try {
-                const { data, error } = await sb
-                    .from('orders')
-                    .update({ 
-                        status: 'cancelled', 
-                        cancelled_at: new Date().toISOString() 
-                    })
-                    .eq('id', id)
-                    .select();
-
-                if (error) {
-                    console.error("Error cancelling order in Supabase:", error);
-                    alert("Failed to cancel order in Supabase: " + error.message);
-                    return;
-                }
-
-                closeModal();
-                await refreshAdmin();
-                openView('cancelledOrdersView');
-                alert('Order cancelled successfully and moved to Cancelled Archive.');
-            } catch (err) {
-                console.error("Exception cancelling order:", err);
-                alert("An unexpected error occurred while cancelling the order.");
             }
         }
 
