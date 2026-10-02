@@ -1108,7 +1108,7 @@
 
         setInterval(() => { changeSlide(1); }, 4000);
 
-        // --- REFINED ELEGANT FIREWORKS ANIMATION (6-Second Cycle) ---
+        // --- PRECISE 6-SECOND CINEMATIC FIREWORKS ANIMATION ---
         const canvas = document.getElementById('fireworks-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -1125,11 +1125,11 @@
                 this.y = y;
                 this.color = color;
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 2.8 + 0.6; // controlled smaller speed
+                const speed = Math.random() * 2.2 + 0.8;
                 this.vx = Math.cos(angle) * speed;
                 this.vy = Math.sin(angle) * speed;
                 this.alpha = 1;
-                this.decay = Math.random() * 0.015 + 0.01;
+                this.decay = Math.random() * 0.012 + 0.008; // ~1000ms explosion fade
             }
             update() {
                 this.x += this.vx;
@@ -1142,7 +1142,7 @@
                 ctx.globalAlpha = Math.max(0, this.alpha);
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, 1.2, 0, Math.PI * 2); // 1-1.5px size
+                ctx.arc(this.x, this.y, 1.2, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.restore();
             }
@@ -1150,34 +1150,28 @@
 
         class Firework {
             constructor() {
-                // Random target in upper/middle area avoiding extreme edges
-                this.targetX = Math.random() * (canvas.width * 0.6) + (canvas.width * 0.2);
-                this.targetY = Math.random() * (canvas.height * 0.35) + (canvas.height * 0.15);
+                // Target within safe bounds: X: 15%-85%, Y: 15%-55%
+                this.targetX = Math.random() * (canvas.width * 0.7) + (canvas.width * 0.15);
+                this.targetY = Math.random() * (canvas.height * 0.4) + (canvas.height * 0.15);
 
-                // Start from lower bottom area with slight horizontal variation
-                this.x = canvas.width / 2 + (Math.random() * 140 - 70);
-                this.y = canvas.height + 15;
+                // Start from bottom center area (90-100% height)
+                this.startX = canvas.width / 2 + (Math.random() * 120 - 60);
+                this.startY = canvas.height + 10;
+                this.x = this.startX;
+                this.y = this.startY;
 
-                // Trajectory and speed for ~2.0-2.5 sec flight time
-                const dx = this.targetX - this.x;
-                const dy = this.targetY - this.y;
-                const distance = Math.hypot(dx, dy);
-                const flightDurationFrames = 135; // approx 2.25 seconds at 60fps
-                this.vx = dx / flightDurationFrames;
-                this.vy = dy / flightDurationFrames;
+                this.cycleStartTime = performance.now();
+                this.targetSelectDuration = 900;       // 0.0 - 0.9s: Target visible & pulsing
+                this.flightDuration = 2400;            // 0.9 - 3.3s: Rocket flight duration (~2.4s)
+                this.explosionDuration = 1100;         // 3.3 - 4.4s: Explosion and particle fade
 
-                this.state = 'selecting'; // selecting -> waiting -> launching -> exploded -> fading
-                this.stateTimer = performance.now();
-                this.selectDuration = 850;  // 850ms glowing target visibility
-
+                this.state = 'selecting';              // selecting -> launching -> exploded -> fading
                 this.particles = [];
                 this.trailHistory = [];
-                this.targetAlpha = 1;
 
-                // Attractive colors (mostly single color, occasional multi-color)
+                // Color selection
                 const standardColors = ['#FF3333', '#FFD700', '#0099FF', '#00FFFF', '#00FF66', '#9900FF', '#FF007F', '#FF6600'];
                 const isMultiColor = Math.random() < 0.25;
-
                 if (isMultiColor) {
                     this.colors = [
                         standardColors[Math.floor(Math.random() * standardColors.length)],
@@ -1191,72 +1185,85 @@
             }
 
             update(now) {
+                const elapsed = now - this.cycleStartTime;
+
                 if (this.state === 'selecting') {
-                    if (now - this.stateTimer >= this.selectDuration) {
+                    if (elapsed >= this.targetSelectDuration) {
                         this.state = 'launching';
+                        this.flightStartTime = now;
                     }
                 } else if (this.state === 'launching') {
-                    // Record small trail history
+                    const flightElapsed = now - this.flightStartTime;
+                    const progress = Math.min(1, flightElapsed / this.flightDuration);
+
+                    // Smooth linear interpolation from start to exact target coordinates
+                    this.x = this.startX + (this.targetX - this.startX) * progress;
+                    this.y = this.startY + (this.targetY - this.startY) * progress;
+
+                    // Record short trailing dots
                     this.trailHistory.push({ x: this.x, y: this.y });
-                    if (this.trailHistory.length > 5) {
+                    if (this.trailHistory.length > 6) {
                         this.trailHistory.shift();
                     }
 
-                    this.x += this.vx;
-                    this.y += this.vy;
-
-                    // Exact target hit check via distance only
-                    const distToTarget = Math.hypot(this.targetX - this.x, this.targetY - this.y);
-                    if (distToTarget <= 5) {
+                    // Reach exact target
+                    if (progress >= 1 || Math.hypot(this.targetX - this.x, this.targetY - this.y) < 4) {
                         this.x = this.targetX;
                         this.y = this.targetY;
                         this.state = 'exploded';
+                        this.explosionStartTime = now;
 
-                        // Compact normal-sized explosion (25-40 particles)
-                        const particleCount = Math.floor(Math.random() * 16) + 25;
-                        for (let i = 0; i < particleCount; i++) {
+                        // Create compact explosion particles (25-40 particles)
+                        const count = Math.floor(Math.random() * 16) + 25;
+                        for (let i = 0; i < count; i++) {
                             const pColor = this.colors[Math.floor(Math.random() * this.colors.length)];
                             this.particles.push(new Particle(this.targetX, this.targetY, pColor));
                         }
                     }
                 } else if (this.state === 'exploded') {
-                    if (this.targetAlpha > 0) {
-                        this.targetAlpha -= 0.05;
-                    }
                     this.particles.forEach(p => p.update());
                     this.particles = this.particles.filter(p => p.alpha > 0);
-                    if (this.particles.length === 0) {
+
+                    if (now - this.explosionStartTime >= this.explosionDuration || this.particles.length === 0) {
                         this.state = 'fading';
                     }
                 }
             }
 
             draw(now) {
+                const elapsed = now - this.cycleStartTime;
+
+                // 1. Target visibility (Visible during selection AND while rocket is travelling)
                 if (this.state === 'selecting' || this.state === 'launching') {
-                    // Small glowing map-like target indicator (6-10px radius)
                     ctx.save();
-                    const pulse = 0.5 + Math.sin(now * 0.012) * 0.3;
-                    ctx.globalAlpha = this.state === 'selecting' ? pulse : 0.35;
+                    const pulse = 0.5 + Math.sin(now * 0.012) * 0.35;
+                    ctx.globalAlpha = this.state === 'selecting' ? pulse : 0.4;
                     ctx.strokeStyle = this.colors[0];
                     ctx.lineWidth = 1.2;
                     ctx.beginPath();
-                    ctx.arc(this.targetX, this.targetY, 7, 0, Math.PI * 2); // ~7px radius
+                    ctx.arc(this.targetX, this.targetY, 7, 0, Math.PI * 2); // inner ring ~7px
                     ctx.stroke();
 
-                    // Tiny central glowing dot
+                    // Tiny central dot (2-3px)
                     ctx.fillStyle = this.colors[0];
                     ctx.beginPath();
                     ctx.arc(this.targetX, this.targetY, 2, 0, Math.PI * 2);
                     ctx.fill();
+
+                    // Outer pulse ring (~9-10px)
+                    ctx.lineWidth = 0.8;
+                    ctx.beginPath();
+                    ctx.arc(this.targetX, this.targetY, 10, 0, Math.PI * 2);
+                    ctx.stroke();
                     ctx.restore();
                 }
 
+                // 2. Rocket Flight & Trail
                 if (this.state === 'launching') {
-                    // Small lightweight rocket trail
                     for (let i = 0; i < this.trailHistory.length; i++) {
                         const pt = this.trailHistory[i];
                         ctx.save();
-                        ctx.globalAlpha = (i + 1) / this.trailHistory.length * 0.35;
+                        ctx.globalAlpha = (i + 1) / this.trailHistory.length * 0.4;
                         ctx.fillStyle = this.colors[0];
                         ctx.beginPath();
                         ctx.arc(pt.x, pt.y, 1.2, 0, Math.PI * 2);
@@ -1264,41 +1271,32 @@
                         ctx.restore();
                     }
 
-                    // Small bright rocket head
+                    // Bright rocket head
                     ctx.save();
                     ctx.fillStyle = this.colors[0];
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
-                } else if (this.state === 'exploded') {
-                    // Fading target ring
-                    if (this.targetAlpha > 0) {
-                        ctx.save();
-                        ctx.globalAlpha = this.targetAlpha;
-                        ctx.strokeStyle = this.colors[0];
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.arc(this.targetX, this.targetY, 9 + (1 - this.targetAlpha) * 8, 0, Math.PI * 2);
-                        ctx.stroke();
-                        ctx.restore();
-                    }
+                }
 
-                    // Draw compact explosion particles
+                // 3. Explosion Particles
+                if (this.state === 'exploded') {
                     this.particles.forEach(p => p.draw());
                 }
             }
         }
 
         let currentFirework = null;
-        let lastCycleEndTime = performance.now();
-        const cyclePause = 1400; // Pause between complete cycle and next target appearance to maintain ~6s total cycle
+        let lastCycleStartTime = performance.now();
+        const totalCycleDuration = 6000; // Strict ~6 second total cycle duration
 
         function animateFireworks(timestamp) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (!currentFirework && timestamp - lastCycleEndTime >= cyclePause) {
+            if (!currentFirework && timestamp - lastCycleStartTime >= totalCycleDuration) {
                 currentFirework = new Firework();
+                lastCycleStartTime = timestamp;
             }
 
             if (currentFirework) {
@@ -1306,14 +1304,13 @@
                 currentFirework.draw(timestamp);
                 if (currentFirework.state === 'fading') {
                     currentFirework = null;
-                    lastCycleEndTime = performance.now();
                 }
             }
 
             requestAnimationFrame(animateFireworks);
         }
 
-        // Start fireworks loop
+        // Start animation loop
         requestAnimationFrame(animateFireworks);
     </script>
 <script src="index-backend.js"></script>
