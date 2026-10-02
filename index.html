@@ -1108,7 +1108,7 @@
 
         setInterval(() => { changeSlide(1); }, 4000);
 
-        // --- FIREWORKS ANIMATION (Restored: Single Sky Shot every 6-8 seconds) ---
+        // --- UPGRADED FIREWORKS ANIMATION (Target -> Sky Shot -> Explosion -> Fade) ---
         const canvas = document.getElementById('fireworks-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -1129,17 +1129,17 @@
                 this.vx = Math.cos(angle) * speed;
                 this.vy = Math.sin(angle) * speed;
                 this.alpha = 1;
-                this.decay = Math.random() * 0.02 + 0.015;
+                this.decay = Math.random() * 0.015 + 0.01;
             }
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.vy += 0.05;
+                this.vy += 0.05; // gravity pull
                 this.alpha -= this.decay;
             }
             draw() {
                 ctx.save();
-                ctx.globalAlpha = this.alpha;
+                ctx.globalAlpha = Math.max(0, this.alpha);
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
@@ -1150,35 +1150,93 @@
 
         class Firework {
             constructor() {
-                this.x = Math.random() * (canvas.width * 0.8) + (canvas.width * 0.1);
-                this.y = canvas.height;
-                this.targetY = Math.random() * (canvas.height * 0.5);
-                this.speed = Math.random() * 3 + 3;
-                this.vy = -Math.abs(this.speed);
-                this.vx = 0;
+                // Random target within safe upper/middle screen bounds
+                this.targetX = Math.random() * (canvas.width * 0.6) + (canvas.width * 0.2);
+                this.targetY = Math.random() * (canvas.height * 0.4) + (canvas.height * 0.15);
+
+                // Start position from bottom center (or random bottom point)
+                this.x = canvas.width / 2 + (Math.random() * 100 - 50);
+                this.y = canvas.height + 10;
+
+                // Calculate trajectory vector toward target
+                const dx = this.targetX - this.x;
+                const dy = this.targetY - this.y;
+                const distance = Math.hypot(dx, dy);
+                const flightSpeed = 8; // speed of ascending rocket
+                this.vx = (dx / distance) * flightSpeed;
+                this.vy = (dy / distance) * flightSpeed;
+
                 this.exploded = false;
                 this.particles = [];
-                this.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+                this.targetAlpha = 1; // for glowing target fade effect
+
+                // Random colors & multi-color probability
+                const paletteOptions = [
+                    [`hsl(${Math.random() * 360}, 100%, 60%)`],
+                    ['#FF3333', '#FFD700', '#0099FF'],
+                    ['#9900FF', '#FF007F', '#00FFFF'],
+                    ['#00FF66', '#FFD700', '#FF6600']
+                ];
+                this.colors = paletteOptions[Math.floor(Math.random() * paletteOptions.length)];
             }
+
             update() {
                 if (!this.exploded) {
+                    this.x += this.vx;
                     this.y += this.vy;
-                    if (this.y <= this.targetY) {
+
+                    // Check if rocket reached or passed target coordinates
+                    if (this.y <= this.targetY || Math.hypot(this.targetX - this.x, this.targetY - this.y) < 10) {
                         this.exploded = true;
-                        for (let i = 0; i < 45; i++) {
-                            this.particles.push(new Particle(this.x, this.y, this.color));
+                        // Create explosion particles
+                        for (let i = 0; i < 60; i++) {
+                            const particleColor = this.colors[Math.floor(Math.random() * this.colors.length)];
+                            this.particles.push(new Particle(this.targetX, this.targetY, particleColor));
                         }
                     }
                 } else {
+                    // Fade out target indicator during explosion
+                    if (this.targetAlpha > 0) {
+                        this.targetAlpha -= 0.05;
+                    }
                     this.particles.forEach(p => p.update());
                     this.particles = this.particles.filter(p => p.alpha > 0);
                 }
             }
+
             draw() {
                 if (!this.exploded) {
-                    ctx.fillStyle = this.color;
-                    ctx.fillRect(this.x, this.y, 2, 8);
+                    // Draw subtle glowing target point
+                    ctx.save();
+                    ctx.globalAlpha = 0.4 + Math.sin(Date.now() * 0.02) * 0.2;
+                    ctx.strokeStyle = '#FFD700';
+                    ctx.lineWidth = 1.5;
+                    ctx.beginPath();
+                    ctx.arc(this.targetX, this.targetY, 12, 0, Math.PI * 2);
+                    ctx.stroke();
+                    ctx.restore();
+
+                    // Draw ascending sky shot rocket
+                    ctx.save();
+                    ctx.fillStyle = this.colors[0];
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
                 } else {
+                    // Draw fading target ring if visible
+                    if (this.targetAlpha > 0) {
+                        ctx.save();
+                        ctx.globalAlpha = this.targetAlpha;
+                        ctx.strokeStyle = this.colors[0];
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.arc(this.targetX, this.targetY, 16 + (1 - this.targetAlpha) * 10, 0, Math.PI * 2);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+
+                    // Draw explosion particles
                     this.particles.forEach(p => p.draw());
                 }
             }
@@ -1191,8 +1249,8 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             fireworkTimer++;
-            // Trigger a single sky shot every ~450 frames (approx 7-8 seconds)
-            if (fireworkTimer > 450 && !currentFirework) {
+            // Target ~4 second cycle (approx 240 frames at 60fps)
+            if (fireworkTimer > 240 && !currentFirework) {
                 currentFirework = new Firework();
                 fireworkTimer = 0;
             }
@@ -1208,7 +1266,8 @@
             requestAnimationFrame(animateFireworks);
         }
 
-
+        // Start fireworks loop
+        requestAnimationFrame(animateFireworks);
     </script>
 <script src="index-backend.js"></script>
 </body>
