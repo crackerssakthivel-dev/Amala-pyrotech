@@ -1108,7 +1108,7 @@
 
         setInterval(() => { changeSlide(1); }, 4000);
 
-        // --- REFINED FIREWORKS ANIMATION ---
+        // --- REFINED ELEGANT FIREWORKS ANIMATION (6-Second Cycle) ---
         const canvas = document.getElementById('fireworks-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -1125,16 +1125,16 @@
                 this.y = y;
                 this.color = color;
                 const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 5 + 1.2;
+                const speed = Math.random() * 2.8 + 0.6; // controlled smaller speed
                 this.vx = Math.cos(angle) * speed;
                 this.vy = Math.sin(angle) * speed;
                 this.alpha = 1;
-                this.decay = Math.random() * 0.015 + 0.012;
+                this.decay = Math.random() * 0.015 + 0.01;
             }
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                this.vy += 0.06; // slight gravity
+                this.vy += 0.04; // gentle gravity
                 this.alpha -= this.decay;
             }
             draw() {
@@ -1142,7 +1142,7 @@
                 ctx.globalAlpha = Math.max(0, this.alpha);
                 ctx.fillStyle = this.color;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, 2.2, 0, Math.PI * 2);
+                ctx.arc(this.x, this.y, 1.2, 0, Math.PI * 2); // 1-1.5px size
                 ctx.fill();
                 ctx.restore();
             }
@@ -1150,33 +1150,33 @@
 
         class Firework {
             constructor() {
-                // Random target in upper/middle viewport, avoiding extreme edges
+                // Random target in upper/middle area avoiding extreme edges
                 this.targetX = Math.random() * (canvas.width * 0.6) + (canvas.width * 0.2);
                 this.targetY = Math.random() * (canvas.height * 0.35) + (canvas.height * 0.15);
 
-                // Start from bottom area
-                this.x = canvas.width / 2 + (Math.random() * 120 - 60);
-                this.y = canvas.height + 10;
+                // Start from lower bottom area with slight horizontal variation
+                this.x = canvas.width / 2 + (Math.random() * 140 - 70);
+                this.y = canvas.height + 15;
 
-                // Trajectory calculation
+                // Trajectory and speed for ~2.0-2.5 sec flight time
                 const dx = this.targetX - this.x;
                 const dy = this.targetY - this.y;
                 const distance = Math.hypot(dx, dy);
-                const flightSpeed = 7.5;
-                this.vx = (dx / distance) * flightSpeed;
-                this.vy = (dy / distance) * flightSpeed;
+                const flightDurationFrames = 135; // approx 2.25 seconds at 60fps
+                this.vx = dx / flightDurationFrames;
+                this.vy = dy / flightDurationFrames;
 
-                this.state = 'waiting'; // states: waiting -> launching -> exploded -> fading
-                this.waitTimer = performance.now();
-                this.waitDuration = 350; // 350ms target wait time
+                this.state = 'selecting'; // selecting -> waiting -> launching -> exploded -> fading
+                this.stateTimer = performance.now();
+                this.selectDuration = 850;  // 850ms glowing target visibility
 
                 this.particles = [];
                 this.trailHistory = [];
-                this.targetAlpha = 0;
+                this.targetAlpha = 1;
 
-                // Color selection: mostly single color, occasional multi-color
+                // Attractive colors (mostly single color, occasional multi-color)
                 const standardColors = ['#FF3333', '#FFD700', '#0099FF', '#00FFFF', '#00FF66', '#9900FF', '#FF007F', '#FF6600'];
-                const isMultiColor = Math.random() < 0.25; // 25% chance of multi-color
+                const isMultiColor = Math.random() < 0.25;
 
                 if (isMultiColor) {
                     this.colors = [
@@ -1191,30 +1191,29 @@
             }
 
             update(now) {
-                if (this.state === 'waiting') {
-                    if (now - this.waitTimer >= this.waitDuration) {
+                if (this.state === 'selecting') {
+                    if (now - this.stateTimer >= this.selectDuration) {
                         this.state = 'launching';
                     }
                 } else if (this.state === 'launching') {
-                    // Record trail history
+                    // Record small trail history
                     this.trailHistory.push({ x: this.x, y: this.y });
-                    if (this.trailHistory.length > 6) {
+                    if (this.trailHistory.length > 5) {
                         this.trailHistory.shift();
                     }
 
                     this.x += this.vx;
                     this.y += this.vy;
 
-                    // Check exact hit on target coordinates using distance only
+                    // Exact target hit check via distance only
                     const distToTarget = Math.hypot(this.targetX - this.x, this.targetY - this.y);
-                    if (distToTarget <= 8) {
+                    if (distToTarget <= 5) {
                         this.x = this.targetX;
                         this.y = this.targetY;
                         this.state = 'exploded';
-                        this.targetAlpha = 1;
 
-                        // Create 50-70 particles
-                        const particleCount = Math.floor(Math.random() * 21) + 50;
+                        // Compact normal-sized explosion (25-40 particles)
+                        const particleCount = Math.floor(Math.random() * 16) + 25;
                         for (let i = 0; i < particleCount; i++) {
                             const pColor = this.colors[Math.floor(Math.random() * this.colors.length)];
                             this.particles.push(new Particle(this.targetX, this.targetY, pColor));
@@ -1222,7 +1221,7 @@
                     }
                 } else if (this.state === 'exploded') {
                     if (this.targetAlpha > 0) {
-                        this.targetAlpha -= 0.04;
+                        this.targetAlpha -= 0.05;
                     }
                     this.particles.forEach(p => p.update());
                     this.particles = this.particles.filter(p => p.alpha > 0);
@@ -1233,73 +1232,72 @@
             }
 
             draw(now) {
-                if (this.state === 'waiting') {
-                    // Draw subtle glowing target before launch
+                if (this.state === 'selecting' || this.state === 'launching') {
+                    // Small glowing map-like target indicator (6-10px radius)
                     ctx.save();
-                    ctx.globalAlpha = 0.6 + Math.sin(now * 0.015) * 0.3;
+                    const pulse = 0.5 + Math.sin(now * 0.012) * 0.3;
+                    ctx.globalAlpha = this.state === 'selecting' ? pulse : 0.35;
                     ctx.strokeStyle = this.colors[0];
-                    ctx.lineWidth = 1.5;
+                    ctx.lineWidth = 1.2;
                     ctx.beginPath();
-                    ctx.arc(this.targetX, this.targetY, 10, 0, Math.PI * 2);
+                    ctx.arc(this.targetX, this.targetY, 7, 0, Math.PI * 2); // ~7px radius
                     ctx.stroke();
-                    ctx.restore();
-                } else if (this.state === 'launching') {
-                    // Draw glowing target indicator softly fading in background
-                    ctx.save();
-                    ctx.globalAlpha = 0.3;
-                    ctx.strokeStyle = this.colors[0];
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.arc(this.targetX, this.targetY, 12, 0, Math.PI * 2);
-                    ctx.stroke();
-                    ctx.restore();
 
-                    // Draw lightweight rocket trail
+                    // Tiny central glowing dot
+                    ctx.fillStyle = this.colors[0];
+                    ctx.beginPath();
+                    ctx.arc(this.targetX, this.targetY, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                if (this.state === 'launching') {
+                    // Small lightweight rocket trail
                     for (let i = 0; i < this.trailHistory.length; i++) {
                         const pt = this.trailHistory[i];
                         ctx.save();
-                        ctx.globalAlpha = (i + 1) / this.trailHistory.length * 0.4;
+                        ctx.globalAlpha = (i + 1) / this.trailHistory.length * 0.35;
                         ctx.fillStyle = this.colors[0];
                         ctx.beginPath();
-                        ctx.arc(pt.x, pt.y, 2, 0, Math.PI * 2);
+                        ctx.arc(pt.x, pt.y, 1.2, 0, Math.PI * 2);
                         ctx.fill();
                         ctx.restore();
                     }
 
-                    // Draw rocket head
+                    // Small bright rocket head
                     ctx.save();
                     ctx.fillStyle = this.colors[0];
                     ctx.beginPath();
-                    ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+                    ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.restore();
                 } else if (this.state === 'exploded') {
-                    // Draw fading target ring
+                    // Fading target ring
                     if (this.targetAlpha > 0) {
                         ctx.save();
                         ctx.globalAlpha = this.targetAlpha;
                         ctx.strokeStyle = this.colors[0];
-                        ctx.lineWidth = 1.2;
+                        ctx.lineWidth = 1;
                         ctx.beginPath();
-                        ctx.arc(this.targetX, this.targetY, 14 + (1 - this.targetAlpha) * 12, 0, Math.PI * 2);
+                        ctx.arc(this.targetX, this.targetY, 9 + (1 - this.targetAlpha) * 8, 0, Math.PI * 2);
                         ctx.stroke();
                         ctx.restore();
                     }
 
-                    // Draw particles
+                    // Draw compact explosion particles
                     this.particles.forEach(p => p.draw());
                 }
             }
         }
 
         let currentFirework = null;
-        let lastLaunchTime = performance.now();
-        const cycleDelay = 1500; // Delay between completed cycle and next target appearance
+        let lastCycleEndTime = performance.now();
+        const cyclePause = 1400; // Pause between complete cycle and next target appearance to maintain ~6s total cycle
 
         function animateFireworks(timestamp) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (!currentFirework && timestamp - lastLaunchTime >= cycleDelay) {
+            if (!currentFirework && timestamp - lastCycleEndTime >= cyclePause) {
                 currentFirework = new Firework();
             }
 
@@ -1308,7 +1306,7 @@
                 currentFirework.draw(timestamp);
                 if (currentFirework.state === 'fading') {
                     currentFirework = null;
-                    lastLaunchTime = performance.now();
+                    lastCycleEndTime = performance.now();
                 }
             }
 
