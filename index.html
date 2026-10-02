@@ -65,37 +65,170 @@
             box-shadow: 0 0 25px rgba(0,0,0,0.15);
         }
 
-        /* டேப்லெட் மற்றும் லேப்டாப் வியூவிற்கான அகலக் கட்டுப்பாடு */
-        @media (min-width: 768px) {
-            .main-container {
-                max-width: 1200px !important;
-                width: 100% !important;
-                margin-left: auto !important;
-                margin-right: auto !important;
-            }
+        /* --- TABLET & LAPTOP RESPONSIVE LAYOUT --- */
+@media (min-width: 768px) {
 
-            /* உள்ளே உள்ள அனைத்து பகுதிகளும் டெஸ்க்டாப்பில் நேர்த்தியாக நடுவில் இருக்க */
-            .main-header, 
-            .announcement-bar,
-            .hero-slider, 
-            .welcome-section, 
-            .specialities-section, 
-            .gallery-section, 
-            .features-section, 
-            .trust-section, 
-            .promo-gradient-section, 
-            .why-choose-section, 
-            .footer {
-                max-width: 1200px;
-                margin-left: auto;
-                margin-right: auto;
-            }
+    .main-container {
+        max-width: 1200px !important;
+        width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
 
-            /* லேப்டாப்பில் கீழே உள்ள மொபைல் நேவிகேஷனை முழுமையாக மறைக்க */
-            .mobile-bottom-nav {
-                display: none !important;
-            }
-        }
+    .main-header,
+    .announcement-bar,
+    .hero-slider,
+    .welcome-section,
+    .specialities-section,
+    .gallery-section,
+    .features-section,
+    .trust-section,
+    .promo-gradient-section,
+    .why-choose-section,
+    .footer {
+        width: 100%;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Desktop Header */
+    .main-header {
+        padding: 14px 30px;
+    }
+
+    .logo-area {
+        gap: 12px;
+    }
+
+    .logo-area img {
+        width: 45px;
+        height: 45px;
+    }
+
+    .logo-area h1 {
+        font-size: 21px;
+    }
+
+    .header-btns {
+        gap: 10px;
+    }
+
+    .h-btn {
+        width: 42px;
+        height: 42px;
+        font-size: 17px;
+    }
+
+    /* Desktop Hero */
+    .hero-slider {
+        height: 420px;
+    }
+
+    /* Desktop Welcome */
+    .welcome-section {
+        padding: 45px 50px;
+    }
+
+    .welcome-section h2 {
+        font-size: 30px;
+    }
+
+    .welcome-section p {
+        font-size: 14px;
+        max-width: 850px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Desktop Specialities */
+    .specialities-section {
+        padding: 45px 40px;
+    }
+
+    .specialities-section h2 {
+        font-size: 28px;
+    }
+
+    .specialities-section p {
+        font-size: 14px;
+    }
+
+    /* Desktop Gallery */
+    .gallery-section {
+        padding: 40px;
+    }
+
+    .gallery-img-container {
+        height: 260px;
+    }
+
+    .dynamic-gallery-item {
+        height: 125px;
+    }
+
+    /* Desktop Features */
+    .features-section {
+        padding: 35px 40px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .feature-card {
+        padding: 22px;
+    }
+
+    /* Desktop Trust */
+    .trust-section {
+        padding: 35px 40px;
+    }
+
+    /* Desktop Promo */
+    .promo-gradient-section {
+        padding: 55px 40px;
+    }
+
+    .promo-gradient-section h3 {
+        font-size: 27px;
+    }
+
+    .promo-gradient-section p {
+        font-size: 14px;
+    }
+
+    /* Desktop Why Choose */
+    .why-choose-section {
+        padding: 40px;
+    }
+
+    .why-choose-section h2 {
+        font-size: 28px;
+    }
+
+    /* Desktop Footer */
+    .footer {
+        padding: 45px 40px 30px;
+    }
+
+    /* Hide mobile bottom navigation */
+    .mobile-bottom-nav {
+        display: none !important;
+    }
+
+    /* Desktop floating controls */
+    .float-social {
+        right: 25px;
+    }
+
+    .float-contact {
+        left: 25px;
+    }
+
+    .quick-purchase-float {
+        right: 25px;
+        bottom: 30px;
+    }
+}
 
         /* --- FIREWORKS CANVAS --- */
         #fireworks-canvas {
