@@ -13,18 +13,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* டெஸ்க்டாப் வியூவை உடனடியாக கட்டாயப்படுத்த */
-        @media screen and (min-width: 768px) {
-            body {
-                background-color: #f0f2f5 !important;
-            }
-            .main-container {
-                max-width: 1200px !important;
-                width: 100% !important;
-                margin: 0 auto !important;
-                float: none !important;
-            }
-        }
         /* Remove mobile tap highlight */
         * {
             -webkit-tap-highlight-color: transparent !important;
@@ -66,25 +54,27 @@
             padding-bottom: 70px;
         }
 
-        /* --- RESPONSIVE LAYOUT --- */
+        /* --- RESPONSIVE LAYOUT (MOBILE, TABLET & LAPTOP) --- */
         .main-container {
-            width: 100% !important;
-            max-width: 1200px !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
             background: var(--white);
             min-height: 100vh;
             position: relative;
             box-shadow: 0 0 25px rgba(0,0,0,0.15);
         }
 
+        /* டேப்லெட் மற்றும் லேப்டாப் வியூவிற்கான அகலக் கட்டுப்பாடு */
         @media (min-width: 768px) {
             .main-container {
                 max-width: 1200px !important;
                 width: 100% !important;
+                margin-left: auto !important;
+                margin-right: auto !important;
             }
 
-            /* டெஸ்க்டாப் மற்றும் டேப்லெட்டில் அனைத்து பகுதிகளும் நடுவில் நேர்த்தியாக இருக்க */
+            /* உள்ளே உள்ள அனைத்து பகுதிகளும் டெஸ்க்டாப்பில் நேர்த்தியாக நடுவில் இருக்க */
             .main-header, 
             .announcement-bar,
             .hero-slider, 
@@ -95,14 +85,13 @@
             .trust-section, 
             .promo-gradient-section, 
             .why-choose-section, 
-            .footer,
-            .mobile-bottom-nav {
+            .footer {
                 max-width: 1200px;
                 margin-left: auto;
                 margin-right: auto;
             }
 
-            /* லேப்டாப்பில் கீழே உள்ள மொபைல் நேவிகேஷனை மறைக்க */
+            /* லேப்டாப்பில் கீழே உள்ள மொபைல் நேவிகேஷனை முழுமையாக மறைக்க */
             .mobile-bottom-nav {
                 display: none !important;
             }
