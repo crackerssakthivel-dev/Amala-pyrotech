@@ -977,6 +977,7 @@
         let currentLang = 'en';
         let lastSubmittedOrder = null;
         let activeModalProductId = null;
+        const translationCache = {};
 
         const translations = {
             en: {
@@ -999,16 +1000,34 @@
 
         let cart = {};
 
-        function renderCatalog() {
+        async function getDisplayProductName(name) {
+            if (currentLang === 'en') return name;
+            if (translationCache[name]) return translationCache[name];
+            try {
+                let url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ta&dt=t&q=` + encodeURIComponent(name);
+                let res = await fetch(url);
+                let json = await res.json();
+                if (json && json[0]) {
+                    let translated = json[0].map(item => item[0]).join('');
+                    translationCache[name] = translated;
+                    return translated;
+                }
+            } catch(e) {
+                console.error(e);
+            }
+            return name;
+        }
+
+        async function renderCatalog() {
             const container = document.getElementById('dynamicCatalogArea');
             container.innerHTML = '';
 
             let searchKey = document.getElementById('searchInput').value.toLowerCase();
             let categories = currentFilter === 'All' ? [...new Set(productsData.map(p => p.cat))] : [currentFilter];
 
-            categories.forEach(cat => {
+            for(let cat of categories) {
                 let catProds = productsData.filter(p => p.cat === cat && (p.name.toLowerCase().includes(searchKey) || p.code.toLowerCase().includes(searchKey)));
-                if(catProds.length === 0) return;
+                if(catProds.length === 0) continue;
 
                 let html = `
                     <div class="cat-banner">
@@ -1017,10 +1036,11 @@
                     </div>
                 `;
 
-                catProds.forEach(prod => {
+                for(let prod of catProds) {
                     let qty = cart[prod.id] || 0;
                     let subtotal = qty * prod.price;
                     let selectedCardClass = qty > 0 ? 'selected' : '';
+                    let displayName = await getDisplayProductName(prod.name);
 
                     html += `
                         <div class="product-card ${selectedCardClass}" id="card-${prod.id}">
@@ -1031,7 +1051,7 @@
                             <div class="prod-main">
                                 <img src="${prod.img}" class="prod-img" alt="Product" onclick="openProductModal(${prod.id})">
                                 <div class="prod-details">
-                                    <div class="prod-name">${prod.name}</div>
+                                    <div class="prod-name" id="name-${prod.id}">${displayName}</div>
                                     <div class="prod-pack">📦 ${prod.pack}</div>
                                     <div class="prod-price-row">
                                         <span class="mrp-span">${prod.mrp > 0 ? `₹${prod.mrp.toFixed(2)}` : ''}</span>
@@ -1049,10 +1069,10 @@
                             </div>
                         </div>
                     `;
-                });
+                }
 
                 container.innerHTML += html;
-            });
+            }
 
             updateAllCalculations();
         }
@@ -1105,21 +1125,22 @@
         }
 
         // --- PRODUCT VIEW POPUP FUNCTIONS ---
-        function openProductModal(prodId) {
+        async function openProductModal(prodId) {
             activeModalProductId = prodId;
             let prod = productsData.find(p => p.id === prodId);
             if(!prod) return;
 
-            updateModalContent(prod);
+            await updateModalContent(prod);
             document.getElementById('productModalOverlay').style.display = 'flex';
         }
 
-        function updateModalContent(prod) {
+        async function updateModalContent(prod) {
             let qty = cart[prod.id] || 0;
             let subtotal = qty * prod.price;
+            let displayName = await getDisplayProductName(prod.name);
 
             document.getElementById('modalProductImg').src = prod.img;
-            document.getElementById('modalProductName').innerText = prod.name;
+            document.getElementById('modalProductName').innerText = displayName;
             document.getElementById('modalProductCodePack').innerText = `Code: ${prod.code} | Pack: ${prod.pack}`;
             document.getElementById('modalProductMrp').innerText = prod.mrp > 0 ? `₹${prod.mrp.toFixed(2)}` : '';
             document.getElementById('modalProductPrice').innerText = `₹${prod.price.toFixed(2)}`;
@@ -1159,7 +1180,7 @@
             setTimeout(() => { cartBar.classList.remove('bounce'); }, 200);
         }
 
-        function updateAllCalculations() {
+        async function updateAllCalculations() {
             let uniqueProductsCount = Object.keys(cart).length;
             let netTotal = 0;
             let totalMrp = 0;
@@ -1172,11 +1193,12 @@
                     if(!prod) continue;
                     netTotal += qty * prod.price;
                     totalMrp += qty * prod.mrp;
+                    let displayName = await getDisplayProductName(prod.name);
 
                     drawerHtml += `
                         <div class="drawer-item-row">
                             <div class="drawer-item-top">
-                                <span><strong>${prod.name}</strong></span>
+                                <span><strong>${displayName}</strong></span>
                                 <button class="drawer-remove-btn" onclick="removeCartItem(${prod.id})"><i class="fas fa-times"></i></button>
                             </div>
                             <div class="drawer-item-bottom">
@@ -1286,6 +1308,8 @@
             document.getElementById('lblDistrict').innerText = t.district;
             document.getElementById('lblTown').innerText = t.town;
             document.getElementById('lblAddress').innerText = t.address;
+
+            renderCatalog();
         }
 
         function filterCategory(cat) {
