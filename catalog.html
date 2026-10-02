@@ -601,8 +601,27 @@
         }
         .drawer-box.open { right: 0; }
         .drawer-item-row {
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex; flex-direction: column;
             background: rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; margin-bottom: 6px; font-size: 11px;
+            gap: 6px;
+        }
+        .drawer-item-top {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .drawer-item-bottom {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .drawer-qty-box {
+            display: flex; align-items: center; border: 1px solid rgba(255,255,255,0.4); border-radius: 15px; background: rgba(0,0,0,0.15); overflow: hidden;
+        }
+        .drawer-q-btn {
+            width: 22px; height: 22px; border: none; background: transparent; font-weight: 700; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center;
+        }
+        .drawer-q-val {
+            width: 24px; text-align: center; font-size: 11px; font-weight: 600; color: white;
+        }
+        .drawer-remove-btn {
+            background: rgba(217, 54, 79, 0.8); color: white; border: none; width: 22px; height: 22px; border-radius: 50%; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
 
         /* --- SUCCESS MODAL OVERLAY & BLINKING BUTTON --- */
@@ -1067,6 +1086,24 @@
             updateAllCalculations();
         }
 
+        function removeCartItem(prodId) {
+            delete cart[prodId];
+            let qtySpan = document.getElementById(`qty-${prodId}`);
+            let subSpan = document.getElementById(`sub-${prodId}`);
+            let cardDiv = document.getElementById(`card-${prodId}`);
+
+            if(qtySpan) qtySpan.innerText = 0;
+            if(subSpan) subSpan.innerText = `₹0.00`;
+            if(cardDiv) cardDiv.classList.remove('selected');
+
+            if(activeModalProductId === prodId) {
+                let prod = productsData.find(p => p.id === prodId);
+                if(prod) updateModalContent(prod);
+            }
+
+            updateAllCalculations();
+        }
+
         // --- PRODUCT VIEW POPUP FUNCTIONS ---
         function openProductModal(prodId) {
             activeModalProductId = prodId;
@@ -1132,13 +1169,24 @@
                 let qty = cart[id];
                 if(qty > 0) {
                     let prod = productsData.find(p => p.id == id);
+                    if(!prod) continue;
                     netTotal += qty * prod.price;
                     totalMrp += qty * prod.mrp;
 
                     drawerHtml += `
                         <div class="drawer-item-row">
-                            <span>${prod.name} (${qty} x ₹${prod.price})</span>
-                            <strong>₹${(qty*prod.price).toFixed(2)}</strong>
+                            <div class="drawer-item-top">
+                                <span><strong>${prod.name}</strong></span>
+                                <button class="drawer-remove-btn" onclick="removeCartItem(${prod.id})"><i class="fas fa-times"></i></button>
+                            </div>
+                            <div class="drawer-item-bottom">
+                                <div class="drawer-qty-box">
+                                    <button class="drawer-q-btn" onclick="updateQty(${prod.id}, -1)">−</button>
+                                    <span class="drawer-q-val">${qty}</span>
+                                    <button class="drawer-q-btn" onclick="updateQty(${prod.id}, 1)">+</button>
+                                </div>
+                                <span>₹${prod.price.toFixed(2)} × ${qty} = <strong>₹${(qty*prod.price).toFixed(2)}</strong></span>
+                            </div>
                         </div>
                     `;
                 }
