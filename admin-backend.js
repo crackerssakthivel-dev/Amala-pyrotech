@@ -7,7 +7,29 @@ async function loadAdminState(){
   const {data:cp}=await sb.from('coupons').select('*').order('id');
   const {data:os}=await sb.from('orders').select('*').order('created_at',{ascending:false});
   const orders=os||[]; const ids=orders.map(o=>o.id); let items=[]; if(ids.length){ const r=await sb.from('order_items').select('*').in('order_id',ids); items=r.data||[]; }
-  const map=orders.map(o=>({id:o.id,orderId:o.order_id,customer:o.customer_name,district:o.district,address:[o.address,o.town,o.district,o.state].filter(Boolean).join(', '),phone:o.mobile,pincode:o.pincode,state:o.state,town:o.town,status:o.status,total:Number(o.grand_total),mrpTotal:Number(o.total_mrp),savings:Number(o.savings),netTotal:Number(o.net_total),packing:o.packing_charges,grandTotal:Number(o.grand_total),invoiceSnapshot:o.invoice_snapshot,items:items.filter(i=>i.order_id===o.id).map(i=>({productId:i.product_id,code:i.code,name:i.name,qty:i.qty,price:Number(i.price),amount:Number(i.amount),mrp:Number(i.mrp),pack:i.pack}))}));
+  const map=orders.map(o=>({
+      id:o.id,
+      orderId:o.order_id,
+      customer:o.customer_name,
+      district:o.district,
+      address:[o.address,o.town,o.district,o.state].filter(Boolean).join(', '),
+      phone:o.mobile,
+      pincode:o.pincode,
+      state:o.state,
+      town:o.town,
+      status:o.status,
+      total:Number(o.grand_total),
+      mrpTotal:Number(o.total_mrp),
+      savings:Number(o.savings),
+      netTotal:Number(o.net_total),
+      packing:o.packing_charges,
+      grandTotal:Number(o.grand_total),
+      invoiceSnapshot:o.invoice_snapshot,
+      transportName: o.transport_name || '',
+      transportMobile: o.transport_mobile || '',
+      transportNumber: o.transport_number || '',
+      items:items.filter(i=>i.order_id===o.id).map(i=>({productId:i.product_id,code:i.code,name:i.name,qty:i.qty,price:Number(i.price),amount:Number(i.amount),mrp:Number(i.mrp),pack:i.pack}))
+  }));
   appState.logo=mediaUrl(s?.logo_path)||'https://via.placeholder.com/150'; appState.whatsapp=s?.whatsapp_number||'+919344265054'; appState.contact=s?.call_number||'7780942656'; appState.instagram=s?.instagram_link||'https://instagram.com/amalapyrotech'; appState.youtube=s?.youtube_link||'https://youtube.com/@amalapyrotech';
   appState.heroBanners=(b||[]).map(x=>({id:x.id,url:mediaUrl(x.storage_path),storage_path:x.storage_path})); appState.gallery=(g||[]).map(x=>({id:x.id,url:mediaUrl(x.storage_path),storage_path:x.storage_path})); appState.categories=c||[]; appState.products=(p||[]).map(x=>({id:x.id,code:x.code,name:x.name,category:x.categories?.name||'',cat:x.categories?.name||'',pack:x.pack||'1 Pkt',mrp:Number(x.mrp),price:Number(x.price),image:mediaUrl(x.image_path),img:mediaUrl(x.image_path),category_id:x.category_id})); appState.coupons=cp||[]; appState.pendingOrders=map.filter(o=>o.status==='pending'); appState.confirmedOrders=map.filter(o=>o.status==='confirmed'); appState.cancelledOrders=map.filter(o=>o.status==='cancelled'); updateDashboardMetrics(); document.getElementById('headerLogo').src=appState.logo;
 }
@@ -33,7 +55,131 @@ async function deleteProduct(id){ if(!confirm('Delete this product?'))return; aw
 async function addNewCoupon(){const code=document.getElementById('couponCode').value.trim().toUpperCase(),discount=Number(document.getElementById('couponDiscount').value||0);if(!code||!discount)return;const {error}=await sb.from('coupons').insert({code,discount,type:'percent',active:true});if(error)return alert(error.message);await refreshAdmin();renderCouponManagement(document.getElementById('dynamicContentArea'));}
 async function deleteCoupon(id){await sb.from('coupons').update({active:false}).eq('id',id);await refreshAdmin();renderCouponManagement(document.getElementById('dynamicContentArea'));}
 
-function viewOrderDetail(orderId,type){let order=(type==='pending'?appState.pendingOrders:type==='confirmed'?appState.confirmedOrders:appState.cancelledOrders).find(o=>o.id===orderId);if(!order)return;let html=`<div class="space-y-4"><div class="flex justify-between items-center border-b pb-2"><h3 class="font-extrabold text-[#263447] text-base">Order #${order.orderId||order.id} Details</h3><button onclick="closeModal()" class="text-gray-500 font-bold text-xl">&times;</button></div><div class="text-xs space-y-1 text-[#263447] bg-[#F5F7F8] p-3 rounded-lg"><p><strong>Customer:</strong> ${order.customer}</p><p><strong>District:</strong> ${order.district}</p><p><strong>Address:</strong> ${order.address}</p><p><strong>Contact:</strong> ${order.phone}</p></div><div class="border rounded-lg overflow-x-auto"><table class="w-full text-left text-xs whitespace-nowrap"><thead class="bg-[#EFFBF4] text-[#0B6B4F]"><tr><th class="p-2">S.No</th><th class="p-2">Product Code</th><th class="p-2">Item Name</th><th class="p-2">Qty</th><th class="p-2">Price</th><th class="p-2">Amount</th></tr></thead><tbody class="divide-y">${order.items.map((i,n)=>`<tr><td class="p-2 font-bold">${n+1}</td><td class="p-2">${i.code}</td><td class="p-2 font-medium">${i.name}</td><td class="p-2">${i.qty}</td><td class="p-2">₹${i.price.toFixed(2)}</td><td class="p-2 font-semibold">₹${i.amount.toFixed(2)}</td></tr>`).join('')}</tbody></table></div><div class="text-right font-extrabold text-sm text-[#263447] pt-1">Order Total: ₹${order.total.toFixed(2)}</div>${type==='pending'?`<div class="flex space-x-2 pt-3 border-t"><button onclick="confirmPendingOrder(${order.id})" class="flex-1 py-2 bg-[#0B6B4F] text-white rounded font-bold text-xs">Confirm Order</button><button onclick="promptCancelOrder(${order.id})" class="flex-1 py-2 bg-[#D9364F] text-white rounded font-bold text-xs">Cancel Order</button></div>`:type==='confirmed'?`<div class="pt-3 border-t"><button onclick="downloadInvoice(${order.id})" class="w-full py-2 bg-[#263447] text-white rounded font-bold text-xs"><i class="fa-solid fa-download"></i> Download / Print Invoice</button></div>`:`<p class="text-center text-xs text-red-500 font-medium italic">Cancelled Record (No Invoice Available)</p>`}</div>`;showModal(html);}
+function viewOrderDetail(orderId,type){
+  let order=(type==='pending'?appState.pendingOrders:type==='confirmed'?appState.confirmedOrders:appState.cancelledOrders).find(o=>o.id===orderId);
+  if(!order)return;
+  
+  let transportSection = '';
+  if (type === 'confirmed') {
+      transportSection = `
+      <div class="mt-4 pt-3 border-t border-custom bg-[#EFFBF4] p-3.5 rounded-xl space-y-3">
+          <div class="flex justify-between items-center">
+              <span class="font-extrabold text-xs text-[#0B6B4F] uppercase tracking-wide flex items-center">
+                  <i class="fa-solid fa-truck-fast mr-2"></i> Transport Details
+              </span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <div>
+                  <label class="block font-semibold text-[#70777D] mb-1">Transport Name</label>
+                  <input type="text" id="transportNameInput" value="${order.transportName || ''}" placeholder="e.g. ABC Transport" class="w-full border p-2 rounded-lg bg-white">
+              </div>
+              <div>
+                  <label class="block font-semibold text-[#70777D] mb-1">Mobile Number</label>
+                  <input type="text" id="transportMobileInput" value="${order.transportMobile || ''}" placeholder="e.g. 9876543210" class="w-full border p-2 rounded-lg bg-white">
+              </div>
+              <div>
+                  <label class="block font-semibold text-[#70777D] mb-1">Transport / LR Number</label>
+                  <input type="text" id="transportNumberInput" value="${order.transportNumber || ''}" placeholder="e.g. LR123456" class="w-full border p-2 rounded-lg bg-white">
+              </div>
+          </div>
+          <div class="flex justify-end space-x-2 pt-1">
+              <button onclick="clearTransportDetails(${order.id})" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-[#263447] rounded-lg font-bold text-xs transition">Clear</button>
+              <button onclick="saveTransportDetails(${order.id}, '${type}')" class="px-4 py-1.5 bg-[#0B6B4F] hover:bg-[#064C3A] text-white rounded-lg font-bold text-xs transition shadow-sm">
+                  ${(order.transportName || order.transportMobile || order.transportNumber) ? 'Update Transport Details' : 'Save Transport Details'}
+              </button>
+          </div>
+      </div>`;
+  }
+
+  let html=`<div class="space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+          <h3 class="font-extrabold text-[#263447] text-base">Order #${order.orderId||order.id} Details</h3>
+          <button onclick="closeModal()" class="text-gray-500 font-bold text-xl">&times;</button>
+      </div>
+      <div class="text-xs space-y-1 text-[#263447] bg-[#F5F7F8] p-3 rounded-lg">
+          <p><strong>Customer:</strong> ${order.customer}</p>
+          <p><strong>District:</strong> ${order.district}</p>
+          <p><strong>Address:</strong> ${order.address}</p>
+          <p><strong>Contact:</strong> ${order.phone}</p>
+      </div>
+      <div class="border rounded-lg overflow-x-auto">
+          <table class="w-full text-left text-xs whitespace-nowrap">
+              <thead class="bg-[#EFFBF4] text-[#0B6B4F]">
+                  <tr>
+                      <th class="p-2">S.No</th>
+                      <th class="p-2">Product Code</th>
+                      <th class="p-2">Item Name</th>
+                      <th class="p-2">Qty</th>
+                      <th class="p-2">Price</th>
+                      <th class="p-2">Amount</th>
+                  </tr>
+              </thead>
+              <tbody class="divide-y">
+                  ${order.items.map((i,n)=>`<tr><td class="p-2 font-bold">${n+1}</td><td class="p-2">${i.code}</td><td class="p-2 font-medium">${i.name}</td><td class="p-2">${i.qty}</td><td class="p-2">₹${i.price.toFixed(2)}</td><td class="p-2 font-semibold">₹${i.amount.toFixed(2)}</td></tr>`).join('')}
+              </tbody>
+          </table>
+      </div>
+      <div class="text-right font-extrabold text-sm text-[#263447] pt-1">Order Total: ₹${order.total.toFixed(2)}</div>
+      ${transportSection}
+      ${type==='pending'?`<div class="flex space-x-2 pt-3 border-t"><button onclick="confirmPendingOrder(${order.id})" class="flex-1 py-2 bg-[#0B6B4F] text-white rounded font-bold text-xs">Confirm Order</button><button onclick="promptCancelOrder(${order.id})" class="flex-1 py-2 bg-[#D9364F] text-white rounded font-bold text-xs">Cancel Order</button></div>`:type==='confirmed'?`<div class="pt-3 border-t"><button onclick="downloadInvoice(${order.id})" class="w-full py-2 bg-[#263447] text-white rounded font-bold text-xs"><i class="fa-solid fa-download"></i> Download / Print Invoice</button></div>`:`<p class="text-center text-xs text-red-500 font-medium italic">Cancelled Record (No Invoice Available)</p>`}
+  </div>`;
+  showModal(html);
+}
+
+async function saveTransportDetails(orderId, type) {
+    let tName = document.getElementById('transportNameInput').value.trim();
+    let tMobile = document.getElementById('transportMobileInput').value.trim();
+    let tNumber = document.getElementById('transportNumberInput').value.trim();
+
+    if (!tName || !tMobile || !tNumber) {
+        return alert('Transport Name, Mobile Number, and Transport / LR Number are all required.');
+    }
+
+    try {
+        const { error } = await sb
+            .from('orders')
+            .update({
+                transport_name: tName,
+                transport_mobile: tMobile,
+                transport_number: tNumber
+            })
+            .eq('id', orderId);
+
+        if (error) throw error;
+
+        await refreshAdmin();
+        viewOrderDetail(orderId, type);
+        alert('Transport details saved successfully.');
+    } catch (e) {
+        console.error(e);
+        alert(e.message || 'Failed to save transport details.');
+    }
+}
+
+async function clearTransportDetails(orderId) {
+    if (!confirm('Clear transport details for this order?')) return;
+
+    try {
+        const { error } = await sb
+            .from('orders')
+            .update({
+                transport_name: null,
+                transport_mobile: null,
+                transport_number: null
+            })
+            .eq('id', orderId);
+
+        if (error) throw error;
+
+        await refreshAdmin();
+        viewOrderDetail(orderId, 'confirmed');
+        alert('Transport details cleared successfully.');
+    } catch (e) {
+        console.error(e);
+        alert(e.message || 'Failed to clear transport details.');
+    }
+}
+
 async function confirmPendingOrder(id){const {error}=await sb.from('orders').update({status:'confirmed',confirmed_at:new Date().toISOString()}).eq('id',id);if(error)return alert(error.message);await refreshAdmin();closeModal();openView('confirmedOrdersView');alert('Order confirmed successfully.');}
 async function executeCancelOrder(id){const {error}=await sb.from('orders').update({status:'cancelled',cancelled_at:new Date().toISOString()}).eq('id',id);if(error)return alert(error.message);await refreshAdmin();closeModal();openView('cancelledOrdersView');alert('Order cancelled successfully and moved to Cancelled Archive.');}
 async function downloadInvoice(orderId){const order=[...appState.confirmedOrders,...appState.pendingOrders].find(o=>o.id===orderId);if(!order||!order.invoiceSnapshot)return alert('Immutable invoice snapshot not found.');await renderAdminInvoicePdf(order.invoiceSnapshot);}
