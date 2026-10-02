@@ -11,10 +11,13 @@
         .track-container { max-width: 500px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; }
         h2 { color: #A9005A; margin-bottom: 10px; font-size: 22px; }
         p { font-size: 13px; color: #666; margin-bottom: 20px; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; margin-bottom: 15px; box-sizing: border-box; text-align: center; }
-        button { background: #B0005A; color: #fff; border: none; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 8px; width: 100%; cursor: pointer; }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 12px; font-weight: 600; color: #444; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; text-align: center; }
+        button { background: #B0005A; color: #fff; border: none; padding: 12px; font-size: 15px; font-weight: 600; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 5px; }
         button:hover { background: #A9005A; }
         .result-box { margin-top: 20px; padding: 15px; background: #FFF0F7; border: 1px solid #FFD1EA; border-radius: 8px; display: none; font-size: 13px; text-align: left; }
+        .result-item { margin-bottom: 8px; }
         .back-link { display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none; font-size: 13px; }
     </style>
 </head>
@@ -22,12 +25,35 @@
 
     <div class="track-container">
         <h2>Track Your Order</h2>
-        <p>Enter your Order ID or Mobile Number to check delivery status.</p>
-        <input type="text" id="order-input" placeholder="Enter Order ID / Mobile Number">
+        <p>Enter both your Order ID and Mobile Number to check delivery status.</p>
+        
+        <div class="input-group">
+            <label for="order-id-input">Order ID</label>
+            <input type="text" id="order-id-input" placeholder="e.g. ORD-12345">
+        </div>
+        
+        <div class="input-group">
+            <label for="mobile-input">Mobile Number</label>
+            <input type="text" id="mobile-input" placeholder="e.g. 9876543210">
+        </div>
+
         <button onclick="trackOrder()">Track Status</button>
 
         <div class="result-box" id="resultBox">
-            <strong>Order Status:</strong> <span id="statusText" style="color: #28A745; font-weight: 600;">Dispatch Ready / Lorry Receipt (LR) Generated. Will be delivered soon!</span>
+            <div class="result-item"><strong>Order ID:</strong> <span id="resOrderId"></span></div>
+            <div class="result-item"><strong>Customer Name:</strong> <span id="resCustomerName"></span></div>
+            <div class="result-item"><strong>Mobile Number:</strong> <span id="resMobile"></span></div>
+            <div class="result-item"><strong>Order Date:</strong> <span id="resDate"></span></div>
+            <div class="result-item"><strong>Grand Total:</strong> <span id="resTotal"></span></div>
+            <div class="result-item"><strong>Order Status:</strong> <span id="statusText" style="color: #28A745; font-weight: 600;"></span></div>
+            <div id="transportSection" style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed #FFD1EA; display: none;">
+                <div class="result-item"><strong>Transport Name:</strong> <span id="resTransportName"></span></div>
+                <div class="result-item"><strong>Transport Mobile:</strong> <span id="resTransportMobile"></span></div>
+                <div class="result-item"><strong>Transport / LR Number:</strong> <span id="resTransportNumber"></span></div>
+                <div style="margin-top: 10px;">
+                    <a id="callTransportBtn" href="#" style="display: inline-block; background: #25D366; color: #fff; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 12px;"><i class="fa-solid fa-phone"></i> Call Transport</a>
+                </div>
+            </div>
         </div>
 
         <a href="index.html" class="back-link">← Back to Home Page</a>
@@ -35,13 +61,85 @@
 
     <script>
         async function trackOrder() {
-            const val=document.getElementById('order-input').value.trim(); const res=document.getElementById('resultBox');
-            if(!val){alert('Please enter Order ID or Mobile Number');res.style.display='none';return;}
-            const {data,error}=await sb.rpc('track_order',{p_value:val});
-            if(error){console.error(error);alert('Unable to check order status right now.');return;}
-            if(!data||!data.length){res.style.display='block';document.getElementById('statusText').innerText='Order not found. Please check your Order ID / Mobile Number.';return;}
-            const o=data[0]; const labels={pending:'Order Received / Pending Confirmation',confirmed:'Order Confirmed / Processing',cancelled:'Order Cancelled'};
-            res.style.display='block'; document.getElementById('statusText').innerText=labels[o.status]||o.status;
+            const orderIdVal = document.getElementById('order-id-input').value.trim();
+            const mobileVal = document.getElementById('mobile-input').value.trim();
+            const res = document.getElementById('resultBox');
+
+            if (!orderIdVal || !mobileVal) {
+                alert('Please enter both Order ID and Mobile Number');
+                res.style.display = 'none';
+                return;
+            }
+
+            const { data, error } = await sb.rpc('track_order', {
+                p_order_id: orderIdVal,
+                p_mobile: mobileVal
+            });
+
+            if (error) {
+                console.error(error);
+                alert('Unable to check order status right now.');
+                return;
+            }
+
+            if (!data || !data.length) {
+                res.style.display = 'block';
+                document.getElementById('statusText').innerText = 'Order not found or details do not match. Please verify your Order ID and Mobile Number.';
+                document.getElementById('resOrderId').innerText = '-';
+                document.getElementById('resCustomerName').innerText = '-';
+                document.getElementById('resMobile').innerText = '-';
+                document.getElementById('resDate').innerText = '-';
+                document.getElementById('resTotal').innerText = '-';
+                document.getElementById('transportSection').style.display = 'none';
+                return;
+            }
+
+            const o = data[0];
+            
+            // Display basic information
+            res.style.display = 'block';
+            document.getElementById('resOrderId').innerText = o.order_id || o.id;
+            document.getElementById('resCustomerName').innerText = o.customer_name || '';
+            document.getElementById('resMobile').innerText = o.mobile || '';
+            document.getElementById('resDate').innerText = o.created_at ? new Date(o.created_at).toLocaleDateString('en-IN') : '';
+            document.getElementById('resTotal').innerText = '₹' + Number(o.grand_total || 0).toFixed(2);
+
+            // Display customer status logic
+            let displayStatus = '';
+            if (o.status === 'pending') {
+                displayStatus = 'ORDER RECEIVED / PENDING CONFIRMATION';
+            } else if (o.status === 'confirmed') {
+                if (!o.transport_name && !o.transport_mobile && !o.transport_number) {
+                    displayStatus = 'ORDER CONFIRMED / PROCESSING';
+                } else {
+                    displayStatus = 'IN TRANSPORT 🚚';
+                }
+            } else if (o.status === 'cancelled') {
+                displayStatus = 'ORDER CANCELLED';
+            } else {
+                displayStatus = o.status;
+            }
+
+            document.getElementById('statusText').innerText = displayStatus;
+
+            // Display transport details if available and order is not cancelled
+            const transportSection = document.getElementById('transportSection');
+            if (o.status === 'confirmed' && (o.transport_name || o.transport_mobile || o.transport_number)) {
+                transportSection.style.display = 'block';
+                document.getElementById('resTransportName').innerText = o.transport_name || '-';
+                document.getElementById('resTransportMobile').innerText = o.transport_mobile || '-';
+                document.getElementById('resTransportNumber').innerText = o.transport_number || '-';
+                
+                const callBtn = document.getElementById('callTransportBtn');
+                if (o.transport_mobile) {
+                    callBtn.href = `tel:${o.transport_mobile}`;
+                    callBtn.style.display = 'inline-block';
+                } else {
+                    callBtn.style.display = 'none';
+                }
+            } else {
+                transportSection.style.display = 'none';
+            }
         }
     </script>
 </body>
