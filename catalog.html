@@ -52,11 +52,33 @@
         }
 
         @media (min-width: 768px) {
-    .main-container { 
-        max-width: 1200px; 
-        padding: 0 20px;
-    }
-}
+            .main-container { 
+                max-width: 1200px !important; 
+                width: 100% !important;
+            }
+            
+            /* டெஸ்க்டாப்பில் அனைத்து பகுதிகளும் நடுவில் நேர்த்தியாக இருக்க */
+            .main-header, 
+            .announcement-bar,
+            .hero-banner, 
+            .catalog-control-bar,
+            .text-slider-banner,
+            .min-order-bar,
+            .sticky-summary-bar,
+            .search-section,
+            .category-chips,
+            .products-list,
+            .checkout-box {
+                max-width: 1200px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            /* லேப்டாப்பில் கீழே உள்ள மொபைல் நேவிகேஷனை மறைக்க */
+            .mobile-bottom-nav {
+                display: none !important;
+            }
+        }
 
         /* --- ANNOUNCEMENT BAR --- */
         .announcement-bar {
@@ -1103,9 +1125,7 @@
             slides[slideIdx].classList.add('active');
         }
         setInterval(autoSlide, 3500);
-
-
     </script>
-<script src="catalog-backend.js"></script>
+    <script src="catalog-backend.js"></script>
 </body>
 </html>
