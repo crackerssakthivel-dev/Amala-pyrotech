@@ -378,9 +378,13 @@
                     html += `<p class="text-sm text-[#70777D] py-8 text-center">No confirmed orders available.</p>`;
                 } else {
                     appState.confirmedOrders.forEach((o) => {
+                        let hasTransport = o.transportName || o.transportMobile || o.transportNumber;
                         html += `<div class="p-4 bg-[#EFFBF4] rounded-xl border border-custom flex justify-between items-center">
                             <div>
-                                <span class="font-bold text-xs text-[#263447]">#${o.orderId || o.id} - ${o.customer}</span>
+                                <div class="flex items-center space-x-2">
+                                    <span class="font-bold text-xs text-[#263447]">#${o.orderId || o.id} - ${o.customer}</span>
+                                    ${hasTransport ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded-full font-bold">🚚 Transport Added</span>' : ''}
+                                </div>
                                 <p class="text-xs text-[#70777D] mt-0.5">Total Paid: ₹${o.total.toFixed(2)} | District: ${o.district || 'N/A'}</p>
                             </div>
                             <button onclick="viewOrderDetail(${o.id}, 'confirmed')" class="px-3.5 py-1.5 bg-[#0B6B4F] text-white rounded-lg text-xs font-bold hover:bg-[#064C3A]">View / Invoice</button>
