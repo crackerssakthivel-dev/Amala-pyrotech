@@ -9,7 +9,19 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <style>
+   <style>
+        /* டெஸ்க்டாப் வியூவை உடனடியாக கட்டாயப்படுத்த */
+        @media screen and (min-width: 768px) {
+            body {
+                background-color: #f0f2f5 !important;
+            }
+            .main-container {
+                max-width: 1200px !important;
+                width: 100% !important;
+                margin: 0 auto !important;
+                float: none !important;
+            }
+        }
         :root {
             --magenta-dark: #B0005A;
             --magenta-light: #C00063;
