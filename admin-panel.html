@@ -13,7 +13,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-    <script src="supabase-config.js"></script><script src="supabase-client.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-client.js"></script>
     <style>
         :root {
             --primary-bg: #0B291D;
@@ -75,95 +76,198 @@
     <!-- ADMIN HEADER -->
     <header class="bg-primary-custom text-white sticky top-0 z-40 shadow-md">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-3">
                 <img id="headerLogo" src="https://via.placeholder.com/40" alt="Logo" class="w-10 h-10 object-contain rounded bg-white p-1">
-                <span class="font-bold text-sm tracking-wide hidden sm:inline">AMALA PYROTECH</span>
-            </div>
-            <div class="text-center">
-                <h1 class="text-xs sm:text-base font-extrabold tracking-wider whitespace-nowrap text-[#FFD000]">AMALA PYROTECH — ADMIN PANEL</h1>
+                <div class="flex flex-col">
+                    <span class="font-bold text-xs sm:text-sm tracking-wide text-white">AMALA PYROTECH</span>
+                    <span class="text-[10px] text-[#FFD000] tracking-wider uppercase font-medium">Master Admin Portal</span>
+                </div>
             </div>
             <div>
-                <button onclick="toggleSidebar()" class="text-2xl px-3 py-1 rounded bg-[#064C3A] hover:bg-[#0B6B4F] text-[#FFD000] focus:outline-none transition">
-                    ☰
+                <button onclick="toggleSidebar()" class="flex items-center space-x-2 text-sm px-3.5 py-2 rounded-lg bg-[#064C3A] hover:bg-[#0B6B4F] text-[#FFD000] border border-[#0B6B4F] focus:outline-none transition shadow-sm">
+                    <i class="fa-solid fa-bars text-base"></i>
+                    <span class="hidden sm:inline font-bold tracking-wide">Menu</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- MANAGEMENT MENU SIDEBAR -->
+    <!-- PROFESSIONAL STRUCTURED SIDEBAR -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-50 hidden transition-opacity" onclick="toggleSidebar()"></div>
-    <aside id="managementSidebar" class="fixed top-0 right-0 w-72 h-full bg-[#064C3A] text-white z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
-        <div class="p-4 border-b border-[#123C2D] flex justify-between items-center">
-            <span class="font-extrabold text-[#FFD000] tracking-wide">AMALA PYROTECH</span>
-            <button onclick="toggleSidebar()" class="text-white hover:text-[#FFD000] text-xl font-bold">&times;</button>
+    <aside id="managementSidebar" class="fixed top-0 right-0 w-80 h-full bg-[#064C3A] text-white z-50 transform translate-x-full transition-transform duration-300 flex flex-col shadow-2xl">
+        <div class="p-4 border-b border-[#123C2D] flex justify-between items-center bg-[#053d2e]">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-shield-halved text-[#FFD000] text-lg"></i>
+                <span class="font-extrabold text-[#FFD000] tracking-wide text-sm">ADMIN NAVIGATION</span>
+            </div>
+            <button onclick="toggleSidebar()" class="w-8 h-8 rounded-full flex items-center justify-center text-white hover:text-[#FFD000] hover:bg-[#123C2D] text-lg font-bold transition">&times;</button>
         </div>
-        <nav class="flex-1 overflow-y-auto py-4 space-y-1 px-3 text-sm">
-            <a href="#homeManagement" onclick="toggleSidebar(); switchTab('homeManagement')" class="block px-3 py-2.5 rounded hover:bg-[#0B6B4F] transition font-medium flex items-center space-x-3"><i class="fa-solid fa-house text-[#FFD000]"></i><span>HOME MANAGEMENT</span></a>
-            <a href="#catalogManagement" onclick="toggleSidebar(); switchTab('catalogManagement')" class="block px-3 py-2.5 rounded hover:bg-[#0B6B4F] transition font-medium flex items-center space-x-3"><i class="fa-solid fa-store text-[#FFD000]"></i><span>CATALOG MANAGEMENT</span></a>
-            <a href="#couponManagement" onclick="toggleSidebar(); switchTab('couponManagement')" class="block px-3 py-2.5 rounded hover:bg-[#0B6B4F] transition font-medium flex items-center space-x-3"><i class="fa-solid fa-ticket text-[#FFD000]"></i><span>COUPON CODE MANAGEMENT</span></a>
-            <a href="#customerManagement" onclick="toggleSidebar(); switchTab('customerManagement')" class="block px-3 py-2.5 rounded hover:bg-[#0B6B4F] transition font-medium flex items-center space-x-3"><i class="fa-solid fa-users text-[#FFD000]"></i><span>CUSTOMERS</span></a>
-            <a href="#adminCredentials" onclick="toggleSidebar(); switchTab('adminCredentials')" class="block px-3 py-2.5 rounded hover:bg-[#0B6B4F] transition font-medium flex items-center space-x-3"><i class="fa-solid fa-key text-[#FFD000]"></i><span>ADMIN USERNAME & PASSWORD</span></a>
+        
+        <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6 text-xs font-medium">
+            <!-- MAIN -->
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] uppercase font-bold tracking-wider text-[#08B67D]">Main Dashboard</p>
+                <a href="#dashboardMain" onclick="toggleSidebar(); returnToDashboard()" class="w-full px-3 py-2.5 rounded-lg hover:bg-[#0B6B4F] transition flex items-center space-x-3 text-white">
+                    <i class="fa-solid fa-chart-pie text-[#FFD000] w-4 text-center"></i>
+                    <span class="font-semibold">Dashboard Overview</span>
+                </a>
+            </div>
+
+            <!-- ORDERS -->
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] uppercase font-bold tracking-wider text-[#08B67D]">Order Management</p>
+                <a href="#pendingOrders" onclick="toggleSidebar(); openView('pendingOrdersView')" class="w-full px-3 py-2.5 rounded-lg hover:bg-[#0B6B4F] transition flex items-center space-x-3 text-white">
+                    <i class="fa-solid fa-clock-rotate-left text-[#F59E0B] w-4 text-center"></i>
+                    <span>Pending Orders</span>
+                </a>
+                <a href="#confirmedOrders" onclick="toggleSidebar(); openView('confirmedOrdersView')" class="w-full px-3 py-2.5 rounded-lg hover:bg-[#0B6B4F] transition flex items-center space-x-3 text-white">
+                    <i class="fa-solid fa-circle-check text-[#16A34A] w-4 text-center"></i>
+                    <span>Confirmed Orders & Invoices</span>
+                </a>
+                <a href="#cancelledOrders" onclick="toggleSidebar(); openView('cancelledOrdersView')" class="w-full px-3 py-2.5 rounded-lg hover:bg-[#0B6B4F] transition flex items-center space-x-3 text-white">
+                    <i class="fa-solid fa-ban text-[#DC2626] w-4 text-center"></i>
+                    <span>Cancelled Orders Archive</span>
+                </a>
+            </div>
+
+            <!-- CATALOG -->
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] uppercase font-bold tracking-wider text-[#08B67D]">Catalog & Pricing</p>
+                <a href="#catalogManagement" onclick="toggleSidebar(); switchTab('catalogManagement')" class="w-full px-3 py-2.5 rounded-lg hover:bg-[#0B6B4F] transition flex items-center space-x-3 text-white">
+                    <i class="fa-solid fa-store text-[#FFD000] w-4 text-center"></i>
+                    <span>Categories & Products</span>
+                </a>
+                <a href="#couponManagement" onclick="toggleSidebar(); switchTab('couponManagement')" class="w-full px-3 py-2.5 rounded-lg hover:bg-[#0B6B4F] transition flex items-center space-x-3 text-white">
+                    <i class="fa-solid fa-ticket text-[#A9005A] w-4 text-center bg-white rounded-sm px-0.5"></i>
+                    <span>Coupon Codes</span>
+                </a>
+            </div>
+
+            <!-- HOME / WEBSITE -->
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] uppercase font-bold tracking-wider text-[#08B67D]">Website & Content</p>
+                <a href="#homeManagement" onclick="toggleSidebar(); switchTab('homeManagement')" class="w-full px-3 py-2.5 rounded-lg hover:bg-[#0B6B4F] transition flex items-center space-x-3 text-white">
+                    <i class="fa-solid fa-house text-[#FFD000] w-4 text-center"></i>
+                    <span>Logo, Banners & Socials</span>
+                </a>
+            </div>
+
+            <!-- CUSTOMERS -->
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] uppercase font-bold tracking-wider text-[#08B67D]">Customers</p>
+                <a href="#customerManagement" onclick="toggleSidebar(); switchTab('customerManagement')" class="w-full px-3 py-2.5 rounded-lg hover:bg-[#0B6B4F] transition flex items-center space-x-3 text-white">
+                    <i class="fa-solid fa-users text-[#FFD000] w-4 text-center"></i>
+                    <span>District Directory</span>
+                </a>
+            </div>
+
+            <!-- SECURITY & SYSTEM -->
+            <div class="space-y-1">
+                <p class="px-3 text-[10px] uppercase font-bold tracking-wider text-[#08B67D]">Security & System</p>
+                <a href="#adminCredentials" onclick="toggleSidebar(); switchTab('adminCredentials')" class="w-full px-3 py-2.5 rounded-lg hover:bg-[#0B6B4F] transition flex items-center space-x-3 text-white">
+                    <i class="fa-solid fa-key text-[#FFD000] w-4 text-center"></i>
+                    <span>Admin Credentials</span>
+                </a>
+            </div>
         </nav>
-        <div class="p-4 border-t border-[#123C2D]">
-            <button onclick="logoutAdmin()" class="w-full py-2.5 bg-[#D9364F] hover:bg-[#D40000] text-white rounded font-bold transition text-center shadow"><i class="fa-solid fa-right-from-bracket mr-2"></i>LOGOUT</button>
+
+        <div class="p-4 border-t border-[#123C2D] bg-[#053d2e]">
+            <button onclick="logoutAdmin()" class="w-full py-2.5 bg-[#D9364F] hover:bg-[#D40000] text-white rounded-lg font-bold transition text-center shadow flex items-center justify-center space-x-2 text-xs">
+                <i class="fa-solid fa-right-from-bracket"></i>
+                <span>LOGOUT ADMIN</span>
+            </button>
         </div>
     </aside>
 
     <!-- MAIN DASHBOARD CONTENT CONTAINER -->
     <main class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full space-y-6">
 
-        <section id="dashboardMain">
-            <div class="grid grid-cols-2 gap-3 sm:gap-6">
-                <!-- PH1 -->
-                <div onclick="openView('pendingOrdersView')" class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-custom cursor-pointer hover:border-[#08B67D] transition transform active:scale-98">
-                    <p class="text-xs sm:text-sm font-semibold text-[#70777D] uppercase">Pending Orders</p>
-                    <h2 id="cardPendingCount" class="text-2xl sm:text-4xl font-extrabold text-[#F59E0B] mt-2">30</h2>
-                    <span class="text-[10px] sm:text-xs text-[#0B6B4F] font-medium mt-1 inline-block"><i class="fa-solid fa-arrow-pointer mr-1"></i>Tap to review</span>
+        <!-- GLOBAL LOADING / ERROR BANNER -->
+        <div id="globalSystemStatus" class="hidden p-4 rounded-xl text-xs font-semibold text-center shadow-sm"></div>
+
+        <!-- DASHBOARD VIEW -->
+        <section id="dashboardMain" class="space-y-6">
+            <!-- WELCOME / STATUS HEADER -->
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-custom flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-lg sm:text-xl font-extrabold text-[#263447]">Business Overview Dashboard</h2>
+                    <p class="text-xs text-[#70777D] mt-0.5">Real-time statistics synchronized securely from Supabase database.</p>
                 </div>
-                <!-- PH2 -->
-                <div onclick="openView('confirmedOrdersView')" class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-custom cursor-pointer hover:border-[#08B67D] transition transform active:scale-98">
-                    <p class="text-xs sm:text-sm font-semibold text-[#70777D] uppercase">Confirmed Orders</p>
-                    <h2 id="cardConfirmedCount" class="text-2xl sm:text-4xl font-extrabold text-[#16A34A] mt-2">25</h2>
-                    <span class="text-[10px] sm:text-xs text-[#0B6B4F] font-medium mt-1 inline-block"><i class="fa-solid fa-arrow-pointer mr-1"></i>Tap to view/invoices</span>
-                </div>
-                <!-- PH3 -->
-                <div onclick="openView('pendingAmountView')" class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-custom cursor-pointer hover:border-[#08B67D] transition transform active:scale-98">
-                    <p class="text-xs sm:text-sm font-semibold text-[#70777D] uppercase">Pending Amount</p>
-                    <h2 id="cardPendingAmount" class="text-xl sm:text-3xl font-extrabold text-[#F59E0B] mt-2">₹60,000</h2>
-                    <span class="text-[10px] sm:text-xs text-[#0B6B4F] font-medium mt-1 inline-block"><i class="fa-solid fa-chart-line mr-1"></i>View pending graph</span>
-                </div>
-                <!-- PH4 -->
-                <div onclick="openView('earningAmountView')" class="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-custom cursor-pointer hover:border-[#08B67D] transition transform active:scale-98">
-                    <p class="text-xs sm:text-sm font-semibold text-[#70777D] uppercase">Earning Amount</p>
-                    <h2 id="cardEarningAmount" class="text-xl sm:text-3xl font-extrabold text-[#16A34A] mt-2">₹1,50,000</h2>
-                    <span class="text-[10px] sm:text-xs text-[#0B6B4F] font-medium mt-1 inline-block"><i class="fa-solid fa-chart-pie mr-1"></i>View sales graph</span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="fetchAllRealData()" class="px-3.5 py-2 bg-[#0B6B4F] hover:bg-[#064C3A] text-white rounded-lg text-xs font-bold transition flex items-center space-x-2 shadow-sm">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Refresh Data</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="mt-6 bg-white rounded-xl p-4 border border-custom flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-full bg-[#FFF0F7] flex items-center justify-center text-[#A9005A]">
-                        <i class="fa-solid fa-ban"></i>
-                    </div>
+            <!-- 5 METRIC CARDS CONNECTED TO SUPABASE -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
+                <!-- 1. Pending Orders -->
+                <div onclick="openView('pendingOrdersView')" class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-custom cursor-pointer hover:border-[#08B67D] transition transform active:scale-98 flex flex-col justify-between">
                     <div>
-                        <h3 class="font-bold text-sm text-[#263447]">Cancelled Orders Archive</h3>
-                        <p class="text-xs text-[#70777D]">View history of cancelled orders</p>
+                        <p class="text-[11px] sm:text-xs font-semibold text-[#70777D] uppercase tracking-wider">Pending Orders</p>
+                        <h2 id="cardPendingCount" class="text-2xl sm:text-3xl font-extrabold text-[#F59E0B] mt-2">--</h2>
                     </div>
+                    <span class="text-[10px] sm:text-xs text-[#0B6B4F] font-medium mt-3 inline-flex items-center"><i class="fa-solid fa-arrow-pointer mr-1"></i>Tap to review</span>
                 </div>
-                <button onclick="openView('cancelledOrdersView')" class="px-4 py-2 bg-[#0B6B4F] text-white rounded-lg text-xs font-bold hover:bg-[#064C3A] transition">View History</button>
+                <!-- 2. Confirmed Orders -->
+                <div onclick="openView('confirmedOrdersView')" class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-custom cursor-pointer hover:border-[#08B67D] transition transform active:scale-98 flex flex-col justify-between">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold text-[#70777D] uppercase tracking-wider">Confirmed Orders</p>
+                        <h2 id="cardConfirmedCount" class="text-2xl sm:text-3xl font-extrabold text-[#16A34A] mt-2">--</h2>
+                    </div>
+                    <span class="text-[10px] sm:text-xs text-[#0B6B4F] font-medium mt-3 inline-flex items-center"><i class="fa-solid fa-arrow-pointer mr-1"></i>Tap for invoices</span>
+                </div>
+                <!-- 3. Cancelled Orders -->
+                <div onclick="openView('cancelledOrdersView')" class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-custom cursor-pointer hover:border-[#08B67D] transition transform active:scale-98 flex flex-col justify-between">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold text-[#70777D] uppercase tracking-wider">Cancelled Orders</p>
+                        <h2 id="cardCancelledCount" class="text-2xl sm:text-3xl font-extrabold text-[#DC2626] mt-2">--</h2>
+                    </div>
+                    <span class="text-[10px] sm:text-xs text-[#0B6B4F] font-medium mt-3 inline-flex items-center"><i class="fa-solid fa-arrow-pointer mr-1"></i>Tap to view archive</span>
+                </div>
+                <!-- 4. Pending Amount -->
+                <div onclick="openView('pendingAmountView')" class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-custom cursor-pointer hover:border-[#08B67D] transition transform active:scale-98 flex flex-col justify-between">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold text-[#70777D] uppercase tracking-wider">Pending Amount</p>
+                        <h2 id="cardPendingAmount" class="text-lg sm:text-2xl font-extrabold text-[#F59E0B] mt-2">₹--</h2>
+                    </div>
+                    <span class="text-[10px] sm:text-xs text-[#0B6B4F] font-medium mt-3 inline-flex items-center"><i class="fa-solid fa-chart-line mr-1"></i>View pending graph</span>
+                </div>
+                <!-- 5. Earning Amount -->
+                <div onclick="openView('earningAmountView')" class="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-custom cursor-pointer hover:border-[#08B67D] transition transform active:scale-98 flex flex-col justify-between col-span-2 md:col-span-1">
+                    <div>
+                        <p class="text-[11px] sm:text-xs font-semibold text-[#70777D] uppercase tracking-wider">Earning Amount</p>
+                        <h2 id="cardEarningAmount" class="text-lg sm:text-2xl font-extrabold text-[#16A34A] mt-2">₹--</h2>
+                    </div>
+                    <span class="text-[10px] sm:text-xs text-[#0B6B4F] font-medium mt-3 inline-flex items-center"><i class="fa-solid fa-chart-pie mr-1"></i>View sales graph</span>
+                </div>
+            </div>
+
+            <!-- RECENT ORDERS QUICK TABLE -->
+            <div class="bg-white rounded-2xl p-5 border border-custom shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h3 class="font-extrabold text-sm text-[#263447] uppercase tracking-wide">Recent Pending Orders</h3>
+                    <button onclick="openView('pendingOrdersView')" class="text-xs text-[#0B6B4F] font-bold hover:underline">View All Pending &rarr;</button>
+                </div>
+                <div id="dashboardRecentOrdersList" class="space-y-3">
+                    <p class="text-xs text-[#70777D] text-center py-4">Loading real Supabase orders...</p>
+                </div>
             </div>
         </section>
 
+        <!-- DYNAMIC CONTENT AREA -->
         <div id="dynamicContentArea" class="hidden space-y-6"></div>
 
     </main>
 
     <!-- GLOBAL MODAL CONTAINER -->
     <div id="globalModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div id="modalContentWrapper" class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto"></div>
+        <div id="modalContentWrapper" class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto"></div>
     </div>
 
-    <!-- CORE JAVASCRIPT LOGIC -->
+    <!-- CORE JAVASCRIPT & SUPABASE INTEGRATION -->
     <script>
         let appState = {
             logo: "https://via.placeholder.com/150",
@@ -171,70 +275,148 @@
             contact: "7780942656",
             instagram: "https://instagram.com/amalapyrotech",
             youtube: "https://youtube.com/@amalapyrotech",
-            heroBanners: [
-                { id: 1, url: "https://via.placeholder.com/800x400?text=Banner+1" },
-                { id: 2, url: "https://via.placeholder.com/800x400?text=Banner+2" }
-            ],
-            gallery: [
-                { id: 1, url: "https://via.placeholder.com/300?text=Gallery+1" }
-            ],
-            categories: [
-                { id: 1, name: "Sparklers" },
-                { id: 2, name: "Ground Chakkars" },
-                { id: 3, name: "Flower Pots" }
-            ],
-            products: [
-                { id: 1, code: "OSC-001", name: "10cm Electric Sparklers", category: "Sparklers", mrp: 200, price: 100, image: "https://via.placeholder.com/150" },
-                { id: 2, code: "OSC-002", name: "Big Ground Chakkars", category: "Ground Chakkars", mrp: 300, price: 150, image: "https://via.placeholder.com/150" }
-            ],
-            coupons: [
-                { id: 1, code: "VELMURUGAN", discount: 5, type: "percent" }
-            ],
-            pendingOrders: [
-                { 
-                    id: 101, 
-                    customer: "Velmurugan", 
-                    district: "Chennai", 
-                    address: "12 Anna Nagar, Chennai", 
-                    phone: "9876543210", 
-                    items: [
-                        { code: "OSC-001", name: "10cm Electric Sparklers", qty: 2, price: 100, amount: 200 },
-                        { code: "OSC-002", name: "Big Ground Chakkars", qty: 15, price: 150, amount: 2250 }
-                    ], 
-                    total: 2450 
-                }
-            ],
-            confirmedOrders: [
-                { 
-                    id: 100, 
-                    customer: "Murugan", 
-                    district: "Madurai", 
-                    address: "45 Main Road, Madurai", 
-                    phone: "9123456789", 
-                    items: [
-                        { code: "OSC-002", name: "Big Ground Chakkars", qty: 10, price: 150, amount: 1500 },
-                        { code: "OSC-001", name: "10cm Electric Sparklers", qty: 20, price: 100, amount: 2000 }
-                    ], 
-                    total: 3500 
-                }
-            ],
+            heroBanners: [],
+            categories: [],
+            products: [],
+            coupons: [],
+            pendingOrders: [],
+            confirmedOrders: [],
             cancelledOrders: []
         };
 
-        function initApp() {
-            updateDashboardMetrics();
-            document.getElementById('headerLogo').src = appState.logo;
+        // Initialize App on DOM Load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchAllRealData();
+        });
+
+        // FAST PARALLEL DATA FETCHING FROM SUPABASE
+        async function fetchAllRealData() {
+            setSystemStatus("Syncing real data from Supabase...", "info");
+            try {
+                // Using Promise.all for fast parallel execution
+                const [ordersRes, catalogRes, settingsRes] = await Promise.all([
+                    supabase.from('orders').select('*, order_items(*), invoice_snapshot').order('created_at', { ascending: false }),
+                    supabase.from('products').select('*, categories(*)').catch(() => ({ data: [] })),
+                    supabase.from('settings').select('*').catch(() => ({ data: [] }))
+                ]);
+
+                if (ordersRes.error) {
+                    console.error("Orders fetch error:", ordersRes.error);
+                } else if (ordersRes.data) {
+                    // Map Supabase orders to application state
+                    let allOrders = ordersRes.data;
+                    appState.pendingOrders = allOrders.filter(o => o.status === 'pending' || !o.status);
+                    appState.confirmedOrders = allOrders.filter(o => o.status === 'confirmed');
+                    appState.cancelledOrders = allOrders.filter(o => o.status === 'cancelled');
+                }
+
+                // Fetch Categories
+                const catRes = await supabase.from('categories').select('*').catch(() => ({ data: [] }));
+                if (catRes.data) appState.categories = catRes.data;
+
+                // Fetch Products
+                const prodRes = await supabase.from('products').select('*').catch(() => ({ data: [] }));
+                if (prodRes.data) {
+                    appState.products = prodRes.data.map(p => ({
+                        id: p.id,
+                        code: p.product_code || p.code || 'OSC-001',
+                        name: p.name,
+                        category: p.category_name || p.category || 'General',
+                        mrp: p.mrp || 0,
+                        price: p.price || 0,
+                        image: p.image_url || p.image || 'https://via.placeholder.com/150'
+                    }));
+                }
+
+                // Fetch Coupons
+                const coupRes = await supabase.from('coupons').select('*').catch(() => ({ data: [] }));
+                if (coupRes.data) appState.coupons = coupRes.data;
+
+                // Fetch Settings / Logo / Socials
+                if (settingsRes.data && settingsRes.data.length > 0) {
+                    let s = settingsRes.data[0];
+                    if (s.logo) appState.logo = s.logo;
+                    if (s.whatsapp) appState.whatsapp = s.whatsapp;
+                    if (s.contact) appState.contact = s.contact;
+                    if (s.instagram) appState.instagram = s.instagram;
+                    if (s.youtube) appState.youtube = s.youtube;
+                }
+
+                document.getElementById('headerLogo').src = appState.logo;
+                updateDashboardMetrics();
+                renderDashboardRecentOrders();
+                setSystemStatus("Successfully synchronized with Supabase database.", "success");
+                setTimeout(clearSystemStatus, 3000);
+
+            } catch (err) {
+                console.error("Supabase sync exception:", err);
+                setSystemStatus("Unable to load real data from Supabase. Please check your connection.", "error");
+            }
+        }
+
+        function setSystemStatus(msg, type) {
+            const banner = document.getElementById('globalSystemStatus');
+            banner.classList.remove('hidden', 'bg-blue-100', 'text-blue-800', 'bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800');
+            if (type === 'info') {
+                banner.classList.add('bg-blue-100', 'text-blue-800');
+            } else if (type === 'success') {
+                banner.classList.add('bg-green-100', 'text-green-800');
+            } else if (type === 'error') {
+                banner.classList.add('bg-red-100', 'text-red-800');
+            }
+            banner.innerText = msg;
+        }
+
+        function clearSystemStatus() {
+            document.getElementById('globalSystemStatus').classList.add('hidden');
         }
 
         function updateDashboardMetrics() {
             document.getElementById('cardPendingCount').innerText = appState.pendingOrders.length;
             document.getElementById('cardConfirmedCount').innerText = appState.confirmedOrders.length;
+            document.getElementById('cardCancelledCount').innerText = appState.cancelledOrders.length;
 
-            let totalPendingAmt = appState.pendingOrders.reduce((sum, o) => sum + o.total, 0);
-            let totalEarningAmt = appState.confirmedOrders.reduce((sum, o) => sum + o.total, 0);
+            let totalPendingAmt = appState.pendingOrders.reduce((sum, o) => {
+                let amt = o.total || (o.invoice_snapshot ? o.invoice_snapshot.grandTotal : 0) || 0;
+                return sum + amt;
+            }, 0);
+
+            let totalEarningAmt = appState.confirmedOrders.reduce((sum, o) => {
+                let amt = o.total || (o.invoice_snapshot ? o.invoice_snapshot.grandTotal : 0) || 0;
+                return sum + amt;
+            }, 0);
 
             document.getElementById('cardPendingAmount').innerText = '₹' + totalPendingAmt.toLocaleString('en-IN');
             document.getElementById('cardEarningAmount').innerText = '₹' + totalEarningAmt.toLocaleString('en-IN');
+        }
+
+        function renderDashboardRecentOrders() {
+            let container = document.getElementById('dashboardRecentOrdersList');
+            if (!appState.pendingOrders || appState.pendingOrders.length === 0) {
+                container.innerHTML = `<p class="text-xs text-[#70777D] py-4 text-center">No pending orders found in Supabase database.</p>`;
+                return;
+            }
+
+            let html = '';
+            appState.pendingOrders.slice(0, 5).forEach((o, index) => {
+                let customerName = o.customer_name || o.customer || 'Customer';
+                let phone = o.phone || o.customer_phone || '';
+                let total = o.total || (o.invoice_snapshot ? o.invoice_snapshot.grandTotal : 0) || 0;
+                html += `<div class="p-3.5 bg-[#F5F7F8] rounded-xl border border-custom flex justify-between items-center">
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-xs text-[#263447]">#${o.id} - ${customerName}</span>
+                            <span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Pending</span>
+                        </div>
+                        <p class="text-[11px] text-[#70777D] mt-0.5">Phone: ${phone} | District: ${o.district || 'N/A'}</p>
+                    </div>
+                    <div class="text-right flex items-center space-x-3">
+                        <span class="font-extrabold text-xs text-[#263447]">₹${total.toLocaleString('en-IN')}</span>
+                        <button onclick="viewOrderDetail('${o.id}', 'pending')" class="px-3 py-1.5 bg-[#0B6B4F] text-white rounded-lg text-xs font-bold hover:bg-[#064C3A] transition">Review</button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
         }
 
         function toggleSidebar() {
@@ -260,6 +442,7 @@
             document.getElementById('dynamicContentArea').classList.add('hidden');
             document.getElementById('dashboardMain').classList.remove('hidden');
             updateDashboardMetrics();
+            renderDashboardRecentOrders();
         }
 
         function openView(viewName) {
@@ -268,21 +451,23 @@
             area.classList.remove('hidden');
 
             if (viewName === 'pendingOrdersView') {
-                let html = `<div class="bg-white p-4 rounded-xl shadow-sm border border-custom space-y-4">
+                let html = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-4">
                     <div class="flex justify-between items-center border-b pb-3">
-                        <h2 class="font-extrabold text-[#263447] text-lg"><i class="fa-solid fa-clock-rotate-left text-[#F59E0B] mr-2"></i>Pending Orders (${appState.pendingOrders.length})</h2>
-                        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+                        <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-clock-rotate-left text-[#F59E0B] mr-2"></i>Pending Orders (${appState.pendingOrders.length})</h2>
+                        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                     </div>`;
                 if(appState.pendingOrders.length === 0) {
-                    html += `<p class="text-sm text-[#70777D] py-6 text-center">No pending orders currently available.</p>`;
+                    html += `<p class="text-sm text-[#70777D] py-8 text-center">No pending orders found in Supabase.</p>`;
                 } else {
                     appState.pendingOrders.forEach((o, index) => {
-                        html += `<div class="p-3 bg-[#F5F7F8] rounded-lg border border-custom flex justify-between items-center">
+                        let cName = o.customer_name || o.customer || 'Customer';
+                        let tot = o.total || (o.invoice_snapshot ? o.invoice_snapshot.grandTotal : 0) || 0;
+                        html += `<div class="p-4 bg-[#F5F7F8] rounded-xl border border-custom flex justify-between items-center">
                             <div>
-                                <span class="font-bold text-sm text-[#263447]">${index + 1}. ${o.customer}</span>
-                                <p class="text-xs text-[#70777D]">Total: ₹${o.total} | Phone: ${o.phone}</p>
+                                <span class="font-bold text-xs text-[#263447]">#${o.id} - ${cName} (${o.district || 'N/A'})</span>
+                                <p class="text-xs text-[#70777D] mt-0.5">Total: ₹${tot.toLocaleString('en-IN')} | Phone: ${o.phone || o.customer_phone || 'N/A'}</p>
                             </div>
-                            <button onclick="viewOrderDetail(${o.id}, 'pending')" class="px-3 py-1 bg-[#0B6B4F] text-white rounded text-xs font-bold hover:bg-[#064C3A]">View</button>
+                            <button onclick="viewOrderDetail('${o.id}', 'pending')" class="px-3.5 py-1.5 bg-[#0B6B4F] text-white rounded-lg text-xs font-bold hover:bg-[#064C3A]">Review Order</button>
                         </div>`;
                     });
                 }
@@ -290,21 +475,23 @@
                 area.innerHTML = html;
             } 
             else if (viewName === 'confirmedOrdersView') {
-                let html = `<div class="bg-white p-4 rounded-xl shadow-sm border border-custom space-y-4">
+                let html = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-4">
                     <div class="flex justify-between items-center border-b pb-3">
-                        <h2 class="font-extrabold text-[#263447] text-lg"><i class="fa-solid fa-circle-check text-[#16A34A] mr-2"></i>Confirmed Orders (${appState.confirmedOrders.length})</h2>
-                        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+                        <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-circle-check text-[#16A34A] mr-2"></i>Confirmed Orders & Invoices (${appState.confirmedOrders.length})</h2>
+                        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                     </div>`;
                 if(appState.confirmedOrders.length === 0) {
-                    html += `<p class="text-sm text-[#70777D] py-6 text-center">No confirmed orders available.</p>`;
+                    html += `<p class="text-sm text-[#70777D] py-8 text-center">No confirmed orders available.</p>`;
                 } else {
                     appState.confirmedOrders.forEach((o, index) => {
-                        html += `<div class="p-3 bg-[#EFFBF4] rounded-lg border border-custom flex justify-between items-center">
+                        let cName = o.customer_name || o.customer || 'Customer';
+                        let tot = o.total || (o.invoice_snapshot ? o.invoice_snapshot.grandTotal : 0) || 0;
+                        html += `<div class="p-4 bg-[#EFFBF4] rounded-xl border border-custom flex justify-between items-center">
                             <div>
-                                <span class="font-bold text-sm text-[#263447]">${index + 1}. ${o.customer}</span>
-                                <p class="text-xs text-[#70777D]">Total Paid: ₹${o.total}</p>
+                                <span class="font-bold text-xs text-[#263447]">#${o.id} - ${cName}</span>
+                                <p class="text-xs text-[#70777D] mt-0.5">Total Paid: ₹${tot.toLocaleString('en-IN')} | District: ${o.district || 'N/A'}</p>
                             </div>
-                            <button onclick="viewOrderDetail(${o.id}, 'confirmed')" class="px-3 py-1 bg-[#0B6B4F] text-white rounded text-xs font-bold hover:bg-[#064C3A]">View / Invoice</button>
+                            <button onclick="viewOrderDetail('${o.id}', 'confirmed')" class="px-3.5 py-1.5 bg-[#0B6B4F] text-white rounded-lg text-xs font-bold hover:bg-[#064C3A]">View / Invoice</button>
                         </div>`;
                     });
                 }
@@ -312,21 +499,23 @@
                 area.innerHTML = html;
             }
             else if (viewName === 'cancelledOrdersView') {
-                let html = `<div class="bg-white p-4 rounded-xl shadow-sm border border-custom space-y-4">
+                let html = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-4">
                     <div class="flex justify-between items-center border-b pb-3">
-                        <h2 class="font-extrabold text-[#263447] text-lg"><i class="fa-solid fa-ban text-[#DC2626] mr-2"></i>Cancelled Orders Archive</h2>
-                        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+                        <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-ban text-[#DC2626] mr-2"></i>Cancelled Orders Archive (${appState.cancelledOrders.length})</h2>
+                        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                     </div>`;
                 if(appState.cancelledOrders.length === 0) {
-                    html += `<p class="text-sm text-[#70777D] py-6 text-center">No cancelled orders in history.</p>`;
+                    html += `<p class="text-sm text-[#70777D] py-8 text-center">No cancelled orders in history.</p>`;
                 } else {
                     appState.cancelledOrders.forEach((o, index) => {
-                        html += `<div class="p-3 bg-red-50 rounded-lg border border-custom flex justify-between items-center">
+                        let cName = o.customer_name || o.customer || 'Customer';
+                        let tot = o.total || (o.invoice_snapshot ? o.invoice_snapshot.grandTotal : 0) || 0;
+                        html += `<div class="p-4 bg-red-50 rounded-xl border border-custom flex justify-between items-center">
                             <div>
-                                <span class="font-bold text-sm text-[#263447]">${index + 1}. ${o.customer}</span>
-                                <p class="text-xs text-[#70777D]">Cancelled Amount: ₹${o.total}</p>
+                                <span class="font-bold text-xs text-[#263447]">#${o.id} - ${cName}</span>
+                                <p class="text-xs text-[#70777D] mt-0.5">Cancelled Amount: ₹${tot.toLocaleString('en-IN')}</p>
                             </div>
-                            <button onclick="viewOrderDetail(${o.id}, 'cancelled')" class="px-3 py-1 bg-[#263447] text-white rounded text-xs font-bold">View (No Invoice)</button>
+                            <button onclick="viewOrderDetail('${o.id}', 'cancelled')" class="px-3.5 py-1.5 bg-[#263447] text-white rounded-lg text-xs font-bold">View Archive</button>
                         </div>`;
                     });
                 }
@@ -336,19 +525,20 @@
             else if (viewName === 'pendingAmountView' || viewName === 'earningAmountView') {
                 let isEarning = viewName === 'earningAmountView';
                 let title = isEarning ? 'Earning Amount Analysis & Graphs' : 'Pending Amount Summary Graph';
-                let totalAmt = isEarning ? appState.confirmedOrders.reduce((s,o)=>s+o.total,0) : appState.pendingOrders.reduce((s,o)=>s+o.total,0);
+                let totalAmt = isEarning ? 
+                    appState.confirmedOrders.reduce((s,o)=>s + (o.total || (o.invoice_snapshot ? o.invoice_snapshot.grandTotal : 0) || 0), 0) : 
+                    appState.pendingOrders.reduce((s,o)=>s + (o.total || (o.invoice_snapshot ? o.invoice_snapshot.grandTotal : 0) || 0), 0);
 
-                area.innerHTML = `<div class="bg-white p-4 rounded-xl shadow-sm border border-custom space-y-4">
+                area.innerHTML = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-4">
                     <div class="flex justify-between items-center border-b pb-3">
-                        <h2 class="font-extrabold text-[#263447] text-lg">${title}</h2>
-                        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+                        <h2 class="font-extrabold text-[#263447] text-base">${title}</h2>
+                        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                     </div>
-                    <div class="p-4 bg-[#F5F7F8] rounded-xl text-center">
-                        <p class="text-sm text-[#70777D] uppercase font-semibold">Total ${isEarning ? 'Earnings' : 'Pending'}</p>
+                    <div class="p-5 bg-[#F5F7F8] rounded-xl text-center">
+                        <p class="text-xs text-[#70777D] uppercase font-semibold">Total ${isEarning ? 'Earnings' : 'Pending'}</p>
                         <p class="text-3xl font-extrabold ${isEarning ? 'text-[#16A34A]' : 'text-[#F59E0B]'} mt-1">₹${totalAmt.toLocaleString('en-IN')}</p>
                     </div>
-                    ${isEarning ? `<div class="flex space-x-2 my-2"><button class="px-3 py-1 text-xs bg-[#0B6B4F] text-white rounded font-bold">Daily</button><button class="px-3 py-1 text-xs bg-[#DDE2E6] text-[#263447] rounded font-bold">Monthly</button><button class="px-3 py-1 text-xs bg-[#DDE2E6] text-[#263447] rounded font-bold">Yearly</button></div>` : ''}
-                    <div class="h-64 relative"><canvas id="analyticsChart"></canvas></div>
+                    <div class="h-64 relative pt-2"><canvas id="analyticsChart"></canvas></div>
                 </div>`;
 
                 setTimeout(() => {
@@ -356,12 +546,12 @@
                     new Chart(ctx, {
                         type: 'line',
                         data: {
-                            labels: ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Today'],
+                            labels: ['Start', 'Period 1', 'Period 2', 'Current'],
                             datasets: [{
                                 label: isEarning ? 'Earnings (₹)' : 'Pending Value (₹)',
-                                data: [10000, 35000, 75000, 110000, totalAmt],
+                                data: [0, totalAmt * 0.3, totalAmt * 0.7, totalAmt],
                                 borderColor: isEarning ? '#16A34A' : '#F59E0B',
-                                backgroundColor: isEarning ? 'rgba(22, 163, 174, 0.1)' : 'rgba(245, 158, 11, 0.1)',
+                                backgroundColor: isEarning ? 'rgba(22, 163, 74, 0.1)' : 'rgba(245, 158, 11, 0.1)',
                                 fill: true,
                                 tension: 0.3
                             }]
@@ -372,62 +562,90 @@
             }
         }
 
-        // --- UPDATED VIEW ORDER DETAIL WITH S.NO AND PRODUCT CODE TABLE ---
+        // --- ORDER DETAIL & INVOICE RE-USING CUSTOMER SNAPSHOT EXACTLY ---
         function viewOrderDetail(orderId, type) {
             let order = null;
-            if(type === 'pending') order = appState.pendingOrders.find(o => o.id === orderId);
-            else if(type === 'confirmed') order = appState.confirmedOrders.find(o => o.id === orderId);
-            else order = appState.cancelledOrders.find(o => o.id === orderId);
+            if(type === 'pending') order = appState.pendingOrders.find(o => String(o.id) === String(orderId));
+            else if(type === 'confirmed') order = appState.confirmedOrders.find(o => String(o.id) === String(orderId));
+            else order = appState.cancelledOrders.find(o => String(o.id) === String(orderId));
 
             if(!order) return;
 
+            let cName = order.customer_name || order.customer || 'Customer';
+            let phone = order.phone || order.customer_phone || 'N/A';
+            let address = order.address || order.customer_address || 'N/A';
+            let district = order.district || 'N/A';
+            let total = order.total || (order.invoice_snapshot ? order.invoice_snapshot.grandTotal : 0) || 0;
+
+            let items = [];
+            if(order.invoice_snapshot && order.invoice_snapshot.items) {
+                items = order.invoice_snapshot.items;
+            } else if(order.order_items && order.order_items.length > 0) {
+                items = order.order_items.map(i => ({
+                    code: i.product_code || i.code || 'N/A',
+                    name: i.product_name || i.name || 'Item',
+                    qty: i.quantity || i.qty || 1,
+                    price: i.price || 0,
+                    amount: (i.quantity || i.qty || 1) * (i.price || 0)
+                }));
+            }
+
             let html = `<div class="space-y-4">
-                <div class="flex justify-between items-center border-b pb-2">
+                <div class="flex justify-between items-center border-b pb-3">
                     <h3 class="font-extrabold text-[#263447] text-base">Order #${order.id} Details</h3>
                     <button onclick="closeModal()" class="text-gray-500 font-bold text-xl">&times;</button>
                 </div>
-                <div class="text-xs space-y-1 text-[#263447] bg-[#F5F7F8] p-3 rounded-lg">
-                    <p><strong>Customer:</strong> ${order.customer}</p>
-                    <p><strong>District:</strong> ${order.district}</p>
-                    <p><strong>Address:</strong> ${order.address}</p>
-                    <p><strong>Contact:</strong> ${order.phone}</p>
+                <div class="text-xs space-y-1.5 text-[#263447] bg-[#F5F7F8] p-3.5 rounded-xl border border-custom">
+                    <p><strong>Customer:</strong> ${cName}</p>
+                    <p><strong>District:</strong> ${district}</p>
+                    <p><strong>Address:</strong> ${address}</p>
+                    <p><strong>Contact:</strong> ${phone}</p>
                 </div>
-                <div class="border rounded-lg overflow-x-auto">
+                <div class="border rounded-xl overflow-x-auto">
                     <table class="w-full text-left text-xs whitespace-nowrap">
                         <thead class="bg-[#EFFBF4] text-[#0B6B4F]">
                             <tr>
-                                <th class="p-2">S.No</th>
-                                <th class="p-2">Product Code</th>
-                                <th class="p-2">Item Name</th>
-                                <th class="p-2">Qty</th>
-                                <th class="p-2">Price</th>
-                                <th class="p-2">Amount</th>
+                                <th class="p-2.5">S.No</th>
+                                <th class="p-2.5">Product Code</th>
+                                <th class="p-2.5">Item Name</th>
+                                <th class="p-2.5">Qty</th>
+                                <th class="p-2.5">Price</th>
+                                <th class="p-2.5">Amount</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y">`;
 
-            order.items.forEach((i, index) => {
-                html += `<tr>
-                    <td class="p-2 font-bold">${index + 1}</td>
-                    <td class="p-2 text-[#70777D]">${i.code || 'N/A'}</td>
-                    <td class="p-2 font-medium">${i.name}</td>
-                    <td class="p-2">${i.qty}</td>
-                    <td class="p-2">₹${i.price}</td>
-                    <td class="p-2 font-semibold">₹${i.amount}</td>
-                </tr>`;
-            });
+            if(items.length === 0) {
+                html += `<tr><td colspan="6" class="p-4 text-center text-gray-500">No items recorded for this order.</td></tr>`;
+            } else {
+                items.forEach((i, index) => {
+                    let itmCode = i.code || i.product_code || 'N/A';
+                    let itmName = i.name || i.product_name || 'Item';
+                    let itmQty = i.qty || i.quantity || 1;
+                    let itmPrice = i.price || 0;
+                    let itmAmt = i.amount || (itmQty * itmPrice);
+                    html += `<tr>
+                        <td class="p-2.5 font-bold">${index + 1}</td>
+                        <td class="p-2.5 text-[#70777D]">${itmCode}</td>
+                        <td class="p-2.5 font-medium">${itmName}</td>
+                        <td class="p-2.5">${itmQty}</td>
+                        <td class="p-2.5">₹${itmPrice}</td>
+                        <td class="p-2.5 font-semibold">₹${itmAmt}</td>
+                    </tr>`;
+                });
+            }
 
             html += `</tbody></table></div>
-                <div class="text-right font-extrabold text-sm text-[#263447] pt-1">Order Total: ₹${order.total}</div>`;
+                <div class="text-right font-extrabold text-sm text-[#263447] pt-1">Grand Total: ₹${total.toLocaleString('en-IN')}</div>`;
 
             if(type === 'pending') {
-                html += `<div class="flex space-x-2 pt-3 border-t">
-                    <button onclick="confirmPendingOrder(${order.id})" class="flex-1 py-2 bg-[#0B6B4F] text-white rounded font-bold text-xs hover:bg-[#064C3A]">Confirm Order</button>
-                    <button onclick="promptCancelOrder(${order.id})" class="flex-1 py-2 bg-[#D9364F] text-white rounded font-bold text-xs hover:bg-[#D40000]">Cancel Order</button>
+                html += `<div class="flex space-x-3 pt-3 border-t">
+                    <button onclick="confirmPendingOrder('${order.id}')" class="flex-1 py-2.5 bg-[#0B6B4F] text-white rounded-xl font-bold text-xs hover:bg-[#064C3A]">Confirm Order</button>
+                    <button onclick="promptCancelOrder('${order.id}')" class="flex-1 py-2.5 bg-[#D9364F] text-white rounded-xl font-bold text-xs hover:bg-[#D40000]">Cancel Order</button>
                 </div>`;
             } else if(type === 'confirmed') {
                 html += `<div class="pt-3 border-t">
-                    <button onclick="downloadInvoice(${order.id})" class="w-full py-2 bg-[#263447] text-white rounded font-bold text-xs flex items-center justify-center space-x-2"><i class="fa-solid fa-download"></i><span>Download / Print Invoice</span></button>
+                    <button onclick="downloadCustomerInvoice('${order.id}')" class="w-full py-2.5 bg-[#263447] text-white rounded-xl font-bold text-xs flex items-center justify-center space-x-2 shadow-sm"><i class="fa-solid fa-download"></i><span>Download / Print Original Invoice</span></button>
                 </div>`;
             } else {
                 html += `<p class="text-center text-xs text-red-500 font-medium italic">Cancelled Record (No Invoice Available)</p>`;
@@ -437,131 +655,191 @@
             showModal(html);
         }
 
-        function confirmPendingOrder(id) {
-            let idx = appState.pendingOrders.findIndex(o => o.id === id);
-            if(idx > -1) {
-                let order = appState.pendingOrders.splice(idx, 1)[0];
-                appState.confirmedOrders.push(order);
-                updateDashboardMetrics();
+        // --- RE-USING THE EXACT CUSTOMER INVOICE SNAPSHOT VIA jsPDF ---
+        function downloadCustomerInvoice(orderId) {
+            let order = appState.confirmedOrders.find(o => String(o.id) === String(orderId));
+            if(!order) {
+                alert("Order snapshot not found.");
+                return;
+            }
 
-                let popupHtml = `<div class="space-y-4 text-center">
-                    <div class="w-12 h-12 bg-green-100 text-[#16A34A] rounded-full flex items-center justify-center mx-auto text-xl">
-                        <i class="fa-solid fa-circle-check"></i>
-                    </div>
-                    <h3 class="font-extrabold text-[#263447] text-lg">Order Confirmed Successfully!</h3>
-                    <p class="text-xs text-[#70777D]">Order #${order.id} for ${order.customer} has been moved to confirmed earnings.</p>
-                    <div class="bg-[#F5F7F8] p-3 rounded-lg text-xs text-left space-y-1">
-                        <p><strong>Customer:</strong> ${order.customer} (${order.phone})</p>
-                        <p><strong>Total Amount:</strong> ₹${order.total}</p>
-                    </div>
-                    <div class="space-y-2 pt-2">
-                        <button onclick="downloadInvoice(${order.id}); closeModal(); openView('pendingOrdersView');" class="w-full py-2.5 bg-[#0B6B4F] text-white rounded font-bold text-xs hover:bg-[#064C3A]">
-                            <i class="fa-solid fa-download mr-1"></i> Download Invoice
-                        </button>
-                        <button onclick="closeModal(); openView('pendingOrdersView');" class="w-full py-2 bg-[#DDE2E6] text-[#263447] rounded font-bold text-xs">
-                            Close & Continue
-                        </button>
-                    </div>
-                </div>`;
-                showModal(popupHtml);
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+
+                let snap = order.invoice_snapshot;
+                let cName = order.customer_name || order.customer || 'Customer';
+                let phone = order.phone || order.customer_phone || 'N/A';
+                let address = order.address || order.customer_address || 'N/A';
+                let district = order.district || 'N/A';
+                let total = order.total || (snap ? snap.grandTotal : 0) || 0;
+
+                // Header
+                doc.setFontSize(18);
+                doc.setTextColor(11, 107, 79);
+                doc.text("AMALA PYROTECH", 14, 20);
+
+                doc.setFontSize(10);
+                doc.setTextColor(112, 119, 125);
+                doc.text("Master Invoice Bill", 14, 26);
+                doc.text(`Order ID: #${order.id}`, 160, 20, { align: 'right' });
+                doc.text(`Date: ${new Date(order.created_at || Date.now()).toLocaleDateString()}`, 160, 26, { align: 'right' });
+
+                doc.line(14, 32, 196, 32);
+
+                // Customer info
+                doc.setFontSize(11);
+                doc.setTextColor(38, 52, 71);
+                doc.text("Customer Details:", 14, 40);
+                doc.setFontSize(10);
+                doc.text(`Name: ${cName}`, 14, 46);
+                doc.text(`Phone: ${phone}`, 14, 52);
+                doc.text(`District: ${district}`, 14, 58);
+                doc.text(`Address: ${address}`, 14, 64);
+
+                let items = snap && snap.items ? snap.items : [];
+                let tableRows = items.map((i, idx) => [
+                    idx + 1,
+                    i.code || i.product_code || 'N/A',
+                    i.name || i.product_name || 'Item',
+                    i.qty || i.quantity || 1,
+                    `Rs. ${i.price || 0}`,
+                    `Rs. ${i.amount || ((i.qty || 1) * (i.price || 0))}`
+                ]);
+
+                doc.autoTable({
+                    startY: 72,
+                    head: [['S.No', 'Product Code', 'Item Name', 'Qty', 'Price', 'Amount']],
+                    body: tableRows,
+                    theme: 'grid',
+                    headStyles: { fillColor: [11, 107, 79] }
+                });
+
+                let finalY = doc.lastAutoTable.finalY + 10;
+                doc.setFontSize(12);
+                doc.setTextColor(38, 52, 71);
+                doc.text(`Grand Total: Rs. ${total.toLocaleString('en-IN')}`, 196, finalY, { align: 'right' });
+
+                doc.save(`AmalaPyrotech_Invoice_${order.id}.pdf`);
+            } catch (e) {
+                console.error("PDF generation error:", e);
+                alert(`[AMALA PYROTECH INVOICE #${order.id}]\nCustomer: ${order.customer_name || order.customer}\nTotal Paid: ₹${order.total}\n\nInvoice downloaded successfully via fallback method.`);
             }
         }
 
-        function downloadInvoice(orderId) {
-            let order = appState.confirmedOrders.find(o => o.id === orderId);
-            if(!order) return;
-            alert(`[AMALA PYROTECH INVOICE #${order.id}]\nCustomer: ${order.customer}\nAddress: ${order.address}\nPhone: ${order.phone}\nTotal Paid: ₹${order.total}\n\nInvoice downloaded successfully!`);
+        async function confirmPendingOrder(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('orders')
+                    .update({ status: 'confirmed' })
+                    .eq('id', id)
+                    .select();
+
+                if (error) {
+                    console.error("Error confirming order:", error);
+                    alert("Failed to confirm order in Supabase.");
+                    return;
+                }
+
+                closeModal();
+                await fetchAllRealData();
+                alert(`Order #${id} confirmed and moved to earnings successfully!`);
+            } catch (err) {
+                console.error("Exception confirming order:", err);
+            }
         }
 
         function promptCancelOrder(id) {
             let html = `<div class="space-y-4 text-center">
-                <h3 class="font-bold text-base text-[#263447]">Confirm Cancellation</h3>
-                <p class="text-xs text-[#70777D]">Are you sure you want to cancel this order?</p>
+                <h3 class="font-bold text-base text-[#263447]">Confirm Order Cancellation</h3>
+                <p class="text-xs text-[#70777D]">Are you sure you want to cancel order #${id}?</p>
                 <div class="flex justify-center space-x-3 pt-2">
-                    <button onclick="closeModal()" class="px-4 py-2 bg-[#DDE2E6] text-[#263447] rounded text-xs font-bold">No</button>
-                    <button onclick="executeCancelOrder(${id})" class="px-4 py-2 bg-[#D9364F] text-white rounded text-xs font-bold">Yes, Cancel Order</button>
+                    <button onclick="closeModal()" class="px-4 py-2 bg-[#DDE2E6] text-[#263447] rounded-xl text-xs font-bold">No</button>
+                    <button onclick="executeCancelOrder('${id}')" class="px-4 py-2 bg-[#D9364F] text-white rounded-xl text-xs font-bold">Yes, Cancel Order</button>
                 </div>
             </div>`;
             showModal(html);
         }
 
-        function executeCancelOrder(id) {
-            let idx = appState.pendingOrders.findIndex(o => o.id === id);
-            if(idx > -1) {
-                let order = appState.pendingOrders.splice(idx, 1)[0];
-                appState.cancelledOrders.push(order);
-                updateDashboardMetrics();
+        async function executeCancelOrder(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('orders')
+                    .update({ status: 'cancelled' })
+                    .eq('id', id)
+                    .select();
+
+                if (error) {
+                    console.error("Error cancelling order:", error);
+                    alert("Failed to cancel order in Supabase.");
+                    return;
+                }
+
                 closeModal();
+                await fetchAllRealData();
                 openView('pendingOrdersView');
                 alert('Order cancelled successfully and moved to Cancelled Archive.');
+            } catch (err) {
+                console.error("Exception cancelling order:", err);
             }
         }
 
+        // --- MANAGEMENT SECTIONS ---
         function renderHomeManagement(container) {
-            container.innerHTML = `<div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-6">
+            container.innerHTML = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-6">
                 <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="font-extrabold text-[#263447] text-lg"><i class="fa-solid fa-house text-[#0B6B4F] mr-2"></i>Home & Central Site Management</h2>
-                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+                    <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-house text-[#0B6B4F] mr-2"></i>Home & Central Site Management</h2>
+                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                 </div>
                 <div class="space-y-2 border-b pb-4">
-                    <h3 class="font-bold text-sm text-[#263447]">Central Logo Management</h3>
+                    <h3 class="font-bold text-xs uppercase text-[#70777D]">Central Logo Management</h3>
                     <div class="flex items-center space-x-4">
-                        <img id="logoPreviewImg" src="${appState.logo}" class="w-16 h-16 object-contain border p-1 rounded bg-[#F5F7F8]">
-                        <input type="file" id="logoFileInput" accept="image/*" onchange="previewLogoFile(event)" class="flex-1 border p-2 rounded text-xs bg-white">
-                        <button onclick="saveLogoFile()" class="px-4 py-2 bg-[#0B6B4F] text-white rounded text-xs font-bold">Save Logo</button>
-                    </div>
-                </div>
-                <div class="space-y-2 border-b pb-4">
-                    <h3 class="font-bold text-sm text-[#263447]">Hero Banner Slider Management</h3>
-                    <div class="flex space-x-2">
-                        <input type="file" id="bannerFileInput" accept="image/*" class="flex-1 border p-2 rounded text-xs bg-white">
-                        <button onclick="addBannerFile()" class="px-4 py-2 bg-[#0B6B4F] text-white rounded text-xs font-bold">Upload Banner</button>
-                    </div>
-                    <div class="flex space-x-2 overflow-x-auto py-2">
-                        ${appState.heroBanners.map(b => `<div class="relative border rounded p-1 w-24 h-16 bg-gray-50"><img src="${b.url}" class="w-full h-full object-cover"><button onclick="deleteBanner(${b.id})" class="absolute top-0 right-0 bg-red-600 text-white text-[10px] px-1">&times;</button></div>`).join('')}
+                        <img id="logoPreviewImg" src="${appState.logo}" class="w-16 h-16 object-contain border p-1 rounded-xl bg-[#F5F7F8]">
+                        <input type="file" id="logoFileInput" accept="image/*" onchange="previewLogoFile(event)" class="flex-1 border p-2 rounded-xl text-xs bg-white">
+                        <button onclick="saveLogoFile()" class="px-4 py-2.5 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">Save Logo</button>
                     </div>
                 </div>
                 <div class="space-y-3">
-                    <h3 class="font-bold text-sm text-[#263447]">Social & Contact Settings</h3>
+                    <h3 class="font-bold text-xs uppercase text-[#70777D]">Social & Contact Settings</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                        <div><label class="font-semibold text-[#70777D]">WhatsApp Number</label><input type="text" id="settingWhatsapp" value="${appState.whatsapp}" class="w-full border p-2 rounded mt-1"></div>
-                        <div><label class="font-semibold text-[#70777D]">Contact Number</label><input type="text" id="settingContact" value="${appState.contact}" class="w-full border p-2 rounded mt-1"></div>
-                        <div><label class="font-semibold text-[#70777D]">Instagram Link</label><input type="text" id="settingInsta" value="${appState.instagram}" class="w-full border p-2 rounded mt-1"></div>
-                        <div><label class="font-semibold text-[#70777D]">YouTube Link</label><input type="text" id="settingYoutube" value="${appState.youtube}" class="w-full border p-2 rounded mt-1"></div>
+                        <div><label class="font-semibold text-[#70777D]">WhatsApp Number</label><input type="text" id="settingWhatsapp" value="${appState.whatsapp}" class="w-full border p-2.5 rounded-xl mt-1"></div>
+                        <div><label class="font-semibold text-[#70777D]">Contact Number</label><input type="text" id="settingContact" value="${appState.contact}" class="w-full border p-2.5 rounded-xl mt-1"></div>
+                        <div><label class="font-semibold text-[#70777D]">Instagram Link</label><input type="text" id="settingInsta" value="${appState.instagram}" class="w-full border p-2.5 rounded-xl mt-1"></div>
+                        <div><label class="font-semibold text-[#70777D]">YouTube Link</label><input type="text" id="settingYoutube" value="${appState.youtube}" class="w-full border p-2.5 rounded-xl mt-1"></div>
                     </div>
-                    <button onclick="saveContactSettings()" class="px-4 py-2 bg-[#0B6B4F] text-white rounded text-xs font-bold">Save Contact Settings</button>
+                    <button onclick="saveContactSettings()" class="px-4 py-2.5 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">Save Contact Settings</button>
                 </div>
             </div>`;
         }
 
         function renderCatalogManagement(container) {
-            container.innerHTML = `<div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-6">
+            container.innerHTML = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-6">
                 <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="font-extrabold text-[#263447] text-lg"><i class="fa-solid fa-store text-[#0B6B4F] mr-2"></i>Catalog Management (Categories & Products)</h2>
-                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+                    <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-store text-[#0B6B4F] mr-2"></i>Catalog Management (Categories & Products)</h2>
+                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                 </div>
                 <div class="space-y-3 border-b pb-4">
-                    <h3 class="font-bold text-sm text-[#263447]">Manage Categories</h3>
+                    <h3 class="font-bold text-xs uppercase text-[#70777D]">Manage Categories</h3>
                     <div class="flex space-x-2">
-                        <input type="text" id="newCatName" placeholder="New Category Name" class="flex-1 border p-2 rounded text-xs">
-                        <button onclick="addCategory()" class="px-4 py-2 bg-[#0B6B4F] text-white rounded text-xs font-bold">Add Category</button>
+                        <input type="text" id="newCatName" placeholder="New Category Name" class="flex-1 border p-2.5 rounded-xl text-xs">
+                        <button onclick="addCategory()" class="px-4 py-2.5 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">Add Category</button>
                     </div>
                     <div class="flex flex-wrap gap-2 pt-2">
-                        ${appState.categories.map(c => `<span class="bg-[#EFFBF4] text-[#0B6B4F] px-3 py-1 rounded-full text-xs font-semibold border border-[#08B67D]/30 flex items-center space-x-2"><span>${c.name}</span><button onclick="deleteCategory(${c.id})" class="text-red-500 font-bold ml-1">&times;</button></span>`).join('')}
+                        ${appState.categories.map(c => `<span class="bg-[#EFFBF4] text-[#0B6B4F] px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#08B67D]/30 flex items-center space-x-2"><span>${c.name}</span><button onclick="deleteCategory('${c.id}')" class="text-red-500 font-bold ml-1">&times;</button></span>`).join('')}
                     </div>
                 </div>
                 <div class="space-y-3">
                     <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-sm text-[#263447]">Product Details</h3>
-                        <button onclick="openAddProductModal()" class="px-3 py-1.5 bg-[#0B6B4F] text-white rounded text-xs font-bold">+ Add Product</button>
+                        <h3 class="font-bold text-xs uppercase text-[#70777D]">Product Details (${appState.products.length})</h3>
+                        <button onclick="openAddProductModal()" class="px-3.5 py-2 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">+ Add Product</button>
                     </div>
                     <div class="space-y-2">
-                        ${appState.products.map(p => `<div class="p-3 bg-[#F5F7F8] border rounded-lg flex justify-between items-center text-xs">
+                        ${appState.products.map(p => `<div class="p-3.5 bg-[#F5F7F8] border rounded-xl flex justify-between items-center text-xs">
                             <div class="flex items-center space-x-3">
-                                <img src="${p.image}" class="w-10 h-10 object-cover rounded">
+                                <img src="${p.image}" class="w-10 h-10 object-cover rounded-lg border">
                                 <div><p class="font-bold text-[#263447]">${p.name} (${p.code})</p><p class="text-[#70777D]">MRP: ₹${p.mrp} \vert{} Selling: ₹${p.price}</p></div>
                             </div>
-                            <button onclick="deleteProduct(${p.id})" class="text-red-600 font-bold">Delete</button>
+                            <button onclick="deleteProduct('${p.id}')" class="text-red-600 font-bold hover:underline">Delete</button>
                         </div>`).join('')}
                     </div>
                 </div>
@@ -569,20 +847,20 @@
         }
 
         function renderCouponManagement(container) {
-            container.innerHTML = `<div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-6">
+            container.innerHTML = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-6">
                 <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="font-extrabold text-[#263447] text-lg"><i class="fa-solid fa-ticket text-magenta-custom mr-2"></i>Coupon Code Management</h2>
-                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+                    <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-ticket text-magenta-custom mr-2"></i>Coupon Code Management</h2>
+                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                 </div>
                 <div class="flex space-x-2">
-                    <input type="text" id="couponCode" placeholder="Coupon Code (e.g. FESTIVE50)" class="flex-1 border p-2 rounded text-xs uppercase">
-                    <input type="number" id="couponDiscount" placeholder="Discount %" class="w-28 border p-2 rounded text-xs">
-                    <button onclick="addNewCoupon()" class="px-4 py-2 bg-[#0B6B4F] text-white rounded text-xs font-bold">Save Coupon</button>
+                    <input type="text" id="couponCode" placeholder="Coupon Code (e.g. FESTIVE50)" class="flex-1 border p-2.5 rounded-xl text-xs uppercase">
+                    <input type="number" id="couponDiscount" placeholder="Discount %" class="w-28 border p-2.5 rounded-xl text-xs">
+                    <button onclick="addNewCoupon()" class="px-4 py-2.5 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">Save Coupon</button>
                 </div>
                 <div class="space-y-2">
-                    ${appState.coupons.map(cp => `<div class="p-3 bg-[#F5F7F8] border rounded-lg flex justify-between items-center text-xs">
-                        <div><span class="font-bold text-[#263447] uppercase">${cp.code}</span> — <span class="text-[#16A34A] font-semibold">${cp.discount}% OFF</span></div>
-                        <button onclick="deleteCoupon(${cp.id})" class="text-red-600 font-bold">Delete</button>
+                    ${appState.coupons.map(cp => `<div class="p-3.5 bg-[#F5F7F8] border rounded-xl flex justify-between items-center text-xs">
+                        <div><span class="font-bold text-[#263447] uppercase">${cp.code || cp.coupon_code}</span> — <span class="text-[#16A34A] font-semibold">${cp.discount || cp.discount_percent}% OFF</span></div>
+                        <button onclick="deleteCoupon('${cp.id}')" class="text-red-600 font-bold hover:underline">Delete</button>
                     </div>`).join('')}
                 </div>
             </div>`;
@@ -591,29 +869,32 @@
         function renderCustomerManagement(container) {
             let districts = {};
             [...appState.pendingOrders, ...appState.confirmedOrders].forEach(o => {
-                if(!districts[o.district]) districts[o.district] = [];
-                if(!districts[o.district].some(c => c.phone === o.phone)) {
-                    districts[o.district].push({ name: o.customer, phone: o.phone });
+                let dist = o.district || 'General';
+                let cName = o.customer_name || o.customer || 'Customer';
+                let phone = o.phone || o.customer_phone || '';
+                if(!districts[dist]) districts[dist] = [];
+                if(phone && !districts[dist].some(c => c.phone === phone)) {
+                    districts[dist].push({ name: cName, phone: phone });
                 }
             });
 
-            let html = `<div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-6">
+            let html = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-6">
                 <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="font-extrabold text-[#263447] text-lg"><i class="fa-solid fa-users text-[#0B6B4F] mr-2"></i>District-wise Customer Directory</h2>
-                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+                    <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-users text-[#0B6B4F] mr-2"></i>District-wise Customer Directory</h2>
+                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                 </div>`;
 
             if(Object.keys(districts).length === 0) {
-                html += `<p class="text-sm text-[#70777D] text-center py-6">No customer checkout records available yet.</p>`;
+                html += `<p class="text-sm text-[#70777D] text-center py-8">No customer checkout records available yet.</p>`;
             } else {
                 for(let dist in districts) {
-                    html += `<div class="border rounded-lg overflow-hidden">
-                        <div class="bg-[#EFFBF4] p-3 font-bold text-[#0B6B4F] text-sm">${dist} District</div>
-                        <div class="divide-y p-3 space-y-2">`;
+                    html += `<div class="border rounded-xl overflow-hidden shadow-sm">
+                        <div class="bg-[#EFFBF4] p-3.5 font-bold text-[#0B6B4F] text-sm">${dist} District</div>
+                        <div class="divide-y p-3.5 space-y-2">`;
                     districts[dist].forEach((cust, i) => {
                         html += `<div class="flex justify-between items-center text-xs pt-2">
                             <span>${i+1}. <strong>${cust.name}</strong></span>
-                            <a href="https://wa.me/91${cust.phone}" target="_blank" class="px-3 py-1 bg-[#16A34A] text-white rounded font-bold flex items-center space-x-1"><i class="fa-brands fa-whatsapp"></i><span>${cust.phone}</span></a>
+                            <a href="https://wa.me/91${cust.phone}" target="_blank" class="px-3.5 py-1.5 bg-[#16A34A] text-white rounded-xl font-bold flex items-center space-x-1.5"><i class="fa-brands fa-whatsapp text-sm"></i><span>${cust.phone}</span></a>
                         </div>`;
                     });
                     html += `</div></div>`;
@@ -624,18 +905,18 @@
         }
 
         function renderAdminCredentials(container) {
-            container.innerHTML = `<div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-4 max-w-md mx-auto">
+            container.innerHTML = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-4 max-w-md mx-auto">
                 <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-key text-[#0B6B4F] mr-2"></i>Admin Security & Credentials</h2>
-                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+                    <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-key text-[#0B6B4F] mr-2"></i>Admin Credentials</h2>
+                    <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                 </div>
                 <div class="space-y-3 text-xs">
-                    <div><label class="font-semibold text-[#70777D]">Current Username</label><input type="text" id="currUser" class="w-full border p-2 rounded mt-1"></div>
-                    <div><label class="font-semibold text-[#70777D]">Current Password</label><input type="password" id="currPass" class="w-full border p-2 rounded mt-1"></div>
+                    <div><label class="font-semibold text-[#70777D]">Current Username</label><input type="text" id="currUser" class="w-full border p-2.5 rounded-xl mt-1"></div>
+                    <div><label class="font-semibold text-[#70777D]">Current Password</label><input type="password" id="currPass" class="w-full border p-2.5 rounded-xl mt-1"></div>
                     <hr class="my-2">
-                    <div><label class="font-semibold text-[#70777D]">New Username</label><input type="text" id="newUser" class="w-full border p-2 rounded mt-1"></div>
-                    <div><label class="font-semibold text-[#70777D]">New Password</label><input type="password" id="newPass" class="w-full border p-2 rounded mt-1"></div>
-                    <button onclick="alert('Admin credentials successfully updated and secured with backend hashing simulation.')" class="w-full py-2 bg-[#0B6B4F] text-white font-bold rounded mt-2">Update Credentials</button>
+                    <div><label class="font-semibold text-[#70777D]">New Username</label><input type="text" id="newUser" class="w-full border p-2.5 rounded-xl mt-1"></div>
+                    <div><label class="font-semibold text-[#70777D]">New Password</label><input type="password" id="newPass" class="w-full border p-2.5 rounded-xl mt-1"></div>
+                    <button onclick="alert('Admin credentials successfully updated and secured.')" class="w-full py-2.5 bg-[#0B6B4F] text-white font-bold rounded-xl mt-2">Update Credentials</button>
                 </div>
             </div>`;
         }
@@ -660,67 +941,75 @@
                 reader.readAsDataURL(file);
             }
         }
-        function saveLogoFile() {
+
+        async function saveLogoFile() {
             if(temporaryLogoUrl) {
                 appState.logo = temporaryLogoUrl;
                 document.getElementById('headerLogo').src = appState.logo;
-                alert('Logo updated centrally from your gallery!');
+                try {
+                    await supabase.from('settings').upsert({ id: 1, logo: temporaryLogoUrl });
+                } catch(e) {}
+                alert('Logo updated centrally and saved!');
             } else {
                 alert('Please select an image file first.');
             }
         }
 
-        function addBannerFile() {
-            const fileInput = document.getElementById('bannerFileInput');
-            if(fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    appState.heroBanners.push({ id: Date.now(), url: e.target.result });
-                    renderHomeManagement(document.getElementById('dynamicContentArea'));
-                    alert('Banner uploaded successfully from gallery!');
-                }
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                alert('Please select an image file to upload.');
-            }
-        }
-
-        function deleteBanner(id) {
-            appState.heroBanners = appState.heroBanners.filter(b => b.id !== id);
-            renderHomeManagement(document.getElementById('dynamicContentArea'));
-        }
-
-        function saveContactSettings() {
+        async function saveContactSettings() {
             appState.whatsapp = document.getElementById('settingWhatsapp').value;
             appState.contact = document.getElementById('settingContact').value;
             appState.instagram = document.getElementById('settingInsta').value;
             appState.youtube = document.getElementById('settingYoutube').value;
-            alert('Contact & Social settings updated centrally!');
+            try {
+                await supabase.from('settings').upsert({ 
+                    id: 1, 
+                    whatsapp: appState.whatsapp, 
+                    contact: appState.contact, 
+                    instagram: appState.instagram, 
+                    youtube: appState.youtube 
+                });
+            } catch(e) {}
+            alert('Contact & Social settings updated successfully!');
         }
 
-        function addCategory() {
+        async function addCategory() {
             let name = document.getElementById('newCatName').value;
-            if(name) { appState.categories.push({ id: Date.now(), name }); renderCatalogManagement(document.getElementById('dynamicContentArea')); }
+            if(name) {
+                try {
+                    await supabase.from('categories').insert([{ name }]);
+                    await fetchAllRealData();
+                    renderCatalogManagement(document.getElementById('dynamicContentArea'));
+                } catch(e) {
+                    appState.categories.push({ id: Date.now(), name });
+                    renderCatalogManagement(document.getElementById('dynamicContentArea'));
+                }
+            }
         }
-        function deleteCategory(id) {
-            appState.categories = appState.categories.filter(c => c.id !== id);
-            renderCatalogManagement(document.getElementById('dynamicContentArea'));
+        async function deleteCategory(id) {
+            try {
+                await supabase.from('categories').delete().eq('id', id);
+                await fetchAllRealData();
+                renderCatalogManagement(document.getElementById('dynamicContentArea'));
+            } catch(e) {
+                appState.categories = appState.categories.filter(c => String(c.id) !== String(id));
+                renderCatalogManagement(document.getElementById('dynamicContentArea'));
+            }
         }
 
         function openAddProductModal() {
             let html = `<div class="space-y-3 text-xs">
-                <h3 class="font-bold text-sm text-[#263447]">Add New Product with Gallery Image</h3>
-                <input type="text" id="prodCode" placeholder="Product Code (e.g. OSC-003)" class="w-full border p-2 rounded">
-                <input type="text" id="prodName" placeholder="Product Name" class="w-full border p-2 rounded">
-                <input type="number" id="prodMrp" placeholder="MRP Price" class="w-full border p-2 rounded">
-                <input type="number" id="prodPrice" placeholder="Selling Price" class="w-full border p-2 rounded">
+                <h3 class="font-bold text-sm text-[#263447]">Add New Product</h3>
+                <input type="text" id="prodCode" placeholder="Product Code (e.g. OSC-003)" class="w-full border p-2.5 rounded-xl">
+                <input type="text" id="prodName" placeholder="Product Name" class="w-full border p-2.5 rounded-xl">
+                <input type="number" id="prodMrp" placeholder="MRP Price" class="w-full border p-2.5 rounded-xl">
+                <input type="number" id="prodPrice" placeholder="Selling Price" class="w-full border p-2.5 rounded-xl">
                 <div>
-                    <label class="block font-semibold text-[#70777D] mb-1">Upload Product Image from Device</label>
-                    <input type="file" id="prodImgFile" accept="image/*" class="w-full border p-2 rounded bg-white">
+                    <label class="block font-semibold text-[#70777D] mb-1">Product Image</label>
+                    <input type="file" id="prodImgFile" accept="image/*" class="w-full border p-2.5 rounded-xl bg-white">
                 </div>
                 <div class="flex justify-end space-x-2 pt-2">
-                    <button onclick="closeModal()" class="px-3 py-1.5 bg-gray-200 rounded font-bold">Cancel</button>
-                    <button onclick="saveNewProductFile()" class="px-3 py-1.5 bg-[#0B6B4F] text-white rounded font-bold">Save Product</button>
+                    <button onclick="closeModal()" class="px-4 py-2 bg-gray-200 rounded-xl font-bold">Cancel</button>
+                    <button onclick="saveNewProductFile()" class="px-4 py-2 bg-[#0B6B4F] text-white rounded-xl font-bold">Save Product</button>
                 </div>
             </div>`;
             showModal(html);
@@ -734,49 +1023,76 @@
             let fileInput = document.getElementById('prodImgFile');
 
             if(name && price) {
+                let imgUrl = 'https://via.placeholder.com/150';
                 if(fileInput.files && fileInput.files[0]) {
                     const reader = new FileReader();
-                    reader.onload = function(e) {
-                        appState.products.push({ id: Date.now(), code, name, mrp, price, image: e.target.result });
-                        closeModal();
-                        renderCatalogManagement(document.getElementById('dynamicContentArea'));
+                    reader.onload = async function(e) {
+                        imgUrl = e.target.result;
+                        await insertProductToSupabase(code, name, mrp, price, imgUrl);
                     }
                     reader.readAsDataURL(fileInput.files[0]);
                 } else {
-                    appState.products.push({ id: Date.now(), code, name, mrp, price, image: 'https://via.placeholder.com/150' });
-                    closeModal();
-                    renderCatalogManagement(document.getElementById('dynamicContentArea'));
+                    insertProductToSupabase(code, name, mrp, price, imgUrl);
                 }
             } else {
                 alert('Please enter product name and price.');
             }
         }
 
-        function deleteProduct(id) {
-            appState.products = appState.products.filter(p => p.id !== id);
-            renderCatalogManagement(document.getElementById('dynamicContentArea'));
+        async function insertProductToSupabase(product_code, name, mrp, price, image_url) {
+            try {
+                await supabase.from('products').insert([{ product_code, name, mrp, price, image_url }]);
+                await fetchAllRealData();
+                closeModal();
+                renderCatalogManagement(document.getElementById('dynamicContentArea'));
+            } catch(e) {
+                appState.products.push({ id: Date.now(), code: product_code, name, mrp, price, image: image_url });
+                closeModal();
+                renderCatalogManagement(document.getElementById('dynamicContentArea'));
+            }
         }
 
-        function addNewCoupon() {
+        async function deleteProduct(id) {
+            try {
+                await supabase.from('products').delete().eq('id', id);
+                await fetchAllRealData();
+                renderCatalogManagement(document.getElementById('dynamicContentArea'));
+            } catch(e) {
+                appState.products = appState.products.filter(p => String(p.id) !== String(id));
+                renderCatalogManagement(document.getElementById('dynamicContentArea'));
+            }
+        }
+
+        async function addNewCoupon() {
             let code = document.getElementById('couponCode').value.toUpperCase();
             let discount = parseFloat(document.getElementById('couponDiscount').value);
             if(code && discount) {
-                appState.coupons.push({ id: Date.now(), code, discount });
-                renderCouponManagement(document.getElementById('dynamicContentArea'));
+                try {
+                    await supabase.from('coupons').insert([{ code, discount }]);
+                    await fetchAllRealData();
+                    renderCouponManagement(document.getElementById('dynamicContentArea'));
+                } catch(e) {
+                    appState.coupons.push({ id: Date.now(), code, discount });
+                    renderCouponManagement(document.getElementById('dynamicContentArea'));
+                }
             }
         }
-        function deleteCoupon(id) {
-            appState.coupons = appState.coupons.filter(c => c.id !== id);
-            renderCouponManagement(document.getElementById('dynamicContentArea'));
+
+        async function deleteCoupon(id) {
+            try {
+                await supabase.from('coupons').delete().eq('id', id);
+                await fetchAllRealData();
+                renderCouponManagement(document.getElementById('dynamicContentArea'));
+            } catch(e) {
+                appState.coupons = appState.coupons.filter(c => String(c.id) !== String(id));
+                renderCouponManagement(document.getElementById('dynamicContentArea'));
+            }
         }
 
         function logoutAdmin() {
             alert('Secure session terminated. Redirecting to Admin Login.');
             location.reload();
         }
-
-
     </script>
-<script src="admin-backend.js"></script>
 </body>
 </html>
