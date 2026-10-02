@@ -54,7 +54,7 @@
             padding-bottom: 70px;
         }
 
-        /* --- RESPONSIVE LAYOUT (MOBILE, TABLET & LAPTOP) --- */
+        /* --- RESPONSIVE LAYOUT --- */
         .main-container {
             width: 100%;
             max-width: 480px;
@@ -65,170 +65,11 @@
             box-shadow: 0 0 25px rgba(0,0,0,0.15);
         }
 
-        /* --- TABLET & LAPTOP RESPONSIVE LAYOUT --- */
-@media (min-width: 768px) {
-
-    .main-container {
-        max-width: 1200px !important;
-        width: 100% !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-    }
-
-    .main-header,
-    .announcement-bar,
-    .hero-slider,
-    .welcome-section,
-    .specialities-section,
-    .gallery-section,
-    .features-section,
-    .trust-section,
-    .promo-gradient-section,
-    .why-choose-section,
-    .footer {
-        width: 100%;
-        max-width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    /* Desktop Header */
-    .main-header {
-        padding: 14px 30px;
-    }
-
-    .logo-area {
-        gap: 12px;
-    }
-
-    .logo-area img {
-        width: 45px;
-        height: 45px;
-    }
-
-    .logo-area h1 {
-        font-size: 21px;
-    }
-
-    .header-btns {
-        gap: 10px;
-    }
-
-    .h-btn {
-        width: 42px;
-        height: 42px;
-        font-size: 17px;
-    }
-
-    /* Desktop Hero */
-    .hero-slider {
-        height: 420px;
-    }
-
-    /* Desktop Welcome */
-    .welcome-section {
-        padding: 45px 50px;
-    }
-
-    .welcome-section h2 {
-        font-size: 30px;
-    }
-
-    .welcome-section p {
-        font-size: 14px;
-        max-width: 850px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    /* Desktop Specialities */
-    .specialities-section {
-        padding: 45px 40px;
-    }
-
-    .specialities-section h2 {
-        font-size: 28px;
-    }
-
-    .specialities-section p {
-        font-size: 14px;
-    }
-
-    /* Desktop Gallery */
-    .gallery-section {
-        padding: 40px;
-    }
-
-    .gallery-img-container {
-        height: 260px;
-    }
-
-    .dynamic-gallery-item {
-        height: 125px;
-    }
-
-    /* Desktop Features */
-    .features-section {
-        padding: 35px 40px;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 20px;
-    }
-
-    .feature-card {
-        padding: 22px;
-    }
-
-    /* Desktop Trust */
-    .trust-section {
-        padding: 35px 40px;
-    }
-
-    /* Desktop Promo */
-    .promo-gradient-section {
-        padding: 55px 40px;
-    }
-
-    .promo-gradient-section h3 {
-        font-size: 27px;
-    }
-
-    .promo-gradient-section p {
-        font-size: 14px;
-    }
-
-    /* Desktop Why Choose */
-    .why-choose-section {
-        padding: 40px;
-    }
-
-    .why-choose-section h2 {
-        font-size: 28px;
-    }
-
-    /* Desktop Footer */
-    .footer {
-        padding: 45px 40px 30px;
-    }
-
-    /* Hide mobile bottom navigation */
-    .mobile-bottom-nav {
-        display: none !important;
-    }
-
-    /* Desktop floating controls */
-    .float-social {
-        right: 25px;
-    }
-
-    .float-contact {
-        left: 25px;
-    }
-
-    .quick-purchase-float {
-        right: 25px;
-        bottom: 30px;
-    }
-}
+        @media (min-width: 1024px) {
+            .main-container {
+                max-width: 1200px;
+            }
+        }
 
         /* --- FIREWORKS CANVAS --- */
         #fireworks-canvas {
@@ -373,7 +214,7 @@
             background: #000;
             z-index: 4;
         }
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             .hero-slider { height: 380px; }
         }
         .hero-slide {
@@ -492,7 +333,7 @@
             gap: 25px;
             padding: 5px 0;
         }
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             .stats-container {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
@@ -554,7 +395,7 @@
             flex-direction: column;
             gap: 15px;
         }
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             .gallery-grid-wrapper {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -619,7 +460,7 @@
             position: relative;
             z-index: 4;
         }
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             .features-section {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
@@ -935,7 +776,7 @@
         .n-call { color: #505868; }
         .n-track { color: #8F003D; }
 
-        @media (min-width: 768px) {
+        @media (min-width: 1024px) {
             .mobile-bottom-nav {
                 max-width: 1200px;
                 left: 50%;
@@ -943,110 +784,74 @@
             }
         }
 
-        /* =====================================================
-   DESKTOP HOME PAGE LAYOUT
-   Mobile design remains unchanged
-   ===================================================== */
+        /* =========================================================
+           DESKTOP-ONLY LAYOUT
+           Mobile styles above remain unchanged.
+           ========================================================= */
+        @media (min-width: 1024px) {
+            body { padding-bottom: 0; }
+            .main-container { max-width: 1400px; width: 100%; }
+            .announcement-bar { font-size: 13px; padding: 8px 0; }
+            .main-header { padding: 14px 34px; }
+            .logo-area { gap: 12px; }
+            .logo-area img { width: 44px; height: 44px; }
+            .logo-area h1 { font-size: 21px; }
+            .header-btns { gap: 10px; }
+            .h-btn { width: 42px; height: 42px; font-size: 17px; }
+            .hero-slider { height: auto; aspect-ratio: 16 / 9; max-height: 700px; }
+            .slider-arrow { width: 40px; height: 40px; font-size: 16px; }
+            .slider-arrow.prev { left: 20px; }
+            .slider-arrow.next { right: 20px; }
+            .welcome-section { padding: 55px 80px; }
+            .festive-greeting { font-size: 15px; }
+            .welcome-badge { font-size: 12px; }
+            .welcome-section h2 { font-size: 32px; }
+            .welcome-section p { max-width: 900px; margin-left: auto; margin-right: auto; font-size: 14px; }
+            .pill-btn { font-size: 14px; padding: 11px 30px; }
+            .specialities-section { padding: 55px 60px; }
+            .specialities-section h2 { font-size: 30px; }
+            .specialities-section p { font-size: 14px; max-width: 800px; }
+            .stats-container { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; max-width: 1100px; margin: 0 auto; }
+            .stat-card { min-height: 150px; padding: 28px 20px 20px; }
+            .stat-number { font-size: 30px; }
+            .stat-label { font-size: 14px; }
+            .gallery-section { padding: 50px 60px; }
+            .gallery-grid-wrapper { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 25px; max-width: 1200px; margin: 0 auto; }
+            .gallery-img-container { height: 360px; }
+            .gallery-text-overlay { padding: 20px; }
+            .gallery-text-overlay h3 { font-size: 22px; }
+            .gallery-text-overlay p { font-size: 12px; }
+            .dynamic-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+            .dynamic-gallery-item { height: 172px; }
+            .features-section { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; padding: 45px 60px; max-width: 1250px; margin-left: auto; margin-right: auto; }
+            .feature-card { padding: 22px; }
+            .feature-content h4 { font-size: 16px; }
+            .feature-content p { font-size: 12px; }
+            .trust-section { padding: 45px 60px; }
+            .trust-card { max-width: 800px; margin: 0 auto; padding: 30px; }
+            .trust-logo { width: 75px; height: 75px; }
+            .promo-gradient-section { padding: 65px 60px; }
+            .promo-gradient-section h3 { max-width: 950px; margin-left: auto; margin-right: auto; font-size: 30px; }
+            .promo-gradient-section p { font-size: 14px; }
+            .yellow-btn { font-size: 14px; padding: 11px 30px; }
+            .why-choose-section { padding: 55px 60px; }
+            .why-choose-section h2 { font-size: 30px; }
+            .why-points { font-size: 14px; }
+            .why-desc { font-size: 12px; max-width: 800px; margin-left: auto; margin-right: auto; }
+            .footer { padding: 50px 60px 35px; }
+            .footer > p, .footer-contact-info { max-width: 850px; margin-left: auto; margin-right: auto; }
+            .quick-links-grid { max-width: 850px; margin-left: auto; margin-right: auto; }
+            .float-social { right: 25px; }
+            .float-contact { left: 25px; bottom: 30px; }
+            .quick-purchase-float { right: 25px; bottom: 30px; font-size: 12px; padding: 9px 15px; }
+            .mobile-bottom-nav { display: none !important; }
+        }
 
-@media (min-width: 1024px) {
-
-    .main-container {
-        max-width: 1400px !important;
-        width: 100% !important;
-    }
-
-    .main-header {
-        padding: 16px 35px;
-    }
-
-    .logo-area h1 {
-        font-size: 22px;
-    }
-
-    .hero-slider {
-        height: 500px;
-    }
-
-    .welcome-section {
-        padding: 55px 80px;
-    }
-
-    .welcome-section h2 {
-        font-size: 32px;
-    }
-
-    .welcome-section p {
-        max-width: 900px;
-        margin-left: auto;
-        margin-right: auto;
-        font-size: 14px;
-    }
-
-    .specialities-section {
-        padding: 55px 60px;
-    }
-
-    .stats-container {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 25px;
-    }
-
-    .gallery-section {
-        padding: 50px 60px;
-    }
-
-    .gallery-grid-wrapper {
-        grid-template-columns: 1.2fr 1fr;
-        gap: 25px;
-    }
-
-    .gallery-img-container {
-        height: 300px;
-    }
-
-    .dynamic-gallery-grid {
-        gap: 15px;
-    }
-
-    .dynamic-gallery-item {
-        height: 142px;
-    }
-
-    .features-section {
-        padding: 45px 60px;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 25px;
-    }
-
-    .trust-section {
-        padding: 45px 60px;
-    }
-
-    .promo-gradient-section {
-        padding: 65px 60px;
-    }
-
-    .promo-gradient-section h3 {
-        font-size: 30px;
-    }
-
-    .why-choose-section {
-        padding: 55px 60px;
-    }
-
-    .why-choose-section h2 {
-        font-size: 30px;
-    }
-
-    .footer {
-        padding: 50px 60px 35px;
-    }
-
-    .mobile-bottom-nav {
-        display: none !important;
-    }
-}
+        @media (min-width: 1400px) {
+            .main-container { max-width: 1440px; }
+            .hero-slider { max-height: 810px; }
+            .gallery-section, .features-section, .trust-section, .specialities-section, .why-choose-section, .promo-gradient-section, .welcome-section, .footer { padding-left: 70px; padding-right: 70px; }
+        }
     </style>
 </head>
 <body>
@@ -1303,7 +1108,7 @@
 
         setInterval(() => { changeSlide(1); }, 4000);
 
-        // --- FIREWORKS ANIMATION ---
+        // --- FIREWORKS ANIMATION (Restored: Single Sky Shot every 6-8 seconds) ---
         const canvas = document.getElementById('fireworks-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -1386,6 +1191,7 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             fireworkTimer++;
+            // Trigger a single sky shot every ~450 frames (approx 7-8 seconds)
             if (fireworkTimer > 450 && !currentFirework) {
                 currentFirework = new Firework();
                 fireworkTimer = 0;
@@ -1401,8 +1207,9 @@
 
             requestAnimationFrame(animateFireworks);
         }
-        animateFireworks();
+
+
     </script>
-    <script src="index-backend.js"></script>
+<script src="index-backend.js"></script>
 </body>
 </html>
