@@ -65,9 +65,33 @@
             box-shadow: 0 0 25px rgba(0,0,0,0.15);
         }
 
-        @media (min-width: 786px) {
+        @media (min-width: 768px) {
             .main-container {
+                max-width: 1200px !important;
+                width: 100% !important;
+            }
+
+            /* டெஸ்க்டாப் மற்றும் டேப்லெட்டில் அனைத்து பகுதிகளும் நடுவில் நேர்த்தியாக இருக்க */
+            .main-header, 
+            .announcement-bar,
+            .hero-slider, 
+            .welcome-section, 
+            .specialities-section, 
+            .gallery-section, 
+            .features-section, 
+            .trust-section, 
+            .promo-gradient-section, 
+            .why-choose-section, 
+            .footer,
+            .mobile-bottom-nav {
                 max-width: 1200px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            /* லேப்டாப்பில் கீழே உள்ள மொபைல் நேவிகேஷனை மறைக்க */
+            .mobile-bottom-nav {
+                display: none !important;
             }
         }
 
@@ -214,7 +238,7 @@
             background: #000;
             z-index: 4;
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 768px) {
             .hero-slider { height: 380px; }
         }
         .hero-slide {
@@ -333,7 +357,7 @@
             gap: 25px;
             padding: 5px 0;
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 768px) {
             .stats-container {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
@@ -395,7 +419,7 @@
             flex-direction: column;
             gap: 15px;
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 768px) {
             .gallery-grid-wrapper {
                 display: grid;
                 grid-template-columns: 1fr 1fr;
@@ -460,7 +484,7 @@
             position: relative;
             z-index: 4;
         }
-        @media (min-width: 1024px) {
+        @media (min-width: 768px) {
             .features-section {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
@@ -776,7 +800,7 @@
         .n-call { color: #505868; }
         .n-track { color: #8F003D; }
 
-        @media (min-width: 1024px) {
+        @media (min-width: 768px) {
             .mobile-bottom-nav {
                 max-width: 1200px;
                 left: 50%;
@@ -1039,7 +1063,7 @@
 
         setInterval(() => { changeSlide(1); }, 4000);
 
-        // --- FIREWORKS ANIMATION (Restored: Single Sky Shot every 6-8 seconds) ---
+        // --- FIREWORKS ANIMATION ---
         const canvas = document.getElementById('fireworks-canvas');
         const ctx = canvas.getContext('2d');
 
@@ -1122,7 +1146,6 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
             fireworkTimer++;
-            // Trigger a single sky shot every ~450 frames (approx 7-8 seconds)
             if (fireworkTimer > 450 && !currentFirework) {
                 currentFirework = new Firework();
                 fireworkTimer = 0;
@@ -1138,9 +1161,8 @@
 
             requestAnimationFrame(animateFireworks);
         }
-
-
+        animateFireworks();
     </script>
-<script src="index-backend.js"></script>
+    <script src="index-backend.js"></script>
 </body>
 </html>
