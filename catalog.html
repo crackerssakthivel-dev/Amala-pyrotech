@@ -1344,17 +1344,43 @@
 
         // SUBMIT ORDER -> OPEN SUCCESS POPUP MODAL
         function sendToWhatsApp() {
-            if(!lastSubmittedOrder) return;
-            let o = lastSubmittedOrder;
-            let msg = `*New Order Quotation - AMALA PYROTECH*\n\n*Order ID:* ${o.orderId}\n*Name:* ${o.name}\n*Mobile:* ${o.mobile}\n*Pincode:* ${o.pincode}\n*Address:* ${o.address}, ${o.town}, ${o.district}, ${o.state}\n\n*Items Ordered:*\n`;
-            for(let id in o.items) {
-                let p = productsData.find(x => x.id == id);
-                msg += `- ${p.name} (${p.code}) x ${o.items[id]} = ₹${(o.items[id]*p.price).toFixed(2)}\n`;
-            }
-            msg += `\n*Grand Total:* ${o.grandTotal}`;
+  if (!lastSubmittedOrder) {
+    return alert('No submitted order found.');
+  }
 
-            window.open(`https://wa.me/919344265054?text=${encodeURIComponent(msg)}`, '_blank');
-        }
+  const o = lastSubmittedOrder;
+  const items = o.items || [];
+
+  let text = `*AMALA PYROTECH*\n`;
+  text += `*Order ID:* ${o.orderId || ''}\n\n`;
+  text += `*Customer Details:*\n`;
+  text += `Name: ${o.name || ''}\n`;
+  text += `Mobile: ${o.mobile || ''}\n`;
+  text += `Pincode: ${o.pincode || ''}\n`;
+  text += `Address: ${o.address || ''}, ${o.town || ''}, ${o.district || ''}, ${o.state || ''}\n\n`;
+
+  text += `*Ordered Products:*\n`;
+  items.forEach((item, index) => {
+    text += `${index + 1}. *${item.name || ''}* (${item.pack || ''})\n`;
+    text += `   Code: ${item.code || ''} | Qty: ${item.qty || 0}\n`;
+    text += `   Price: ₹${Number(item.price || 0).toFixed(2)} | Subtotal: ₹${Number(item.amount || 0).toFixed(2)}\n`;
+
+    if (Number(item.mrp || 0) > 0) {
+      text += `   MRP: ₹${Number(item.mrp).toFixed(2)}\n`;
+    }
+  });
+
+  text += `\n*Order Summary:*\n`;
+  text += `MRP Total: ₹${Number(o.mrpTotal || 0).toFixed(2)}\n`;
+  text += `Savings: ₹${Number(o.savings || 0).toFixed(2)}\n`;
+  text += `Product Net Total: ₹${Number(o.netTotal || 0).toFixed(2)}\n`;
+  text += `Packing Charges: ₹${Number(o.packing || 0).toFixed(2)}\n`;
+  text += `Grand Total: ₹${Number(o.grandTotal || 0).toFixed(2)}\n`;
+  text += `Transport: To-Pay at Lorry Hub`;
+
+  const url = `https://wa.me/919344265054?text=${encodeURIComponent(text)}`;
+  window.location.href = url;
+}
 
         function continueShopping() {
             document.getElementById('successModal').style.display = 'none';
