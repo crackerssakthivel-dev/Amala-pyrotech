@@ -111,24 +111,30 @@
         .logo-area {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         .logo-area img {
-            height: 35px;
-            width: 35px;
+            height: 45px;
+            width: 45px;
             object-fit: contain;
             border-radius: 50%;
             border: 2px solid var(--berry);
         }
         .logo-area h1 {
-            font-size: 16px;
+            font-size: 25px;
             color: var(--berry);
             font-weight: 700;
             letter-spacing: 0.3px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            margin: 0;
         }
         .header-btns {
             display: flex;
             gap: 6px;
+            z-index: 2;
         }
         .h-btn {
             width: 36px;
@@ -793,9 +799,9 @@
             .main-container { max-width: 1400px; width: 100%; }
             .announcement-bar { font-size: 13px; padding: 8px 0; }
             .main-header { padding: 14px 34px; }
-            .logo-area { gap: 12px; }
-            .logo-area img { width: 44px; height: 44px; }
-            .logo-area h1 { font-size: 21px; }
+            .logo-area { gap: 16px; }
+            .logo-area img { width: 56px; height: 56px; }
+            .logo-area h1 { font-size: 32px; }
             .header-btns { gap: 10px; }
             .h-btn { width: 42px; height: 42px; font-size: 17px; }
             .hero-slider { height: auto; aspect-ratio: 16 / 9; max-height: 700px; }
