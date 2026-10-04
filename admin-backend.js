@@ -187,7 +187,49 @@ async function renderAdminInvoicePdf(s){const {jsPDF}=window.jspdf;const doc=new
 
 async function logoutAdmin(){await sb.auth.signOut();window.location.href='admin-login.html';}
 function renderAdminCredentials(container){container.innerHTML=`<div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-4 max-w-md mx-auto"><div class="flex justify-between items-center border-b pb-3"><h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-key text-[#0B6B4F] mr-2"></i>Admin Security & Credentials</h2><button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button></div><div class="space-y-3 text-xs"><div><label class="font-semibold text-[#70777D]">Current Username</label><input type="text" id="currUser" class="w-full border p-2 rounded mt-1"></div><div><label class="font-semibold text-[#70777D]">Current Password</label><input type="password" id="currPass" class="w-full border p-2 rounded mt-1"></div><hr class="my-2"><div><label class="font-semibold text-[#70777D]">New Username</label><input type="text" id="newUser" class="w-full border p-2 rounded mt-1"></div><div><label class="font-semibold text-[#70777D]">New Password</label><input type="password" id="newPass" class="w-full border p-2 rounded mt-1"></div><button onclick="updateAdminCredentials()" class="w-full py-2 bg-[#0B6B4F] text-white font-bold rounded mt-2">Update Credentials</button></div></div>`;}
-async function updateAdminCredentials(){const email=document.getElementById('newUser').value.trim(),pass=document.getElementById('newPass').value;if(!email&&!pass)return alert('Enter a new username/email or password.');const payload={};if(email)payload.email=email;if(pass)payload.password=pass;const {error}=await sb.auth.updateUser(payload);if(error)return alert(error.message);alert('Admin credentials updated successfully. If email confirmation is enabled, confirm the new email before the next login.');}
+async function updateAdminCredentials(){
+  const currUser = document.getElementById('currUser').value.trim();
+  const currPass = document.getElementById('currPass').value;
+  const newUser = document.getElementById('newUser').value.trim();
+  const newPass = document.getElementById('newPass').value;
+
+  if(!currUser || !currPass){
+    return alert('Please enter your current username and current password to verify your identity.');
+  }
+
+  if(!newUser && !newPass){
+    return alert('Please enter a new username/email or new password to update.');
+  }
+
+  try {
+    const { error: signInError } = await sb.auth.signInWithPassword({
+      email: currUser,
+      password: currPass
+    });
+
+    if(signInError){
+      return alert('Current username or password is incorrect.');
+    }
+
+    const payload = {};
+    if(newUser) payload.email = newUser;
+    if(newPass) payload.password = newPass;
+
+    if(Object.keys(payload).length > 0){
+      const { error: updateError } = await sb.auth.updateUser(payload);
+      if(updateError) throw updateError;
+    }
+
+    alert('Admin credentials updated successfully. If email confirmation is enabled, confirm the new email before the next login.');
+    document.getElementById('currUser').value = '';
+    document.getElementById('currPass').value = '';
+    document.getElementById('newUser').value = '';
+    document.getElementById('newPass').value = '';
+  } catch(e) {
+    console.error(e);
+    alert(e.message || 'Failed to update credentials.');
+  }
+}
 window.addEventListener('load', initApp);
 async function renderCustomerManagement(container){
   const {data:customers,error}=await sb.from('customers').select('*').order('district').order('name');
