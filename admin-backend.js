@@ -1,37 +1,90 @@
 async function loadAdminState(){
-  const {data:s}=await sb.from('site_settings').select('*').eq('id',1).maybeSingle();
-  const {data:b}=await sb.from('hero_banners').select('*').order('sort_order').order('id');
-  const {data:g}=await sb.from('gallery_images').select('*').order('sort_order').order('id');
-  const {data:c}=await sb.from('categories').select('*').order('id');
-  const {data:p}=await sb.from('products').select('*,categories(name)').order('id');
-  const {data:cp}=await sb.from('coupons').select('*').order('id');
-  const {data:os}=await sb.from('orders').select('*').order('created_at',{ascending:false});
-  const orders=os||[]; const ids=orders.map(o=>o.id); let items=[]; if(ids.length){ const r=await sb.from('order_items').select('*').in('order_id',ids); items=r.data||[]; }
-  const map=orders.map(o=>({
-      id:o.id,
-      orderId:o.order_id,
-      customer:o.customer_name,
-      district:o.district,
-      address:[o.address,o.town,o.district,o.state].filter(Boolean).join(', '),
-      phone:o.mobile,
-      pincode:o.pincode,
-      state:o.state,
-      town:o.town,
-      status:o.status,
-      total:Number(o.grand_total),
-      mrpTotal:Number(o.total_mrp),
-      savings:Number(o.savings),
-      netTotal:Number(o.net_total),
-      packing:o.packing_charges,
-      grandTotal:Number(o.grand_total),
-      invoiceSnapshot:o.invoice_snapshot,
-      transportName: o.transport_name || '',
-      transportMobile: o.transport_mobile || '',
-      transportNumber: o.transport_number || '',
-      items:items.filter(i=>i.order_id===o.id).map(i=>({productId:i.product_id,code:i.code,name:i.name,qty:i.qty,price:Number(i.price),amount:Number(i.amount),mrp:Number(i.mrp),pack:i.pack}))
-  }));
-  appState.logo=mediaUrl(s?.logo_path)||'https://via.placeholder.com/150'; appState.whatsapp=s?.whatsapp_number||'+919344265054'; appState.contact=s?.call_number||'7780942656'; appState.instagram=s?.instagram_link||'https://instagram.com/amalapyrotech'; appState.youtube=s?.youtube_link||'https://youtube.com/@amalapyrotech';
-  appState.heroBanners=(b||[]).map(x=>({id:x.id,url:mediaUrl(x.storage_path),storage_path:x.storage_path})); appState.gallery=(g||[]).map(x=>({id:x.id,url:mediaUrl(x.storage_path),storage_path:x.storage_path})); appState.categories=c||[]; appState.products=(p||[]).map(x=>({id:x.id,code:x.code,name:x.name,category:x.categories?.name||'',cat:x.categories?.name||'',pack:x.pack||'1 Pkt',mrp:Number(x.mrp),price:Number(x.price),image:mediaUrl(x.image_path),img:mediaUrl(x.image_path),category_id:x.category_id})); appState.coupons=cp||[]; appState.pendingOrders=map.filter(o=>o.status==='pending'); appState.confirmedOrders=map.filter(o=>o.status==='confirmed'); appState.cancelledOrders=map.filter(o=>o.status==='cancelled'); updateDashboardMetrics(); document.getElementById('headerLogo').src=appState.logo;
+  // Phase 1: Fast Initial Load (Logo & Dashboard Metrics in parallel)
+  try {
+    const [settingRes, pendingRes, confirmedRes] = await Promise.all([
+      sb.from('site_settings').select('logo_path, whatsapp_number, call_number, instagram_link, youtube_link').eq('id', 1).maybeSingle(),
+      sb.from('orders').select('grand_total').eq('status', 'pending'),
+      sb.from('orders').select('grand_total').eq('status', 'confirmed')
+    ]);
+
+    const s = settingRes.data;
+    appState.logo = mediaUrl(s?.logo_path) || 'https://via.placeholder.com/150';
+    appState.whatsapp = s?.whatsapp_number || '+919344265054';
+    appState.contact = s?.call_number || '7780942656';
+    appState.instagram = s?.instagram_link || 'https://instagram.com/amalapyrotech';
+    appState.youtube = s?.youtube_link || 'https://youtube.com/@amalapyrotech';
+
+    const logoImg = document.getElementById('headerLogo');
+    if (logoImg) logoImg.src = appState.logo;
+
+    const pendingOrdersList = pendingRes.data || [];
+    const confirmedOrdersList = confirmedRes.data || [];
+
+    // Temporary or partial counts/amounts for immediate dashboard rendering
+    appState.pendingOrders = pendingOrdersList.map(o => ({ grandTotal: Number(o.grand_total) }));
+    appState.confirmedOrders = confirmedOrdersList.map(o => ({ grandTotal: Number(o.grand_total) }));
+    updateDashboardMetrics();
+  } catch (e) {
+    console.error('Initial load metrics/logo error:', e);
+  }
+
+  // Phase 2: Background Load (Non-blocking rest of the data)
+  (async () => {
+    try {
+      const [bRes, gRes, cRes, pRes, cpRes, osRes] = await Promise.all([
+        sb.from('hero_banners').select('*').order('sort_order').order('id').catch(() => ({ data: [] })),
+        sb.from('gallery_images').select('*').order('sort_order').order('id').catch(() => ({ data: [] })),
+        sb.from('categories').select('*').order('id').catch(() => ({ data: [] })),
+        sb.from('products').select('*,categories(name)').order('id').catch(() => ({ data: [] })),
+        sb.from('coupons').select('*').order('id').catch(() => ({ data: [] })),
+        sb.from('orders').select('*').order('created_at', { ascending: false }).catch(() => ({ data: [] }))
+      ]);
+
+      const b = bRes.data || [];
+      const g = gRes.data || [];
+      const c = cRes.data || [];
+      const p = pRes.data || [];
+      const cp = cpRes.data || [];
+      const os = osRes.data || [];
+
+      const map = os.map(o => ({
+          id: o.id,
+          orderId: o.order_id,
+          customer: o.customer_name,
+          district: o.district,
+          address: [o.address, o.town, o.district, o.state].filter(Boolean).join(', '),
+          phone: o.mobile,
+          pincode: o.pincode,
+          state: o.state,
+          town: o.town,
+          status: o.status,
+          total: Number(o.grand_total),
+          mrpTotal: Number(o.total_mrp),
+          savings: Number(o.savings),
+          netTotal: Number(o.net_total),
+          packing: o.packing_charges,
+          grandTotal: Number(o.grand_total),
+          invoiceSnapshot: o.invoice_snapshot,
+          transportName: o.transport_name || '',
+          transportMobile: o.transport_mobile || '',
+          transportNumber: o.transport_number || '',
+          items: [] // Loaded lazily on demand when viewing order details
+      }));
+
+      appState.heroBanners = b.map(x => ({ id: x.id, url: mediaUrl(x.storage_path), storage_path: x.storage_path }));
+      appState.gallery = g.map(x => ({ id: x.id, url: mediaUrl(x.storage_path), storage_path: x.storage_path }));
+      appState.categories = c;
+      appState.products = p.map(x => ({ id: x.id, code: x.code, name: x.name, category: x.categories?.name || '', cat: x.categories?.name || '', pack: x.pack || '1 Pkt', mrp: Number(x.mrp), price: Number(x.price), image: mediaUrl(x.image_path), img: mediaUrl(x.image_path), category_id: x.category_id }));
+      appState.coupons = cp;
+      appState.pendingOrders = map.filter(o => o.status === 'pending');
+      appState.confirmedOrders = map.filter(o => o.status === 'confirmed');
+      appState.cancelledOrders = map.filter(o => o.status === 'cancelled');
+
+      updateDashboardMetrics();
+    } catch (bgError) {
+      console.error('Background load error:', bgError);
+    }
+  })();
 }
 
 async function initApp(){
@@ -55,9 +108,28 @@ async function deleteProduct(id){ if(!confirm('Delete this product?'))return; aw
 async function addNewCoupon(){const code=document.getElementById('couponCode').value.trim().toUpperCase(),discount=Number(document.getElementById('couponDiscount').value||0);if(!code||!discount)return;const {error}=await sb.from('coupons').insert({code,discount,type:'percent',active:true});if(error)return alert(error.message);await refreshAdmin();renderCouponManagement(document.getElementById('dynamicContentArea'));}
 async function deleteCoupon(id){await sb.from('coupons').update({active:false}).eq('id',id);await refreshAdmin();renderCouponManagement(document.getElementById('dynamicContentArea'));}
 
-function viewOrderDetail(orderId,type){
+async function viewOrderDetail(orderId,type){
   let order=(type==='pending'?appState.pendingOrders:type==='confirmed'?appState.confirmedOrders:appState.cancelledOrders).find(o=>o.id===orderId);
   if(!order)return;
+
+  if(!order.items || order.items.length === 0){
+    try {
+      const { data: itemRows } = await sb.from('order_items').select('*').eq('order_id', orderId);
+      order.items = (itemRows || []).map(i => ({
+        productId: i.product_id,
+        code: i.code,
+        name: i.name,
+        qty: i.qty,
+        price: Number(i.price),
+        amount: Number(i.amount),
+        mrp: Number(i.mrp),
+        pack: i.pack
+      }));
+    } catch(err) {
+      console.error('Failed to fetch order items lazily:', err);
+      order.items = [];
+    }
+  }
   
   let transportSection = '';
   if (type === 'confirmed') {
