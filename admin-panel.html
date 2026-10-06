@@ -259,7 +259,8 @@
 
     <!-- CORE LOGIC INTEGRATED WITH ADMIN-BACKEND.JS -->
     <script>
-        let appState = {
+        // Keep one global state object and make this declaration safe even if this inline block is loaded more than once.
+        var appState = window.appState || (window.appState = {
             logo: "https://via.placeholder.com/150",
             whatsapp: "+919344265054",
             contact: "7780942656",
@@ -274,7 +275,7 @@
             pendingOrders: [],
             confirmedOrders: [],
             cancelledOrders: []
-        };
+        });
 
         function updateDashboardMetrics() {
             document.getElementById('cardPendingCount').innerText = appState.pendingOrders.length;
