@@ -98,24 +98,9 @@ async function loadAmalaHome() {
       .map(item => mediaUrl(item.storage_path))
       .filter(Boolean);
 
-    console.log(
-      'AMALA PYROTECH HERO IMAGES:',
-      heroImages
-    );
-
-    console.log(
-      'AMALA PYROTECH LOGO:',
-      logoUrl
-    );
-
     /*
-     * START LOGO + FIRST HERO REQUEST
-     * IMMEDIATELY.
+     * PRELOAD FIRST HERO IMAGE
      */
-    if (logoUrl) {
-      preloadImage(logoUrl, 'high');
-    }
-
     if (heroImages.length > 0) {
       preloadImage(heroImages[0], 'high');
     }
@@ -137,11 +122,11 @@ async function loadAmalaHome() {
 
     /*
      * SET LOGO
-     * Do NOT wait for preload.
+     * Header logo is embedded directly in HTML.
+     * Only Trust Card and Footer use Supabase logo.
      */
     if (logoUrl) {
       const logoIds = [
-        'display-logo',
         'trust-card-logo',
         'footer-logo'
       ];
@@ -282,7 +267,7 @@ async function loadAmalaHome() {
 
     }
 
-        /*
+    /*
      * PRELOAD CATALOG DATA IN BACKGROUND
      * Catalog should be ready before customer clicks it.
      */
@@ -306,14 +291,14 @@ async function loadAmalaHome() {
         }
 
         sessionStorage.setItem(
-  'amala_catalog_cache',
-  JSON.stringify({
-    settings: null,
-    banners: [],
-    products: products || [],
-    savedAt: Date.now()
-  })
-);
+          'amala_catalog_cache',
+          JSON.stringify({
+            settings: null,
+            banners: [],
+            products: products || [],
+            savedAt: Date.now()
+          })
+        );
 
       } catch (error) {
 
@@ -325,7 +310,7 @@ async function loadAmalaHome() {
       }
 
     }, 0);
-    
+
     /*
      * LOAD GALLERY SEPARATELY.
      * Gallery must NOT block Logo or Hero.
