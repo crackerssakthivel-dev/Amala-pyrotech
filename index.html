@@ -3,10 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMALA PYROTECH | Direct Sivakasi Factory Crackers Wholesale</title>
+    <title>AMALA PYROTECH | Crackers Shop in Sivakasi | Wholesale &amp; Retail</title>
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Amala Pyrotech - Sivakasi's leading factory-direct wholesale fireworks destination with authentic Sivakasi quality, massive discounts up to 85% off MRP, and direct transport booking.">
-    <meta name="keywords" content="Amala Pyrotech, Sivakasi Crackers, Direct Factory Wholesale Fireworks, Online Crackers Shopping, Diwali Crackers">
+    <meta name="description" content="Explore quality Sivakasi crackers and fireworks at AMALA PYROTECH, a wholesale and retail crackers shop in Sivakasi. View our online catalogue, price list and combo packs.">
+    <meta name="keywords" content="AMALA PYROTECH, best crackers shop in Sivakasi, Sivakasi crackers, crackers shop Sivakasi, Sivakasi crackers online, crackers shop online, crackers online shopping, Sivakasi fireworks wholesale, wholesale crackers, Sivakasi crackers price list, Diwali crackers, best firecrackers, family combo packs, festival combo packs, marriage combo packs">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="AMALA PYROTECH | Crackers Shop in Sivakasi | Wholesale &amp; Retail">
+    <meta property="og:description" content="Explore quality Sivakasi crackers and fireworks at AMALA PYROTECH. View our online catalogue, price list and combo packs.">
+    <meta property="og:site_name" content="AMALA PYROTECH">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AMALA PYROTECH | Crackers Shop in Sivakasi | Wholesale &amp; Retail">
+    <meta name="twitter:description" content="Explore quality Sivakasi crackers and fireworks. View our online catalogue, price list and combo packs.">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "AMALA PYROTECH",
+      "description": "Wholesale and retail fireworks shop in Sivakasi offering quality crackers, fireworks, Diwali crackers and combo packs.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "TNC Alangulam Main Road, Kundayiruppu",
+        "addressLocality": "Sivakasi",
+        "addressRegion": "Tamil Nadu",
+        "postalCode": "626131",
+        "addressCountry": "IN"
+      }
+    }
+    </script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
@@ -286,6 +311,7 @@
             margin-bottom: 12px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
+        .welcome-section h1,
         .welcome-section h2 {
             font-family: 'Playfair Display', serif;
             color: var(--berry);
@@ -795,6 +821,100 @@
             }
         }
 
+        /* --- COMBO PACKS SVG SLIDER --- */
+        .combo-gallery-section {
+            padding: 25px 16px;
+            background: var(--white);
+        }
+        .combo-gallery-card {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #f7f7f7;
+            border-radius: 14px;
+            overflow: hidden;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border: 1px solid #eeeeee;
+        }
+        .combo-gallery-heading { padding: 18px 16px 8px; }
+        .combo-gallery-kicker {
+            font-family: 'Playfair Display', serif;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--berry);
+            margin-bottom: 8px;
+        }
+        .combo-gallery-heading h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: #111;
+            margin-bottom: 8px;
+        }
+        .combo-gallery-heading p {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.5;
+            margin: 0;
+        }
+        .combo-slider {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            overflow: hidden;
+            touch-action: pan-y;
+            background: #fff;
+        }
+        .combo-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .45s ease;
+        }
+        .combo-slide.active { opacity: 1; visibility: visible; }
+        .combo-slide img { width: 100%; height: 100%; display: block; object-fit: cover; }
+        .combo-slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border: 0;
+            border-radius: 50%;
+            background: rgba(0,0,0,.55);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3;
+            cursor: pointer;
+        }
+        .combo-slider-arrow.prev { left: 10px; }
+        .combo-slider-arrow.next { right: 10px; }
+        .combo-dots { display: flex; justify-content: center; gap: 9px; padding: 13px 0 7px; }
+        .combo-dot {
+            width: 9px; height: 9px; border-radius: 50%; border: 1px solid #666; background: transparent; padding: 0; cursor: pointer;
+        }
+        .combo-dot.active { background: #666; }
+        .combo-price-line { font-size: 16px; color: #555; font-weight: 600; padding: 3px 12px; }
+        .combo-type-line { font-size: 12px; color: #222; margin-top: 8px; }
+        .combo-shop-btn { margin: 15px 0 20px; }
+        .footer-local-seo { font-family: 'Playfair Display', serif; font-size: 18px; color: var(--white); margin: 18px 0 7px; }
+        .footer-local-seo-desc { font-size: 11px; color: #D0D0D0; line-height: 1.6; max-width: 800px; margin: 0 auto 14px; }
+        @media (min-width: 1024px) {
+            .combo-gallery-section { padding: 50px 60px; }
+            .combo-gallery-heading { padding: 25px 25px 12px; }
+            .combo-gallery-heading h2 { font-size: 30px; }
+            .combo-gallery-heading p { font-size: 13px; }
+            .combo-gallery-kicker { font-size: 21px; }
+            .combo-slider-arrow { width: 40px; height: 40px; }
+            .combo-price-line { font-size: 18px; }
+            .combo-type-line { font-size: 13px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .combo-slide { transition: none; }
+        }
+
         /* =========================================================
            DESKTOP-ONLY LAYOUT
            Mobile styles above remain unchanged.
@@ -816,7 +936,7 @@
             .welcome-section { padding: 55px 80px; }
             .festive-greeting { font-size: 15px; }
             .welcome-badge { font-size: 12px; }
-            .welcome-section h2 { font-size: 32px; }
+            .welcome-section h1, .welcome-section h2 { font-size: 32px; }
             .welcome-section p { max-width: 900px; margin-left: auto; margin-right: auto; font-size: 14px; }
             .pill-btn { font-size: 14px; padding: 11px 30px; }
             .specialities-section { padding: 55px 60px; }
@@ -874,7 +994,7 @@
 
         <!-- 1. TOP ANNOUNCEMENT BAR -->
         <div class="announcement-bar">
-            <marquee scrollamount="5" id="display-announcement">Welcome to Amala Pyrotech! Direct Sivakasi Factory Wholesale Crackers. Massive discounts up to 85% OFF!</marquee>
+            <marquee scrollamount="5" id="display-announcement">🎆 AMALA PYROTECH | Sivakasi Crackers | Wholesale &amp; Retail | Quality Fireworks | Explore Our Price List 🎆</marquee>
         </div>
 
         <!-- 2. MAIN HEADER -->
@@ -908,27 +1028,22 @@
         </div>
 
         <!-- 3. HERO BANNER / SLIDER -->
-        <section class="hero-slider" id="hero-slider-container">
-            <div class="hero-slide active" style="background-image: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=800&q=80');"></div>
-            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1498931299472-f7a63a5a1cfa?auto=format&fit=crop&w=800&q=80');"></div>
-            <button class="slider-arrow prev" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
-            <button class="slider-arrow next" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
-        </section>
+        <section class="hero-slider" id="hero-slider-container" aria-label="AMALA PYROTECH Sivakasi crackers hero banners"></section>
 
         <!-- 4. WELCOME SECTION -->
         <section class="welcome-section">
             <div class="festive-greeting">✨ Happy Diwali • Festival of Lights ✨</div>
             <div class="welcome-badge">✦ WELCOME TO AMALA PYROTECH</div>
-            <h2>Direct Sivakasi Factory<br>Crackers in Sivakasi</h2>
-            <p>Sivakasi's leading factory-direct wholesale fireworks destination with authentic Sivakasi quality, massive discounts, and direct transport booking.</p>
-            <p>Welcome to AMALA PYROTECH, your trusted destination for authentic Sivakasi fireworks. We bring you quality crackers directly from the Sivakasi manufacturing hub at competitive prices, with reliable service and convenient delivery options.</p>
+            <h1>Best Crackers Shop in Sivakasi</h1>
+            <p><strong>Quality Sivakasi Crackers &amp; Fireworks at Wholesale and Retail Prices</strong></p>
+            <p>Explore our wide collection of Diwali crackers, fireworks, family combo packs, festival specials and marriage combo packs. Browse the AMALA PYROTECH online catalogue and view our Sivakasi crackers price list.</p>
             <a href="catalog.html" class="pill-btn">SHOP NOW →</a>
         </section>
 
         <!-- 6. OUR SPECIALITIES -->
         <section class="specialities-section">
             <h2>Our Specialities</h2>
-            <p>To maintain quality of the product in every aspect by offering safe, unique and environmental-friendly crackers.</p>
+            <p>Quality Sivakasi fireworks, a wide range of crackers and competitive wholesale and retail prices for festivals, family celebrations and special occasions.</p>
 
             <!-- 7 & 8. STATISTICS CARDS -->
             <div class="stats-container">
@@ -950,19 +1065,27 @@
             </div>
         </section>
 
-        <!-- 9. FIREWORKS GALLERY -->
-        <section class="gallery-section">
-            <div class="gallery-grid-wrapper">
-                <div class="main-gallery-card">
-                    <div class="gallery-img-container">
-                        <img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=600&q=80" alt="Fireworks">
-                    </div>
-                    <div class="gallery-text-overlay">
-                        <h3 id="gallery-title-text">AMALA PYROTECH</h3>
-                        <p>Crafted with tradition, delivered with festive care.</p>
-                    </div>
+        <!-- 9. COMBO PACKS SVG SLIDER -->
+        <section class="gallery-section combo-gallery-section" aria-labelledby="combo-gallery-title">
+            <div class="combo-gallery-card">
+                <div class="combo-gallery-heading">
+                    <div class="combo-gallery-kicker">COMBO PACKS</div>
+                    <h2 id="combo-gallery-title">Best Family Combo Packs</h2>
+                    <p>Explore quality Sivakasi crackers and fireworks in our available combo packs.</p>
                 </div>
-                <div class="dynamic-gallery-grid" id="dynamic-gallery-container"></div>
+                <div class="combo-slider" id="combo-slider" aria-label="Combo Packs slideshow">
+                    <div class="combo-slide active"><img src="combo-family-3000.svg" alt="₹3,000 Family Combo Pack with Sivakasi crackers and fireworks" loading="lazy" decoding="async"></div>
+                    <div class="combo-slide"><img src="combo-festival-5000.svg" alt="₹5,000 Festival Combo Pack with Sivakasi crackers and fireworks" loading="lazy" decoding="async"></div>
+                    <div class="combo-slide"><img src="combo-marriage-7000.svg" alt="₹7,000 Marriage Combo Pack with Sivakasi crackers and fireworks" loading="lazy" decoding="async"></div>
+                    <div class="combo-slide"><img src="combo-family-10000.svg" alt="₹10,000 Family Combo Pack with Sivakasi crackers and fireworks" loading="lazy" decoding="async"></div>
+                    <div class="combo-slide"><img src="combo-festival-special.svg" alt="Festival Special Combo Pack with Sivakasi crackers and fireworks" loading="lazy" decoding="async"></div>
+                    <button class="combo-slider-arrow prev" type="button" onclick="changeComboSlide(-1)" aria-label="Previous combo pack"><i class="fas fa-chevron-left"></i></button>
+                    <button class="combo-slider-arrow next" type="button" onclick="changeComboSlide(1)" aria-label="Next combo pack"><i class="fas fa-chevron-right"></i></button>
+                </div>
+                <div class="combo-dots" id="combo-dots" aria-label="Combo slide indicators"></div>
+                <div class="combo-price-line">₹3,000 • ₹5,000 • ₹7,000 • ₹10,000</div>
+                <div class="combo-type-line">Festival • Marriage Combo Packs</div>
+                <a href="catalog.html" class="pill-btn combo-shop-btn">SHOP NOW →</a>
             </div>
         </section>
 
@@ -976,29 +1099,29 @@
             <div class="feature-card">
                 <div class="feature-icon fi-1"><i class="fas fa-shield-alt"></i></div>
                 <div class="feature-content">
-                    <h4>Direct Factory Wholesale</h4>
-                    <p>No middlemen or dealer margins. Direct factory pricing with discounts up to 85% Off off MRP.</p>
+                    <h4>Wholesale &amp; Retail Crackers</h4>
+                    <p>Quality crackers and fireworks available for wholesale and retail customers at competitive prices.</p>
                 </div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon fi-2"><i class="fas fa-truck"></i></div>
                 <div class="feature-content">
-                    <h4>100% Authentic Sivakasi Stock</h4>
-                    <p>Freshly manufactured genuine fireworks sourced straight from Sivakasi industrial sheds.</p>
+                    <h4>Quality Sivakasi Fireworks</h4>
+                    <p>Explore a wide collection of quality Sivakasi crackers and fireworks for Diwali and other celebrations.</p>
                 </div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon fi-3"><i class="fas fa-box"></i></div>
                 <div class="feature-content">
-                    <h4>Bulk Cartons & Family Packs</h4>
-                    <p>Full cartons available for retailers, institutions, and family festive groups at wholesale rates.</p>
+                    <h4>Family, Festival &amp; Marriage Combos</h4>
+                    <p>Choose from family combo packs, festival combo packs and marriage combo packs based on availability.</p>
                 </div>
             </div>
             <div class="feature-card">
                 <div class="feature-icon fi-4"><i class="fas fa-check-circle"></i></div>
                 <div class="feature-content">
-                    <h4>Express Dispatch to Sivakasi</h4>
-                    <p>Direct transport booking with instant Lorry Receipt (LR) tracking provided for every consignment.</p>
+                    <h4>Customer Support &amp; Enquiries</h4>
+                    <p>Contact AMALA PYROTECH for product enquiries, catalogue information and purchase assistance.</p>
                 </div>
             </div>
         </section>
@@ -1009,43 +1132,45 @@
                 <img id="trust-card-logo" src="https://via.placeholder.com/70" alt="Trust Logo" class="trust-logo">
                 <h4 style="color: var(--berry); font-weight: 700;" id="trust-company-title">AMALA PYROTECH</h4>
                 <div class="trust-badge">
-                    <i class="fas fa-check-circle" style="color: #28A745;"></i> DIRECT SIVAKASI FACTORY
+                    <i class="fas fa-check-circle" style="color: #28A745;"></i> WHOLESALE &amp; RETAIL CRACKERS SHOP IN SIVAKASI
                 </div>
             </div>
         </section>
 
         <!-- 14. PROMOTIONAL GRADIENT SECTION -->
         <section class="promo-gradient-section">
-            <h3>We offer the best quality products directly from Sivakasi factory at the lowest price.</h3>
-            <p>Celebrate your festivals with 100% safety and grand excitement.</p>
-            <a href="catalog.html" class="yellow-btn">Shop Online →</a>
+            <h3>Explore Sivakasi Crackers Online</h3>
+            <p>Browse quality fireworks, Diwali crackers and combo packs in our online catalogue. View product varieties and prices at AMALA PYROTECH.</p>
+            <a href="catalog.html" class="yellow-btn">VIEW CRACKERS CATALOGUE →</a>
         </section>
 
         <!-- 15. WHY CHOOSE SECTION -->
         <section class="why-choose-section">
-            <div class="why-badge">SIVAKASI DIRECT QUALITY ASSURED</div>
-            <h2>Why Choose Direct<br>Sivakasi Factory Deals</h2>
-            <div class="why-points">Direct From Source • Rock Bottom Wholesale Rates • Verified Quality</div>
-            <p class="why-desc">Eliminate middlemen and buy certified Sivakasi crackers straight from the manufacturing hub.</p>
+            <div class="why-badge">SIVAKASI QUALITY • WHOLESALE &amp; RETAIL</div>
+            <h2>Why Choose AMALA PYROTECH?</h2>
+            <div class="why-points">Quality Fireworks • Wholesale &amp; Retail Prices • Wide Crackers Collection • Combo Packs</div>
+            <p class="why-desc">Explore our Sivakasi crackers catalogue with quality fireworks, competitive prices and combo pack options for Diwali, festivals, family celebrations and special occasions.</p>
         </section>
 
         <!-- 16 & 17. FOOTER & CONTACT -->
         <footer class="footer">
             <img id="footer-logo" src="https://via.placeholder.com/50" alt="Footer Logo" class="footer-logo">
             <h4 id="footer-company-name">AMALA PYROTECH</h4>
-            <p style="font-size: 11px; color: #D0D0D0; margin-bottom: 15px;">AMALA PYROTECH brings you authentic, top-grade Sivakasi fireworks at unbeatable factory pricing with trusted delivery across Sivakasi.</p>
+            <p style="font-size: 11px; color: #D0D0D0; margin-bottom: 15px;">AMALA PYROTECH is a wholesale and retail crackers shop in Sivakasi, offering quality fireworks, Diwali crackers and combo packs. Explore our online catalogue and Sivakasi crackers price list.</p>
             
             <div class="quick-links-title">Quick Links</div>
             <div class="quick-links-grid">
                 <a href="index.html" class="quick-link-pill">Home</a>
-                <a href="catalog.html" class="quick-link-pill">About</a>
+                <a href="about.html" class="quick-link-pill">About</a>
                 <a href="catalog.html" class="quick-link-pill">Price List</a>
                 <a href="track-order.html" class="quick-link-pill">Track Order</a>
-                <a href="catalog.html" class="quick-link-pill">Safety Tips</a>
+                <a href="about.html" class="quick-link-pill">Safety Tips</a>
                 <a href="contact.html" class="quick-link-pill">Contact Us</a>
                 <a href="catalog.html" class="quick-link-pill">Quick Purchase</a>
             </div>
 
+            <h2 class="footer-local-seo">Crackers &amp; Fireworks Shop in Sivakasi</h2>
+            <p class="footer-local-seo-desc">AMALA PYROTECH is a wholesale and retail crackers shop in Sivakasi. Explore quality Sivakasi crackers, fireworks, Diwali crackers, combo packs and our online catalogue.</p>
             <div style="font-size: 14px; font-weight: 700; color: var(--gold); margin-bottom: 8px;">Contact Us</div>
             <div class="footer-contact-info">
                 <p style="margin-top: 6px;"><strong>Location:</strong><br><i class="fas fa-map-marker-alt"></i> TNC Alangulam Main Road, Kundayiruppu, Sivakasi, Tamil Nadu, 626131</p>
@@ -1317,6 +1442,63 @@
 
         // Start animation loop
         requestAnimationFrame(animateFireworks);
+    </script>
+<script>
+        // --- COMBO PACKS SVG SLIDER ---
+        let comboCurrentSlide = 0;
+        let comboAutoTimer = null;
+
+        function renderComboDots() {
+            const slides = document.querySelectorAll('.combo-slide');
+            const dots = document.getElementById('combo-dots');
+            if (!dots || slides.length === 0) return;
+            dots.innerHTML = '';
+            slides.forEach((_, index) => {
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.className = 'combo-dot' + (index === comboCurrentSlide ? ' active' : '');
+                dot.setAttribute('aria-label', `Show combo pack ${index + 1}`);
+                dot.addEventListener('click', () => { changeComboSlide(index - comboCurrentSlide); });
+                dots.appendChild(dot);
+            });
+        }
+
+        function changeComboSlide(direction) {
+            const slides = document.querySelectorAll('.combo-slide');
+            if (slides.length === 0) return;
+            slides[comboCurrentSlide].classList.remove('active');
+            comboCurrentSlide = (comboCurrentSlide + direction + slides.length) % slides.length;
+            slides[comboCurrentSlide].classList.add('active');
+            renderComboDots();
+        }
+
+        function startComboAutoSlide() {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            clearInterval(comboAutoTimer);
+            comboAutoTimer = setInterval(() => changeComboSlide(1), 4500);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.getElementById('combo-slider');
+            if (!slider) return;
+            renderComboDots();
+            startComboAutoSlide();
+
+            let touchStartX = 0;
+            slider.addEventListener('touchstart', event => {
+                touchStartX = event.changedTouches[0].clientX;
+            }, { passive: true });
+            slider.addEventListener('touchend', event => {
+                const delta = event.changedTouches[0].clientX - touchStartX;
+                if (Math.abs(delta) > 45) {
+                    changeComboSlide(delta < 0 ? 1 : -1);
+                    startComboAutoSlide();
+                }
+            }, { passive: true });
+
+            slider.addEventListener('mouseenter', () => clearInterval(comboAutoTimer));
+            slider.addEventListener('mouseleave', startComboAutoSlide);
+        });
     </script>
 <script src="index-backend.js"></script>
 </body>
