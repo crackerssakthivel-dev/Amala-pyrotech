@@ -35,13 +35,25 @@ async function loadCatalogBackend() {
         ];
 
         if (chips) {
-            chips.innerHTML =
-                `<div class="cat-chip active" onclick="filterCategory('All')">All Products</div>` +
-                cats.map(c =>
-                    `<div class="cat-chip" onclick="filterCategory('${String(c).replace(/'/g, "\\'")}')">${c}</div>`
-                ).join('');
-        }
+    chips.innerHTML =
+        `<div class="cat-chip active" onclick="filterCategory('All')">All Products</div>` +
+        cats.map(c =>
+            `<div class="cat-chip" onclick="filterCategory('${String(c).replace(/'/g, "\\'")}')">${c}</div>`
+        ).join('');
+
+    const urlCategory = new URLSearchParams(window.location.search).get('category');
+
+    if (urlCategory) {
+        currentFilter = urlCategory;
+
+        document.querySelectorAll('.cat-chip').forEach(chip => {
+            chip.classList.toggle(
+                'active',
+                chip.textContent.trim() === urlCategory
+            );
+        });
     }
+}
 
     async function refreshFromSupabase() {
 
