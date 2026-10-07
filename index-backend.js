@@ -75,7 +75,7 @@ async function loadAmalaHome() {
 
     const announcement =
       settings.announcement ||
-      'Welcome to Amala Pyrotech! Direct Sivakasi Factory Wholesale Crackers.';
+      'AMALA PYROTECH | Sivakasi Crackers | Wholesale & Retail | Quality Fireworks | Explore Our Price List';
 
     const whatsappNumber =
       settings.whatsapp_number || '+919344265054';
