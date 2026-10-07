@@ -795,9 +795,15 @@ window.addEventListener(
     try {
       await loadCatalogBackend();
 
-      generateMath();
+const category = new URLSearchParams(window.location.search).get('category');
 
-      renderCatalog();
+if (category) {
+    currentFilter = category;
+}
+
+generateMath();
+
+renderCatalog();
 
     } catch (e) {
       console.error(e);
