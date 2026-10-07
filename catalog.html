@@ -1319,6 +1319,13 @@
             renderCatalog();
         }
 
+        const params = new URLSearchParams(window.location.search);
+const category = params.get('category');
+
+if (category) {
+    currentFilter = category;
+}
+        
         function toggleDrawer() {
             let box = document.getElementById('drawerBox');
             let overlay = document.getElementById('drawerOverlay');
