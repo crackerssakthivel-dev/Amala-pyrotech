@@ -561,82 +561,22 @@ async function confirmPendingOrder(id){
   const order=(appState.pendingOrders||[]).find(o=>String(o.id)===String(id));
   if(!order) return alert('Pending order not found. Refresh and try again.');
   if(!Array.isArray(order.items)||!order.items.length) return alert('Order items not found. Cannot confirm safely.');
-  if(!confirm('Confirm this order and deduct the ordered quantities from stock?')) return;
-
-  const {data:claimed,error:claimError}=await sb.from('orders')
-    .update({status:'confirmed',confirmed_at:new Date().toISOString()})
-    .eq('id',id).eq('status','pending').select('id');
-
-  if(claimError) return alert(claimError.message);
-  if(!claimed||!claimed.length) return alert('This order has already been processed. Refresh the page.');
-
-  const deducted=[];
-
-  try{
-    for(const item of order.items){
-      const productId=item.productId;
-      const qty=Number(item.qty);
-
-      if(!productId||!Number.isInteger(qty)||qty<=0){
-        throw new Error('Invalid product or quantity in order item.');
-      }
-
-      const product=(appState.products||[]).find(p=>String(p.id)===String(productId));
-      if(!product){
-        throw new Error('Product '+(item.name||productId)+' was not found in catalog.');
-      }
-
-      const current=Number(product.stock_quantity||0);
-      if(current<qty){
-        throw new Error('Insufficient stock for '+(item.name||product.name)+'. Available: '+current+', ordered: '+qty+'.');
-      }
-
-      const {data:updated,error}=await sb.from('products')
-        .update({stock_quantity:current-qty,updated_at:new Date().toISOString()})
-        .eq('id',productId)
-        .eq('stock_quantity',current)
-        .select('id');
-
-      if(error) throw error;
-      if(!updated||!updated.length){
-        throw new Error('Stock changed while confirming '+(item.name||product.name)+'. Refresh and retry.');
-      }
-
-      deducted.push({id:productId,qty:qty,after:current-qty});
-    }
-  }catch(e){
-    for(const d of deducted){
-      await sb.from('products')
-        .update({stock_quantity:d.after+d.qty})
-        .eq('id',d.id)
-        .eq('stock_quantity',d.after);
-    }
-
-    await sb.from('orders')
-      .update({status:'pending',confirmed_at:null})
-      .eq('id',id).eq('status','confirmed');
-
-    return alert('Order confirmation was stopped; stock was not fully deducted. '+(e.message||'Please refresh and check stock.'));
-  }
-
+  if(!confirm('Confirm this order and deduct the reserved quantities from stock?')) return;
+  const {error}=await sb.rpc('confirm_order_with_stock',{p_order_id:Number(id)});
+  if(error){ console.error(error); return alert(error.message||'Order confirmation failed. Refresh and try again.'); }
   await refreshAdmin();
   closeModal();
   openView('confirmedOrdersView');
-  alert('Order confirmed successfully. Stock quantities updated.');
+  alert('Order confirmed successfully. Reserved stock has been deducted.');
 }
 
 async function executeCancelOrder(id){
-  const {error}=await sb.from('orders').update({
-    status:'cancelled',
-    cancelled_at:new Date().toISOString()
-  }).eq('id',id);
-
-  if(error) return alert(error.message);
-
+  const {error}=await sb.rpc('cancel_order_release_stock',{p_order_id:Number(id)});
+  if(error) return alert(error.message||'Order cancellation failed. Refresh and try again.');
   await refreshAdmin();
   closeModal();
   openView('cancelledOrdersView');
-  alert('Order cancelled successfully and moved to Cancelled Archive.');
+  alert('Order cancelled successfully. Reserved stock has been released.');
 }
 
 /* INVOICE PDF */
