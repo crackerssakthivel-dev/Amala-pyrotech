@@ -77,10 +77,9 @@ async function loadCatalogBackend() {
             .eq('active', true)
             .order('id');
 
-        const reservationsPromise = sb
-            .from('stock_reservations')
-            .select('product_id,qty')
-            .eq('status', 'reserved');
+        // Read only per-product reserved totals through the secured RPC.
+        // Do not expose stock_reservations rows directly to public visitors.
+        const reservationsPromise = sb.rpc('get_catalog_reserved_stock');
 
         const [
             { data: settings, error: settingsError },
@@ -106,20 +105,18 @@ async function loadCatalogBackend() {
             throw error;
         }
 
-        // Reservation lookup is deliberately non-fatal: a reservation-query
-        // problem must not stop the entire catalog from loading.
+        // Fail safely: never treat physical stock as fully available if the
+        // reservation totals could not be fetched.
         if (reservationsError) {
-            console.error('Stock reservations could not be loaded; using physical stock only:', reservationsError);
+            console.error('Reserved stock RPC failed; keeping existing catalog data:', reservationsError);
+            throw reservationsError;
         }
 
         const reservedByProduct = {};
-        if (!reservationsError) {
-            (reservations || []).forEach(r => {
-                const key = String(r.product_id);
-                reservedByProduct[key] =
-                    (reservedByProduct[key] || 0) + (Number(r.qty) || 0);
-            });
-        }
+        (reservations || []).forEach(r => {
+            const key = String(r.product_id);
+            reservedByProduct[key] = Number(r.reserved_quantity) || 0;
+        });
 
         const productsWithAvailability = (data || []).map(p => ({
             ...p,
@@ -165,6 +162,12 @@ async function loadCatalogBackend() {
         }
 
         applyProducts(productsWithAvailability);
+
+        // Repaint the catalog after background refresh so current stock limits
+        // and OUT OF STOCK / LOW STOCK labels are reflected immediately.
+        if (typeof renderCatalog === 'function') {
+            await renderCatalog();
+        }
     }
 
     // FIRST: Try instant cache
