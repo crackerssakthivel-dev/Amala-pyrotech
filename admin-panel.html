@@ -697,28 +697,31 @@
 
         async function executeCancelOrder(id) {
             try {
-                const { data, error } = await sb
-                    .from('orders')
-                    .update({ 
-                        status: 'cancelled', 
-                        cancelled_at: new Date().toISOString() 
-                    })
-                    .eq('id', id)
-                    .select();
+                // Release reserved stock and cancel the pending order atomically.
+                // Do not update orders.status directly here; the RPC handles both.
+                const orderId = Number(id);
+                if (!Number.isSafeInteger(orderId) || orderId <= 0) {
+                    alert('Invalid order ID.');
+                    return;
+                }
+
+                const { error } = await sb.rpc('cancel_order_release_stock', {
+                    p_order_id: orderId
+                });
 
                 if (error) {
-                    console.error("Error cancelling order in Supabase:", error);
-                    alert("Failed to cancel order in Supabase: " + error.message);
+                    console.error('Error cancelling order and releasing stock:', error);
+                    alert('Failed to cancel order and release stock: ' + error.message);
                     return;
                 }
 
                 closeModal();
                 await refreshAdmin();
                 openView('cancelledOrdersView');
-                alert('Order cancelled successfully and moved to Cancelled Archive.');
+                alert('Order cancelled successfully. Reserved stock has been released.');
             } catch (err) {
-                console.error("Exception cancelling order:", err);
-                alert("An unexpected error occurred while cancelling the order.");
+                console.error('Exception cancelling order:', err);
+                alert(err?.message || 'An unexpected error occurred while cancelling the order.');
             }
         }
 
