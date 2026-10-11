@@ -1,31 +1,38 @@
 async function loadAdminState(){
-  // Load the admin dashboard data with explicit awaited queries.
-  // This avoids relying on .catch() on a Supabase query builder.
   try {
-    const {data:s, error:settingsError}=await sb.from('site_settings').select('*').eq('id',1).maybeSingle();
+    const {data:s,error:settingsError}=await sb.from('site_settings').select('*').eq('id',1).maybeSingle();
     if(settingsError) throw settingsError;
 
-    const {data:b, error:bannersError}=await sb.from('hero_banners').select('*').order('sort_order').order('id');
+    const {data:b,error:bannersError}=await sb.from('hero_banners').select('*').order('sort_order').order('id');
     if(bannersError) throw bannersError;
 
-    const {data:g, error:galleryError}=await sb.from('gallery_images').select('*').order('sort_order').order('id');
+    const {data:g,error:galleryError}=await sb.from('gallery_images').select('*').order('sort_order').order('id');
     if(galleryError) throw galleryError;
 
-    const {data:c, error:categoriesError}=await sb.from('categories').select('*').order('sort_order',{ascending:true}).order('id');
-    if(categoriesError) throw categoriesError;
+    let c;
+    const categoriesSorted=await sb.from('categories').select('*').order('sort_order',{ascending:true}).order('id');
+    if(categoriesSorted.error && /sort_order|column/i.test(categoriesSorted.error.message||'')){
+      const categoriesFallback=await sb.from('categories').select('*').order('id');
+      if(categoriesFallback.error) throw categoriesFallback.error;
+      c=categoriesFallback.data||[];
+    } else {
+      if(categoriesSorted.error) throw categoriesSorted.error;
+      c=categoriesSorted.data||[];
+    }
 
-    const {data:p, error:productsError}=await sb.from('products').select('*,categories(name)').order('id');
+    const {data:p,error:productsError}=await sb.from('products').select('*,categories(name)').order('id');
     if(productsError) throw productsError;
 
-    const {data:cp, error:couponsError}=await sb.from('coupons').select('*').order('id');
+    const {data:cp,error:couponsError}=await sb.from('coupons').select('*').order('id');
     if(couponsError) throw couponsError;
 
-    const {data:os, error:ordersError}=await sb.from('orders').select('*').order('created_at',{ascending:false});
+    const {data:os,error:ordersError}=await sb.from('orders').select('*').order('created_at',{ascending:false});
     if(ordersError) throw ordersError;
 
     const orders=os||[];
     const ids=orders.map(o=>o.id);
     let items=[];
+
     if(ids.length){
       const {data:itemData,error:itemsError}=await sb.from('order_items').select('*').in('order_id',ids);
       if(itemsError) throw itemsError;
@@ -71,9 +78,21 @@ async function loadAdminState(){
     appState.instagram=s?.instagram_link||'https://instagram.com/amalapyrotech';
     appState.youtube=s?.youtube_link||'https://youtube.com/@amalapyrotech';
     appState.announcement=s?.announcement||'';
-    appState.heroBanners=(b||[]).map(x=>({id:x.id,url:mediaUrl(x.storage_path),storage_path:x.storage_path}));
-    appState.gallery=(g||[]).map(x=>({id:x.id,url:mediaUrl(x.storage_path),storage_path:x.storage_path}));
+
+    appState.heroBanners=(b||[]).map(x=>({
+      id:x.id,
+      url:mediaUrl(x.storage_path),
+      storage_path:x.storage_path
+    }));
+
+    appState.gallery=(g||[]).map(x=>({
+      id:x.id,
+      url:mediaUrl(x.storage_path),
+      storage_path:x.storage_path
+    }));
+
     appState.categories=c||[];
+
     appState.products=(p||[]).map(x=>({
       id:x.id,
       code:x.code,
@@ -86,17 +105,20 @@ async function loadAdminState(){
       image:mediaUrl(x.image_path),
       img:mediaUrl(x.image_path),
       category_id:x.category_id,
-      stock_quantity:Number(x.stock_quantity ?? 0),
-      active:x.active !== false
+      stock_quantity:Number(x.stock_quantity??0),
+      active:x.active!==false
     }));
+
     appState.coupons=cp||[];
     appState.pendingOrders=map.filter(o=>o.status==='pending');
     appState.confirmedOrders=map.filter(o=>o.status==='confirmed');
     appState.cancelledOrders=map.filter(o=>o.status==='cancelled');
 
     if(typeof updateDashboardMetrics==='function') updateDashboardMetrics();
+
     const headerLogo=document.getElementById('headerLogo');
     if(headerLogo) headerLogo.src=appState.logo;
+
   } catch(e) {
     console.error('Admin data load error:',e);
     throw e;
@@ -107,53 +129,84 @@ async function initApp(){
   try {
     const {data:{session},error}=await sb.auth.getSession();
     if(error) throw error;
-    if(!session){ window.location.href='admin-login.html'; return; }
+
+    if(!session){
+      window.location.href='admin-login.html';
+      return;
+    }
+
     await loadAdminState();
   } catch(e) {
     console.error('Initial load metrics/logo error:',e);
     const container=document.getElementById('dashboardRecentOrdersList');
-    if(container) container.innerHTML='<p class="text-xs text-red-600 py-4 text-center">Unable to load Supabase data. Please refresh and try again.</p>';
+    if(container){
+      container.innerHTML='<p class="text-xs text-red-600 py-4 text-center">Unable to load Supabase data. Please refresh and try again.</p>';
+    }
   }
 }
-async function refreshAdmin(){ await loadAdminState(); }
 
-function showPreviewFile(input,imgId){ const f=input.files?.[0]; if(f){ document.getElementById(imgId).src=URL.createObjectURL(f); } }
-function previewLogoFile(event){ showPreviewFile(event.target,'logoPreviewImg'); }
+async function refreshAdmin(){
+  await loadAdminState();
+}
+
+function showPreviewFile(input,imgId){
+  const f=input.files?.[0];
+  if(f) document.getElementById(imgId).src=URL.createObjectURL(f);
+}
+
+function previewLogoFile(event){
+  showPreviewFile(event.target,'logoPreviewImg');
+}
 
 async function saveLogoFile(){
   const f=document.getElementById('logoFileInput').files?.[0];
-  if(!f)return alert('Please select an image file first.');
+  if(!f) return alert('Please select an image file first.');
+
   try{
     const path=await uploadMedia(f,'logo');
-    await sb.from('site_settings').upsert({id:1,logo_path:path,updated_at:new Date().toISOString()});
+    const {error}=await sb.from('site_settings').upsert({
+      id:1,
+      logo_path:path,
+      updated_at:new Date().toISOString()
+    });
+    if(error) throw error;
+
     await refreshAdmin();
     renderHomeManagement(document.getElementById('dynamicContentArea'));
     alert('Logo updated successfully.');
   }catch(e){
     console.error(e);
-    alert('Logo upload failed.');
+    alert('Logo upload failed: '+(e.message||'Unknown error'));
   }
 }
 
 async function addBannerFile(){
   const f=document.getElementById('bannerFileInput').files?.[0];
-  if(!f)return alert('Please select an image file to upload.');
+  if(!f) return alert('Please select an image file to upload.');
+
   try{
     const path=await uploadMedia(f,'banners');
     const max=(appState.heroBanners||[]).reduce((m,x)=>Math.max(m,x.id||0),0);
-    await sb.from('hero_banners').insert({storage_path:path,sort_order:max+1});
+    const {error}=await sb.from('hero_banners').insert({
+      storage_path:path,
+      sort_order:max+1
+    });
+    if(error) throw error;
+
     await refreshAdmin();
     renderHomeManagement(document.getElementById('dynamicContentArea'));
     alert('Banner uploaded successfully.');
   }catch(e){
     console.error(e);
-    alert('Banner upload failed.');
+    alert('Banner upload failed: '+(e.message||'Unknown error'));
   }
 }
 
 async function deleteBanner(id){
-  if(!confirm('Delete this banner?'))return;
-  await sb.from('hero_banners').delete().eq('id',id);
+  if(!confirm('Delete this banner?')) return;
+  const {error}=await sb.from('hero_banners').delete().eq('id',id);
+  if(error) return alert(error.message);
+
   await refreshAdmin();
   renderHomeManagement(document.getElementById('dynamicContentArea'));
 }
@@ -167,101 +220,111 @@ async function saveContactSettings(){
     youtube_link:document.getElementById('settingYoutube').value.trim(),
     updated_at:new Date().toISOString()
   };
+
   const {error}=await sb.from('site_settings').upsert(row);
-  if(error)return alert(error.message);
+  if(error) return alert(error.message);
+
   await refreshAdmin();
   alert('Contact & Social settings updated centrally.');
 }
 
+/* CATEGORY MANAGEMENT */
+
 async function addCategory(){
   const input=document.getElementById('newCatName');
   const name=input?.value.trim();
-  if(!name)return alert('Please enter a category name.');
-  try{
-    const nextOrder=(appState.categories||[]).reduce((m,c)=>Math.max(m,Number(c.sort_order)||0),0)+1;
-    const {error}=await sb.from('categories').insert({name,sort_order:nextOrder});
-    if(error)throw error;
-    await refreshAdmin();
-    renderCatalogManagement(document.getElementById('dynamicContentArea'));
-  }catch(e){
-    console.error(e);
-    alert(e.message||'Category could not be added.');
-  }
-}
+  if(!name) return alert('Category name is required.');
 
-async function renameCategory(id){
-  const category=(appState.categories||[]).find(c=>Number(c.id)===Number(id));
-  if(!category)return;
-  const name=prompt('Enter the new category name:',category.name||'');
-  if(name===null)return;
-  if(!name.trim())return alert('Category name cannot be empty.');
-  try{
-    const {error}=await sb.from('categories').update({name:name.trim()}).eq('id',id);
-    if(error)throw error;
-    await refreshAdmin();
-    renderCatalogManagement(document.getElementById('dynamicContentArea'));
-  }catch(e){
-    console.error(e);
-    alert(e.message||'Category rename failed.');
-  }
-}
+  const {error}=await sb.from('categories').insert({name});
+  if(error) return alert(error.message);
 
-async function moveCategory(id,direction){
-  const list=[...(appState.categories||[])];
-  const index=list.findIndex(c=>Number(c.id)===Number(id));
-  const target=index+Number(direction);
-  if(index<0||target<0||target>=list.length)return;
-  const a=list[index],b=list[target];
-  try{
-    const {error:e1}=await sb.from('categories').update({sort_order:target+1}).eq('id',a.id);
-    if(e1)throw e1;
-    const {error:e2}=await sb.from('categories').update({sort_order:index+1}).eq('id',b.id);
-    if(e2)throw e2;
-    await refreshAdmin();
-    renderCatalogManagement(document.getElementById('dynamicContentArea'));
-  }catch(e){
-    console.error(e);
-    alert(e.message||'Category order could not be changed. Please try again.');
-  }
+  await refreshAdmin();
+  renderCatalogManagement(document.getElementById('dynamicContentArea'));
 }
 
 async function deleteCategory(id){
-  const linked=(appState.products||[]).filter(p=>Number(p.category_id)===Number(id));
-  if(linked.length)return alert('This category still has products assigned to it. Move those products to another category before deleting it.');
-  if(!confirm('Delete this category?'))return;
+  if(!confirm('Delete this category? Products linked to it may prevent deletion.')) return;
+
+  const {error}=await sb.from('categories').delete().eq('id',id);
+  if(error) return alert(error.message);
+
+  await refreshAdmin();
+  renderCatalogManagement(document.getElementById('dynamicContentArea'));
+}
+
+async function renameCategory(id){
+  const cat=(appState.categories||[]).find(c=>Number(c.id)===Number(id));
+  if(!cat) return;
+
+  const name=prompt('Enter the new category name:',cat.name||'');
+  if(name===null) return;
+
+  const clean=name.trim();
+  if(!clean) return alert('Category name is required.');
+
+  const {error}=await sb.from('categories').update({name:clean}).eq('id',id);
+  if(error) return alert(error.message);
+
+  await refreshAdmin();
+  renderCatalogManagement(document.getElementById('dynamicContentArea'));
+}
+
+async function moveCategory(id,direction){
+  const cats=[...(appState.categories||[])];
+  const i=cats.findIndex(c=>Number(c.id)===Number(id));
+  const j=i+Number(direction);
+
+  if(i<0||j<0||j>=cats.length) return;
+
+  [cats[i],cats[j]]=[cats[j],cats[i]];
+
   try{
-    const {error}=await sb.from('categories').delete().eq('id',id);
-    if(error)throw error;
+    for(let n=0;n<cats.length;n++){
+      const {error}=await sb.from('categories')
+        .update({sort_order:n+1})
+        .eq('id',cats[n].id);
+      if(error) throw error;
+    }
+
     await refreshAdmin();
     renderCatalogManagement(document.getElementById('dynamicContentArea'));
   }catch(e){
-    console.error(e);
-    alert(e.message||'Category delete failed.');
+    alert('Category reorder needs a sort_order column in categories. '+(e.message||''));
   }
 }
 
+/* PRODUCT MANAGEMENT */
+
 function openAddProductModal(){
-  showModal(`<div class="space-y-3 text-xs">
-    <h3 class="font-bold text-sm text-[#263447]">Add New Product with Gallery Image</h3>
-    <input type="text" id="prodCode" placeholder="Product Code (e.g. OSC-003)" class="w-full border p-2 rounded">
-    <input type="text" id="prodName" placeholder="Product Name" class="w-full border p-2 rounded">
-    <input type="number" min="0" id="prodMrp" placeholder="MRP Price" class="w-full border p-2 rounded">
-    <input type="number" min="0" id="prodPrice" placeholder="Selling Price" class="w-full border p-2 rounded">
-    <input type="text" id="prodPack" placeholder="Pack (e.g. 1 Pkt)" value="1 Pkt" class="w-full border p-2 rounded">
-    <label class="block font-semibold text-[#70777D]">Initial Stock Quantity</label>
-    <input type="number" min="0" step="1" id="prodStock" value="0" placeholder="Stock Quantity" class="w-full border p-2 rounded">
-    <select id="prodCategory" class="w-full border p-2 rounded">
-      ${appState.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
-    </select>
-    <div>
-      <label class="block font-semibold text-[#70777D] mb-1">Upload Product Image from Device</label>
-      <input type="file" id="prodImgFile" accept="image/*" class="w-full border p-2 rounded bg-white">
+  showModal(`
+    <div class="space-y-3 text-xs">
+      <h3 class="font-bold text-sm text-[#263447]">Add New Product with Gallery Image</h3>
+
+      <input type="text" id="prodCode" placeholder="Product Code (e.g. OSC-003)" class="w-full border p-2 rounded">
+      <input type="text" id="prodName" placeholder="Product Name" class="w-full border p-2 rounded">
+      <input type="number" id="prodMrp" placeholder="MRP Price" class="w-full border p-2 rounded">
+      <input type="number" id="prodPrice" placeholder="Selling Price" class="w-full border p-2 rounded">
+
+      <label class="block font-semibold text-[#70777D]">Stock Quantity</label>
+      <input type="number" min="0" step="1" id="prodStock" value="0" placeholder="Stock Quantity" class="w-full border p-2 rounded">
+
+      <input type="text" id="prodPack" placeholder="Pack (e.g. 1 Pkt)" value="1 Pkt" class="w-full border p-2 rounded">
+
+      <select id="prodCategory" class="w-full border p-2 rounded">
+        ${appState.categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}
+      </select>
+
+      <div>
+        <label class="block font-semibold text-[#70777D] mb-1">Upload Product Image from Device</label>
+        <input type="file" id="prodImgFile" accept="image/*" class="w-full border p-2 rounded bg-white">
+      </div>
+
+      <div class="flex justify-end space-x-2 pt-2">
+        <button onclick="closeModal()" class="px-3 py-1.5 bg-gray-200 rounded font-bold">Cancel</button>
+        <button onclick="saveNewProductFile()" class="px-3 py-1.5 bg-[#0B6B4F] text-white rounded font-bold">Save Product</button>
+      </div>
     </div>
-    <div class="flex justify-end space-x-2 pt-2">
-      <button onclick="closeModal()" class="px-3 py-1.5 bg-gray-200 rounded font-bold">Cancel</button>
-      <button onclick="saveNewProductFile()" class="px-3 py-1.5 bg-[#0B6B4F] text-white rounded font-bold">Save Product</button>
-    </div>
-  </div>`);
+  `);
 }
 
 async function saveNewProductFile(){
@@ -269,21 +332,33 @@ async function saveNewProductFile(){
   const name=document.getElementById('prodName').value.trim();
   const mrp=Number(document.getElementById('prodMrp').value||0);
   const price=Number(document.getElementById('prodPrice').value||0);
+  const stock_quantity=Number(document.getElementById('prodStock').value||0);
   const pack=document.getElementById('prodPack').value.trim()||'1 Pkt';
   const category_id=Number(document.getElementById('prodCategory').value||0);
-  const stock_quantity=Number(document.getElementById('prodStock').value||0);
   const f=document.getElementById('prodImgFile').files?.[0];
 
-  if(!code||!name||!price)return alert('Please enter product code, name and price.');
-  if(!Number.isInteger(stock_quantity)||stock_quantity<0)return alert('Stock quantity must be a whole number of 0 or more.');
+  if(!code||!name||!price) return alert('Please enter product code, name and price.');
+  if(!Number.isInteger(stock_quantity)||stock_quantity<0){
+    return alert('Stock quantity must be a whole number of 0 or more.');
+  }
 
   try{
     let image_path=null;
-    if(f)image_path=await uploadMedia(f,'products');
+    if(f) image_path=await uploadMedia(f,'products');
+
     const {error}=await sb.from('products').insert({
-      code,name,mrp,price,pack,category_id,image_path,stock_quantity,active:true
+      code,
+      name,
+      mrp,
+      price,
+      pack,
+      category_id,
+      image_path,
+      stock_quantity,
+      active:true
     });
-    if(error)throw error;
+    if(error) throw error;
+
     closeModal();
     await refreshAdmin();
     renderCatalogManagement(document.getElementById('dynamicContentArea'));
@@ -294,190 +369,260 @@ async function saveNewProductFile(){
 }
 
 async function deleteProduct(id){
-  if(!confirm('Mark this product as deleted? It will be hidden from the customer catalog while its database record is retained for existing order history.'))return;
-  try{
-    const {error}=await sb.from('products').update({
-      active:false,
-      updated_at:new Date().toISOString()
-    }).eq('id',id);
-    if(error)throw error;
-    await refreshAdmin();
-    renderCatalogManagement(document.getElementById('dynamicContentArea'));
-  }catch(e){
-    console.error(e);
-    alert(e.message||'Product delete failed.');
-  }
+  if(!confirm('Delete this product?')) return;
+
+  const {error}=await sb.from('products').update({active:false}).eq('id',id);
+  if(error) return alert(error.message);
+
+  await refreshAdmin();
+  renderCatalogManagement(document.getElementById('dynamicContentArea'));
 }
 
 async function restoreProduct(id){
-  if(!confirm('Restore this product to active status?'))return;
-  try{
-    const {error}=await sb.from('products').update({
-      active:true,
-      updated_at:new Date().toISOString()
-    }).eq('id',id);
-    if(error)throw error;
-    await refreshAdmin();
-    renderCatalogManagement(document.getElementById('dynamicContentArea'));
-  }catch(e){
-    console.error(e);
-    alert(e.message||'Product restore failed.');
-  }
+  const {error}=await sb.from('products').update({active:true}).eq('id',id);
+  if(error) return alert(error.message);
+
+  await refreshAdmin();
+  renderCatalogManagement(document.getElementById('dynamicContentArea'));
 }
+
+/* COUPON MANAGEMENT */
 
 async function addNewCoupon(){
   const code=document.getElementById('couponCode').value.trim().toUpperCase();
   const discount=Number(document.getElementById('couponDiscount').value||0);
-  if(!code||!discount)return;
-  const {error}=await sb.from('coupons').insert({code,discount,type:'percent',active:true});
-  if(error)return alert(error.message);
+  if(!code||!discount) return;
+
+  const {error}=await sb.from('coupons').insert({
+    code,
+    discount,
+    type:'percent',
+    active:true
+  });
+  if(error) return alert(error.message);
+
   await refreshAdmin();
   renderCouponManagement(document.getElementById('dynamicContentArea'));
 }
 
 async function deleteCoupon(id){
-  await sb.from('coupons').update({active:false}).eq('id',id);
+  const {error}=await sb.from('coupons').update({active:false}).eq('id',id);
+  if(error) return alert(error.message);
+
   await refreshAdmin();
   renderCouponManagement(document.getElementById('dynamicContentArea'));
 }
 
-function viewOrderDetail(orderId,type){
-  let order=(type==='pending'?appState.pendingOrders:type==='confirmed'?appState.confirmedOrders:appState.cancelledOrders).find(o=>o.id===orderId);
-  if(!order)return;
+/* ORDER DETAILS */
 
-  let transportSection = '';
-  if (type === 'confirmed') {
-      transportSection = `
+function viewOrderDetail(orderId,type){
+  const order=(type==='pending'
+    ?appState.pendingOrders
+    :type==='confirmed'
+      ?appState.confirmedOrders
+      :appState.cancelledOrders
+  ).find(o=>o.id===orderId);
+
+  if(!order) return;
+
+  let transportSection='';
+
+  if(type==='confirmed'){
+    transportSection=`
       <div class="mt-4 pt-3 border-t border-custom bg-[#EFFBF4] p-3.5 rounded-xl space-y-3">
-          <div class="flex justify-between items-center">
-              <span class="font-extrabold text-xs text-[#0B6B4F] uppercase tracking-wide flex items-center">
-                  <i class="fa-solid fa-truck-fast mr-2"></i> Transport Details
-              </span>
+        <div class="flex justify-between items-center">
+          <span class="font-extrabold text-xs text-[#0B6B4F] uppercase tracking-wide flex items-center">
+            <i class="fa-solid fa-truck-fast mr-2"></i> Transport Details
+          </span>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+          <div>
+            <label class="block font-semibold text-[#70777D] mb-1">Transport Name</label>
+            <input type="text" id="transportNameInput" value="${order.transportName||''}" placeholder="e.g. ABC Transport" class="w-full border p-2 rounded-lg bg-white">
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-              <div>
-                  <label class="block font-semibold text-[#70777D] mb-1">Transport Name</label>
-                  <input type="text" id="transportNameInput" value="${order.transportName || ''}" placeholder="e.g. ABC Transport" class="w-full border p-2 rounded-lg bg-white">
-              </div>
-              <div>
-                  <label class="block font-semibold text-[#70777D] mb-1">Mobile Number</label>
-                  <input type="text" id="transportMobileInput" value="${order.transportMobile || ''}" placeholder="e.g. 9876543210" class="w-full border p-2 rounded-lg bg-white">
-              </div>
-              <div>
-                  <label class="block font-semibold text-[#70777D] mb-1">Transport / LR Number</label>
-                  <input type="text" id="transportNumberInput" value="${order.transportNumber || ''}" placeholder="e.g. LR123456" class="w-full border p-2 rounded-lg bg-white">
-              </div>
+          <div>
+            <label class="block font-semibold text-[#70777D] mb-1">Mobile Number</label>
+            <input type="text" id="transportMobileInput" value="${order.transportMobile||''}" placeholder="e.g. 9876543210" class="w-full border p-2 rounded-lg bg-white">
           </div>
-          <div class="flex justify-end space-x-2 pt-1">
-              <button onclick="clearTransportDetails(${order.id})" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-[#263447] rounded-lg font-bold text-xs transition">Clear</button>
-              <button onclick="saveTransportDetails(${order.id}, '${type}')" class="px-4 py-1.5 bg-[#0B6B4F] hover:bg-[#064C3A] text-white rounded-lg font-bold text-xs transition shadow-sm">
-                  ${(order.transportName || order.transportMobile || order.transportNumber) ? 'Update Transport Details' : 'Save Transport Details'}
-              </button>
+          <div>
+            <label class="block font-semibold text-[#70777D] mb-1">Transport / LR Number</label>
+            <input type="text" id="transportNumberInput" value="${order.transportNumber||''}" placeholder="e.g. LR123456" class="w-full border p-2 rounded-lg bg-white">
           </div>
+        </div>
+        <div class="flex justify-end space-x-2 pt-1">
+          <button onclick="clearTransportDetails(${order.id})" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-[#263447] rounded-lg font-bold text-xs transition">Clear</button>
+          <button onclick="saveTransportDetails(${order.id}, '${type}')" class="px-4 py-1.5 bg-[#0B6B4F] hover:bg-[#064C3A] text-white rounded-lg font-bold text-xs transition shadow-sm">
+            ${(order.transportName||order.transportMobile||order.transportNumber)?'Update Transport Details':'Save Transport Details'}
+          </button>
+        </div>
       </div>`;
   }
 
-  let html=`<div class="space-y-4">
-      <div class="flex justify-between items-center border-b pb-2">
-          <h3 class="font-extrabold text-[#263447] text-base">Order #${order.orderId||order.id} Details</h3>
-          <button onclick="closeModal()" class="text-gray-500 font-bold text-xl">&times;</button>
-      </div>
-      <div class="text-xs space-y-1 text-[#263447] bg-[#F5F7F8] p-3 rounded-lg">
-          <p><strong>Customer:</strong> ${order.customer}</p>
-          <p><strong>District:</strong> ${order.district}</p>
-          <p><strong>Address:</strong> ${order.address}</p>
-          <p><strong>Contact:</strong> ${order.phone}</p>
-      </div>
-      <div class="border rounded-lg overflow-x-auto">
-          <table class="w-full text-left text-xs whitespace-nowrap">
-              <thead class="bg-[#EFFBF4] text-[#0B6B4F]">
-                  <tr>
-                      <th class="p-2">S.No</th>
-                      <th class="p-2">Product Code</th>
-                      <th class="p-2">Item Name</th>
-                      <th class="p-2">Qty</th>
-                      <th class="p-2">Price</th>
-                      <th class="p-2">Amount</th>
-                  </tr>
-              </thead>
-              <tbody class="divide-y">
-                  ${order.items.map((i,n)=>`<tr><td class="p-2 font-bold">${n+1}</td><td class="p-2">${i.code}</td><td class="p-2 font-medium">${i.name}</td><td class="p-2">${i.qty}</td><td class="p-2">₹${i.price.toFixed(2)}</td><td class="p-2 font-semibold">₹${i.amount.toFixed(2)}</td></tr>`).join('')}
-              </tbody>
-          </table>
-      </div>
-      <div class="text-right font-extrabold text-sm text-[#263447] pt-1">Order Total: ₹${order.total.toFixed(2)}</div>
-      ${transportSection}
-      ${type==='pending'?`<div class="flex space-x-2 pt-3 border-t"><button onclick="confirmPendingOrder(${order.id})" class="flex-1 py-2 bg-[#0B6B4F] text-white rounded font-bold text-xs">Confirm Order</button><button onclick="promptCancelOrder(${order.id})" class="flex-1 py-2 bg-[#D9364F] text-white rounded font-bold text-xs">Cancel Order</button></div>`:type==='confirmed'?`<div class="pt-3 border-t"><button onclick="downloadInvoice(${order.id})" class="w-full py-2 bg-[#263447] text-white rounded font-bold text-xs"><i class="fa-solid fa-download"></i> Download / Print Invoice</button></div>`:`<p class="text-center text-xs text-red-500 font-medium italic">Cancelled Record (No Invoice Available)</p>`}
+  const html=`<div class="space-y-4">
+    <div class="flex justify-between items-center border-b pb-2">
+      <h3 class="font-extrabold text-[#263447] text-base">Order #${order.orderId||order.id} Details</h3>
+      <button onclick="closeModal()" class="text-gray-500 font-bold text-xl">&times;</button>
+    </div>
+    <div class="text-xs space-y-1 text-[#263447] bg-[#F5F7F8] p-3 rounded-lg">
+      <p><strong>Customer:</strong> ${order.customer}</p>
+      <p><strong>District:</strong> ${order.district}</p>
+      <p><strong>Address:</strong> ${order.address}</p>
+      <p><strong>Contact:</strong> ${order.phone}</p>
+    </div>
+    <div class="border rounded-lg overflow-x-auto">
+      <table class="w-full text-left text-xs whitespace-nowrap">
+        <thead class="bg-[#EFFBF4] text-[#0B6B4F]">
+          <tr>
+            <th class="p-2">S.No</th><th class="p-2">Product Code</th><th class="p-2">Item Name</th>
+            <th class="p-2">Qty</th><th class="p-2">Price</th><th class="p-2">Amount</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y">
+          ${order.items.map((i,n)=>`<tr>
+            <td class="p-2 font-bold">${n+1}</td><td class="p-2">${i.code}</td>
+            <td class="p-2 font-medium">${i.name}</td><td class="p-2">${i.qty}</td>
+            <td class="p-2">₹${Number(i.price).toFixed(2)}</td>
+            <td class="p-2 font-semibold">₹${Number(i.amount).toFixed(2)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-right font-extrabold text-sm text-[#263447] pt-1">Order Total: ₹${Number(order.total).toFixed(2)}</div>
+    ${transportSection}
+    ${type==='pending'
+      ?`<div class="flex space-x-2 pt-3 border-t">
+          <button onclick="confirmPendingOrder(${order.id})" class="flex-1 py-2 bg-[#0B6B4F] text-white rounded font-bold text-xs">Confirm Order</button>
+          <button onclick="promptCancelOrder(${order.id})" class="flex-1 py-2 bg-[#D9364F] text-white rounded font-bold text-xs">Cancel Order</button>
+        </div>`
+      :type==='confirmed'
+        ?`<div class="pt-3 border-t">
+            <button onclick="downloadInvoice(${order.id})" class="w-full py-2 bg-[#263447] text-white rounded font-bold text-xs">
+              <i class="fa-solid fa-download"></i> Download / Print Invoice
+            </button>
+          </div>`
+        :`<p class="text-center text-xs text-red-500 font-medium italic">Cancelled Record (No Invoice Available)</p>`
+    }
   </div>`;
+
   showModal(html);
 }
 
-async function saveTransportDetails(orderId, type) {
-    let tName = document.getElementById('transportNameInput').value.trim();
-    let tMobile = document.getElementById('transportMobileInput').value.trim();
-    let tNumber = document.getElementById('transportNumberInput').value.trim();
+async function saveTransportDetails(orderId,type){
+  const tName=document.getElementById('transportNameInput').value.trim();
+  const tMobile=document.getElementById('transportMobileInput').value.trim();
+  const tNumber=document.getElementById('transportNumberInput').value.trim();
 
-    if (!tName || !tMobile || !tNumber) {
-        return alert('Transport Name, Mobile Number, and Transport / LR Number are all required.');
-    }
+  if(!tName||!tMobile||!tNumber){
+    return alert('Transport Name, Mobile Number, and Transport / LR Number are all required.');
+  }
 
-    try {
-        const { error } = await sb
-            .from('orders')
-            .update({
-                transport_name: tName,
-                transport_mobile: tMobile,
-                transport_number: tNumber
-            })
-            .eq('id', orderId);
+  try{
+    const {error}=await sb.from('orders').update({
+      transport_name:tName,
+      transport_mobile:tMobile,
+      transport_number:tNumber
+    }).eq('id',orderId);
 
-        if (error) throw error;
+    if(error) throw error;
 
-        await refreshAdmin();
-        viewOrderDetail(orderId, type);
-        alert('Transport details saved successfully.');
-    } catch (e) {
-        console.error(e);
-        alert(e.message || 'Failed to save transport details.');
-    }
+    await refreshAdmin();
+    viewOrderDetail(orderId,type);
+    alert('Transport details saved successfully.');
+  }catch(e){
+    console.error(e);
+    alert(e.message||'Failed to save transport details.');
+  }
 }
 
-async function clearTransportDetails(orderId) {
-    if (!confirm('Clear transport details for this order?')) return;
+async function clearTransportDetails(orderId){
+  if(!confirm('Clear transport details for this order?')) return;
 
-    try {
-        const { error } = await sb
-            .from('orders')
-            .update({
-                transport_name: null,
-                transport_mobile: null,
-                transport_number: null
-            })
-            .eq('id', orderId);
+  try{
+    const {error}=await sb.from('orders').update({
+      transport_name:null,
+      transport_mobile:null,
+      transport_number:null
+    }).eq('id',orderId);
 
-        if (error) throw error;
+    if(error) throw error;
 
-        await refreshAdmin();
-        viewOrderDetail(orderId, 'confirmed');
-        alert('Transport details cleared successfully.');
-    } catch (e) {
-        console.error(e);
-        alert(e.message || 'Failed to clear transport details.');
-    }
+    await refreshAdmin();
+    viewOrderDetail(orderId,'confirmed');
+    alert('Transport details cleared successfully.');
+  }catch(e){
+    console.error(e);
+    alert(e.message||'Failed to clear transport details.');
+  }
 }
+
+/* ORDER CONFIRMATION AND STOCK */
 
 async function confirmPendingOrder(id){
+  const order=(appState.pendingOrders||[]).find(o=>String(o.id)===String(id));
+  if(!order) return alert('Pending order not found. Refresh and try again.');
+  if(!Array.isArray(order.items)||!order.items.length) return alert('Order items not found. Cannot confirm safely.');
+  if(!confirm('Confirm this order and deduct the ordered quantities from stock?')) return;
+
+  const {data:claimed,error:claimError}=await sb.from('orders')
+    .update({status:'confirmed',confirmed_at:new Date().toISOString()})
+    .eq('id',id).eq('status','pending').select('id');
+
+  if(claimError) return alert(claimError.message);
+  if(!claimed||!claimed.length) return alert('This order has already been processed. Refresh the page.');
+
+  const deducted=[];
+
   try{
-    const {error}=await sb.rpc('confirm_order_and_decrement_stock',{p_order_id:String(id)});
-    if(error)throw error;
-    await refreshAdmin();
-    closeModal();
-    openView('confirmedOrdersView');
-    alert('Order confirmed successfully. Stock quantities have been updated.');
+    for(const item of order.items){
+      const productId=item.productId;
+      const qty=Number(item.qty);
+
+      if(!productId||!Number.isInteger(qty)||qty<=0){
+        throw new Error('Invalid product or quantity in order item.');
+      }
+
+      const product=(appState.products||[]).find(p=>String(p.id)===String(productId));
+      if(!product){
+        throw new Error('Product '+(item.name||productId)+' was not found in catalog.');
+      }
+
+      const current=Number(product.stock_quantity||0);
+      if(current<qty){
+        throw new Error('Insufficient stock for '+(item.name||product.name)+'. Available: '+current+', ordered: '+qty+'.');
+      }
+
+      const {data:updated,error}=await sb.from('products')
+        .update({stock_quantity:current-qty,updated_at:new Date().toISOString()})
+        .eq('id',productId)
+        .eq('stock_quantity',current)
+        .select('id');
+
+      if(error) throw error;
+      if(!updated||!updated.length){
+        throw new Error('Stock changed while confirming '+(item.name||product.name)+'. Refresh and retry.');
+      }
+
+      deducted.push({id:productId,qty:qty,after:current-qty});
+    }
   }catch(e){
-    console.error('Order confirmation / stock update failed:',e);
-    alert(e.message||'Order could not be confirmed. Please check product stock and try again.');
+    for(const d of deducted){
+      await sb.from('products')
+        .update({stock_quantity:d.after+d.qty})
+        .eq('id',d.id)
+        .eq('stock_quantity',d.after);
+    }
+
+    await sb.from('orders')
+      .update({status:'pending',confirmed_at:null})
+      .eq('id',id).eq('status','confirmed');
+
+    return alert('Order confirmation was stopped; stock was not fully deducted. '+(e.message||'Please refresh and check stock.'));
   }
+
+  await refreshAdmin();
+  closeModal();
+  openView('confirmedOrdersView');
+  alert('Order confirmed successfully. Stock quantities updated.');
 }
 
 async function executeCancelOrder(id){
@@ -485,16 +630,20 @@ async function executeCancelOrder(id){
     status:'cancelled',
     cancelled_at:new Date().toISOString()
   }).eq('id',id);
-  if(error)return alert(error.message);
+
+  if(error) return alert(error.message);
+
   await refreshAdmin();
   closeModal();
   openView('cancelledOrdersView');
   alert('Order cancelled successfully and moved to Cancelled Archive.');
 }
 
+/* INVOICE PDF */
+
 async function downloadInvoice(orderId){
   const order=[...appState.confirmedOrders,...appState.pendingOrders].find(o=>o.id===orderId);
-  if(!order||!order.invoiceSnapshot)return alert('Immutable invoice snapshot not found.');
+  if(!order||!order.invoiceSnapshot) return alert('Immutable invoice snapshot not found.');
   await renderAdminInvoicePdf(order.invoiceSnapshot);
 }
 
@@ -508,6 +657,7 @@ async function renderAdminInvoicePdf(s){
   doc.setTextColor(169,0,90);
   doc.text(s.company_name,14,y);
   y+=7;
+
   doc.setFontSize(9);
   doc.setTextColor(70,70,70);
   doc.text(s.tagline,14,y);
@@ -516,20 +666,25 @@ async function renderAdminInvoicePdf(s){
   y+=5;
   doc.text(`WhatsApp: ${s.whatsapp} | Phone: ${s.phone}`,14,y);
   y+=9;
+
   doc.setDrawColor(169,0,90);
   doc.line(14,y,196,y);
   y+=8;
+
   doc.setFontSize(10);
   doc.setTextColor(40,40,40);
   doc.text('Customer Details:',14,y);
   doc.setFont('helvetica','normal');
   y+=5;
+
   doc.text(`Name: ${s.customer.name}`,14,y);
   doc.text(`Order ID: ${s.order_id}`,130,y);
   y+=5;
+
   doc.text(`Mobile: ${s.customer.mobile}`,14,y);
   doc.text(`Date: ${new Date(s.date).toLocaleDateString('en-IN')}`,130,y);
   y+=5;
+
   doc.text(`Address: ${s.customer.address}, ${s.customer.town}, ${s.customer.district}, ${s.customer.state} - ${s.customer.pincode}`,14,y,{maxWidth:180});
   y+=9;
 
@@ -553,13 +708,14 @@ async function renderAdminInvoicePdf(s){
   });
 
   y=doc.lastAutoTable.finalY+8;
+
   doc.autoTable({
     startY:y,
     body:[
       ['Total MRP',`₹${Number(s.totals.mrp_total).toFixed(2)}`],
       ['Special Savings',`- ₹${Number(s.totals.savings).toFixed(2)}`],
       ['Product Net Total',`₹${Number(s.totals.net_total).toFixed(2)}`],
-      ['Packing Charges',s.totals.packing_display || (typeof s.totals.packing==='number'?`₹${s.totals.packing.toFixed(2)}`:s.totals.packing)],
+      ['Packing Charges',s.totals.packing_display||(typeof s.totals.packing==='number'?`₹${s.totals.packing.toFixed(2)}`:s.totals.packing)],
       ['Transport',s.totals.transport],
       ['Grand Total',`₹${Number(s.totals.grand_total).toFixed(2)}`]
     ],
@@ -576,72 +732,96 @@ async function renderAdminInvoicePdf(s){
   doc.save(`${s.order_id}-invoice.pdf`);
 }
 
+/* ADMIN LOGIN AND CREDENTIALS */
+
 async function logoutAdmin(){
   await sb.auth.signOut();
   window.location.href='admin-login.html';
 }
 
 function renderAdminCredentials(container){
-  container.innerHTML=`<div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-4 max-w-md mx-auto">
-    <div class="flex justify-between items-center border-b pb-3">
-      <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-key text-[#0B6B4F] mr-2"></i>Admin Security & Credentials</h2>
-      <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
-    </div>
-    <div class="space-y-3 text-xs">
-      <div><label class="font-semibold text-[#70777D]">Current Username</label><input type="text" id="currUser" class="w-full border p-2 rounded mt-1"></div>
-      <div><label class="font-semibold text-[#70777D]">Current Password</label><input type="password" id="currPass" class="w-full border p-2 rounded mt-1"></div>
-      <hr class="my-2">
-      <div><label class="font-semibold text-[#70777D]">New Username</label><input type="text" id="newUser" class="w-full border p-2 rounded mt-1"></div>
-      <div><label class="font-semibold text-[#70777D]">New Password</label><input type="password" id="newPass" class="w-full border p-2 rounded mt-1"></div>
-      <button onclick="updateAdminCredentials()" class="w-full py-2 bg-[#0B6B4F] text-white font-bold rounded mt-2">Update Credentials</button>
-    </div>
-  </div>`;
+  container.innerHTML=`
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-4 max-w-md mx-auto">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h2 class="font-extrabold text-[#263447] text-base">
+          <i class="fa-solid fa-key text-[#0B6B4F] mr-2"></i>Admin Security & Credentials
+        </h2>
+        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <div><label class="font-semibold text-[#70777D]">Current Username</label><input type="text" id="currUser" class="w-full border p-2 rounded mt-1"></div>
+        <div><label class="font-semibold text-[#70777D]">Current Password</label><input type="password" id="currPass" class="w-full border p-2 rounded mt-1"></div>
+        <hr class="my-2">
+        <div><label class="font-semibold text-[#70777D]">New Username</label><input type="text" id="newUser" class="w-full border p-2 rounded mt-1"></div>
+        <div><label class="font-semibold text-[#70777D]">New Password</label><input type="password" id="newPass" class="w-full border p-2 rounded mt-1"></div>
+        <button onclick="updateAdminCredentials()" class="w-full py-2 bg-[#0B6B4F] text-white font-bold rounded mt-2">Update Credentials</button>
+      </div>
+    </div>`;
 }
 
 async function updateAdminCredentials(){
   const email=document.getElementById('newUser').value.trim();
   const pass=document.getElementById('newPass').value;
-  if(!email&&!pass)return alert('Enter a new username/email or password.');
+
+  if(!email&&!pass) return alert('Enter a new username/email or password.');
+
   const payload={};
-  if(email)payload.email=email;
-  if(pass)payload.password=pass;
+  if(email) payload.email=email;
+  if(pass) payload.password=pass;
+
   const {error}=await sb.auth.updateUser(payload);
-  if(error)return alert(error.message);
+  if(error) return alert(error.message);
+
   alert('Admin credentials updated successfully. If email confirmation is enabled, confirm the new email before the next login.');
 }
 
-window.addEventListener('load', initApp);
+window.addEventListener('load',initApp);
+
+/* CUSTOMER DIRECTORY */
 
 async function renderCustomerManagement(container){
-  const {data:customers,error}=await sb.from('customers').select('*').order('district').order('name');
-  if(error)return container.innerHTML=`<div class="bg-white p-6 rounded-xl border border-custom"><p class="text-sm text-red-600">${error.message}</p></div>`;
+  const {data:customers,error}=await sb.from('customers')
+    .select('*').order('district').order('name');
+
+  if(error){
+    container.innerHTML=`<div class="bg-white p-6 rounded-xl border border-custom"><p class="text-sm text-red-600">${error.message}</p></div>`;
+    return;
+  }
+
   const districts={};
   (customers||[]).forEach(c=>{
     const d=c.district||'Unknown District';
-    (districts[d] ||= []).push(c);
+    (districts[d]||=[]).push(c);
   });
 
-  let html=`<div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-6">
-    <div class="flex justify-between items-center border-b pb-3">
-      <h2 class="font-extrabold text-[#263447] text-lg"><i class="fa-solid fa-users text-[#0B6B4F] mr-2"></i>District-wise Customer Directory</h2>
-      <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
-    </div>`;
+  let html=`
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-custom space-y-6">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h2 class="font-extrabold text-[#263447] text-lg">
+          <i class="fa-solid fa-users text-[#0B6B4F] mr-2"></i>District-wise Customer Directory
+        </h2>
+        <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1 rounded font-bold">Back</button>
+      </div>`;
 
   if(!Object.keys(districts).length){
     html+=`<p class="text-sm text-[#70777D] text-center py-6">No customer checkout records available yet.</p>`;
   }else{
     for(const dist of Object.keys(districts)){
-      html+=`<div class="border rounded-lg overflow-hidden">
-        <div class="bg-[#EFFBF4] p-3 font-bold text-[#0B6B4F] text-sm">${dist} District</div>
-        <div class="divide-y p-3 space-y-2">`;
+      html+=`
+        <div class="border rounded-lg overflow-hidden">
+          <div class="bg-[#EFFBF4] p-3 font-bold text-[#0B6B4F] text-sm">${dist} District</div>
+          <div class="divide-y p-3 space-y-2">`;
+
       districts[dist].forEach((c,i)=>{
-        html+=`<div class="flex justify-between items-center text-xs pt-2">
-          <span>${i+1}. <strong>${c.name}</strong></span>
-          <a href="https://wa.me/91${cleanPhone(c.mobile)}" target="_blank" class="px-3 py-1 bg-[#16A34A] text-white rounded font-bold flex items-center space-x-1">
-            <i class="fa-brands fa-whatsapp"></i><span>${c.mobile}</span>
-          </a>
-        </div>`;
+        html+=`
+          <div class="flex justify-between items-center text-xs pt-2">
+            <span>${i+1}. <strong>${c.name}</strong></span>
+            <a href="https://wa.me/91${cleanPhone(c.mobile)}" target="_blank" class="px-3 py-1 bg-[#16A34A] text-white rounded font-bold flex items-center space-x-1">
+              <i class="fa-brands fa-whatsapp"></i><span>${c.mobile}</span>
+            </a>
+          </div>`;
       });
+
       html+=`</div></div>`;
     }
   }
