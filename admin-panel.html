@@ -552,40 +552,62 @@
         }
 
         function renderCatalogManagement(container) {
+            const products = appState.products || [];
+            const lowStock = products.filter(p => p.active !== false && Number(p.stock_quantity || 0) > 0 && Number(p.stock_quantity || 0) <= 100);
+            const outOfStock = products.filter(p => p.active !== false && Number(p.stock_quantity || 0) === 0);
             container.innerHTML = `<div class="bg-white p-6 rounded-2xl shadow-sm border border-custom space-y-6">
-                <div class="flex justify-between items-center border-b pb-3">
-                    <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-store text-[#0B6B4F] mr-2"></i>Catalog Management (Categories & Products)</h2>
+                <div class="flex justify-between items-center border-b pb-3 gap-3">
+                    <h2 class="font-extrabold text-[#263447] text-base"><i class="fa-solid fa-store text-[#0B6B4F] mr-2"></i>Catalog & Product Management</h2>
                     <button onclick="returnToDashboard()" class="text-xs bg-[#F5F7F8] px-3 py-1.5 rounded-lg font-bold">Back to Dashboard</button>
                 </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div class="rounded-xl border border-amber-300 bg-amber-50 p-3">
+                        <p class="font-bold text-amber-800 text-sm">Low Stock Alert (100 or below): ${lowStock.length}</p>
+                        <p class="text-xs text-amber-800 mt-1">${lowStock.length ? lowStock.map(p => `${escapeHtml(p.name)} (${Number(p.stock_quantity)} left)`).join(' • ') : 'No low-stock products.'}</p>
+                    </div>
+                    <div class="rounded-xl border border-red-300 bg-red-50 p-3">
+                        <p class="font-bold text-red-800 text-sm">Out of Stock: ${outOfStock.length}</p>
+                        <p class="text-xs text-red-800 mt-1">${outOfStock.length ? outOfStock.map(p => escapeHtml(p.name)).join(' • ') : 'No out-of-stock products.'}</p>
+                    </div>
+                </div>
                 <div class="space-y-3 border-b pb-4">
-                    <h3 class="font-bold text-xs uppercase text-[#70777D]">Manage Categories</h3>
-                    <div class="flex space-x-2">
+                    <h3 class="font-bold text-xs uppercase text-[#70777D]">Categories — Add / Rename / Reorder / Delete</h3>
+                    <div class="flex flex-col sm:flex-row gap-2">
                         <input type="text" id="newCatName" placeholder="New Category Name" class="flex-1 border p-2.5 rounded-xl text-xs">
                         <button onclick="addCategory()" class="px-4 py-2.5 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">Add Category</button>
                     </div>
-                    <div class="flex flex-wrap gap-2 pt-2">
-                        ${appState.categories.map(c => `<span class="bg-[#EFFBF4] text-[#0B6B4F] px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#08B67D]/30 flex items-center space-x-2"><span>${c.name}</span><button onclick="deleteCategory(${c.id})" class="text-red-500 font-bold ml-1">&times;</button></span>`).join('')}
+                    <div class="space-y-2 pt-2">
+                        ${appState.categories.map((c, i) => `<div class="bg-[#EFFBF4] text-[#0B6B4F] p-2.5 rounded-xl text-xs font-semibold border border-[#08B67D]/30 flex items-center gap-2">
+                            <span class="min-w-0 flex-1">${escapeHtml(c.name)}</span>
+                            <button title="Move up" ${i===0?'disabled':''} onclick="moveCategory(${c.id}, -1)" class="px-2 py-1 border rounded-lg disabled:opacity-30">↑</button>
+                            <button title="Move down" ${i===appState.categories.length-1?'disabled':''} onclick="moveCategory(${c.id}, 1)" class="px-2 py-1 border rounded-lg disabled:opacity-30">↓</button>
+                            <button onclick="renameCategory(${c.id})" class="px-2 py-1 bg-blue-600 text-white rounded-lg">Rename</button>
+                            <button onclick="deleteCategory(${c.id})" class="px-2 py-1 bg-red-600 text-white rounded-lg">Delete</button>
+                        </div>`).join('')}
                     </div>
                 </div>
                 <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-xs uppercase text-[#70777D]">Product Details (${appState.products.length})</h3>
+                    <div class="flex justify-between items-center gap-3">
+                        <h3 class="font-bold text-xs uppercase text-[#70777D]">Product Details (${products.length})</h3>
                         <button onclick="openAddProductModal()" class="px-3.5 py-2 bg-[#0B6B4F] text-white rounded-xl text-xs font-bold">+ Add Product</button>
                     </div>
                     <div class="space-y-2">
-                        ${appState.products.map(p => {
+                        ${products.map(p => {
                             let disc = p.mrp > 0 ? (((p.mrp - p.price) / p.mrp) * 100).toFixed(0) : 0;
-                            return `<div class="p-3.5 bg-[#F5F7F8] border rounded-xl flex justify-between items-center text-xs">
-                                <div class="flex items-center space-x-3">
-                                    <img src="${p.image}" class="w-10 h-10 object-cover rounded-lg border">
-                                    <div>
-                                        <p class="font-bold text-[#263447]">${p.name} (${p.code})</p>
-                                        <p class="text-[#70777D]">MRP: ₹${p.mrp} | Net Price: ₹${p.price} \vert{} Disc:${disc}%</p>
+                            const stock = Number(p.stock_quantity || 0);
+                            const status = p.active === false ? '<span class="text-gray-500">Deleted / Inactive</span>' : stock === 0 ? '<span class="text-red-700 font-bold">OUT OF STOCK</span>' : stock <= 100 ? '<span class="text-amber-700 font-bold">LOW STOCK</span>' : '<span class="text-emerald-700 font-bold">In Stock</span>';
+                            return `<div class="p-3.5 bg-[#F5F7F8] border rounded-xl flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 text-xs">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <img src="${p.image || ''}" class="w-10 h-10 object-cover rounded-lg border" alt="">
+                                    <div class="min-w-0">
+                                        <p class="font-bold text-[#263447]">${escapeHtml(p.name)} (${escapeHtml(p.code || '')})</p>
+                                        <p class="text-[#70777D]">MRP: ₹${p.mrp} | Net Price: ₹${p.price} | Discount: ${disc}%</p>
+                                        <p class="mt-1">Stock: <strong>${stock}</strong> &nbsp; ${status}</p>
                                     </div>
                                 </div>
-                                <div class="flex items-center space-x-2">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <button onclick="openEditProductModal(${p.id})" class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold">Edit</button>
-                                    <button onclick="deleteProduct(${p.id})" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold">Delete</button>
+                                    ${p.active === false ? `<button onclick="restoreProduct(${p.id})" class="px-3 py-1 bg-emerald-700 text-white rounded-lg font-bold">Restore</button>` : `<button onclick="deleteProduct(${p.id})" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold">Delete</button>`}
                                 </div>
                             </div>`;
                         }).join('')}
@@ -604,6 +626,8 @@
                 <input type="text" id="editProdName" value="${escapeHtml(p.name || '')}" placeholder="Product Name" class="w-full border p-2.5 rounded-xl">
                 <input type="number" id="editProdMrp" value="${p.mrp || 0}" placeholder="MRP Price" class="w-full border p-2.5 rounded-xl">
                 <input type="number" id="editProdPrice" value="${p.price || 0}" placeholder="Net Price" class="w-full border p-2.5 rounded-xl">
+                <label class="block font-semibold text-[#70777D]">Stock Quantity</label>
+                <input type="number" min="0" step="1" id="editProdStock" value="${Number(p.stock_quantity || 0)}" placeholder="Stock Quantity" class="w-full border p-2.5 rounded-xl">
                 <input type="text" id="editProdPack" value="${p.pack || '1 Pkt'}" placeholder="Pack" class="w-full border p-2.5 rounded-xl">
                 <select id="editProdCategory" class="w-full border p-2.5 rounded-xl">
                     ${appState.categories.map(c => `<option value="${c.id}" ${Number(c.id) === Number(p.category_id) ? 'selected' : ''}>${c.name}</option>`).join('')}
@@ -633,13 +657,15 @@
             let name = document.getElementById('editProdName').value.trim();
             let mrp = Number(document.getElementById('editProdMrp').value || 0);
             let price = Number(document.getElementById('editProdPrice').value || 0);
+            let stock_quantity = Number(document.getElementById('editProdStock').value || 0);
             let pack = document.getElementById('editProdPack').value.trim();
             let category_id = Number(document.getElementById('editProdCategory').value || 0);
             let f = document.getElementById('editProdImgFile').files?.[0];
 
             if(!code || !name) return alert('Product code and name are required.');
+            if(!Number.isInteger(stock_quantity) || stock_quantity < 0) return alert('Stock quantity must be a whole number of 0 or more.');
             try {
-                let updateData = { code, name, mrp, price, pack, category_id, updated_at: new Date().toISOString() };
+                let updateData = { code, name, mrp, price, pack, category_id, stock_quantity, updated_at: new Date().toISOString() };
                 if(f) {
                     let path = await uploadMedia(f, 'products');
                     updateData.image_path = path;
