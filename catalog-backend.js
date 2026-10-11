@@ -1,6 +1,6 @@
 async function loadCatalogBackend() {
 
-    const CACHE_KEY = 'amala_catalog_cache';
+    const CACHE_KEY = 'amala_catalog_cache_v2_stock';
     const chips = document.getElementById('categoryChipsContainer');
 
     function applyProducts(rawProducts) {
@@ -26,7 +26,11 @@ async function loadCatalogBackend() {
                 pack: p.pack || '1 Pkt',
                 mrp: Number.isFinite(mrp) ? mrp : 0,
                 price: Number.isFinite(price) ? price : 0,
-                img: mediaUrl(p.image_path) || ''
+                img: mediaUrl(p.image_path) || '',
+                stock_quantity: Math.max(0, Number(p.stock_quantity || 0)),
+                reserved_quantity: Math.max(0, Number(p.reserved_quantity || 0)),
+                available_stock: Math.max(0, Number(p.stock_quantity || 0) - Number(p.reserved_quantity || 0)),
+                stockStatus: (Number(p.stock_quantity || 0) - Number(p.reserved_quantity || 0)) <= 0 ? 'OUT OF STOCK' : ((Number(p.stock_quantity || 0) - Number(p.reserved_quantity || 0)) <= 100 ? 'LOW STOCK' : 'IN STOCK')
             };
         });
 
@@ -57,20 +61,27 @@ async function loadCatalogBackend() {
             .order('sort_order')
             .order('id');
 
+        const reservationsPromise = sb
+            .from('stock_reservations')
+            .select('product_id,qty')
+            .eq('status', 'reserved');
+
         const productsPromise = sb
             .from('products')
-            .select('id,code,name,pack,mrp,price,image_path,category_id,categories(name,offer_percent)')
+            .select('id,code,name,pack,mrp,price,image_path,category_id,stock_quantity,categories(name,offer_percent)')
             .eq('active', true)
             .order('id');
 
         const [
             { data: settings, error: settingsError },
             { data: banners, error: bannersError },
-            { data, error }
+            { data, error },
+            { data: reservations, error: reservationsError }
         ] = await Promise.all([
             settingsPromise,
             bannersPromise,
-            productsPromise
+            productsPromise,
+            reservationsPromise
         ]);
 
         if (settingsError) {
@@ -84,11 +95,21 @@ async function loadCatalogBackend() {
         if (error) {
             throw error;
         }
+        if (reservationsError) {
+            console.error('Stock reservations error:', reservationsError);
+        }
+
+        const reservedByProduct = {};
+        (reservations || []).forEach(r => {
+            const key = String(r.product_id);
+            reservedByProduct[key] = (reservedByProduct[key] || 0) + Number(r.qty || 0);
+        });
+        const productsWithAvailability = (data || []).map(p => ({ ...p, reserved_quantity: reservedByProduct[String(p.id)] || 0 }));
 
         const cacheData = {
             settings: settings || null,
             banners: banners || [],
-            products: data || [],
+            products: productsWithAvailability,
             savedAt: Date.now()
         };
 
@@ -123,7 +144,7 @@ async function loadCatalogBackend() {
             });
         }
 
-        applyProducts(data || []);
+        applyProducts(productsWithAvailability);
     }
 
     // FIRST: Try instant cache
@@ -299,6 +320,13 @@ async function submitFinalOrder() {
     return alert('Please select at least one product.');
   }
 
+  for (const id in cart) {
+    const p = productsData.find(x => String(x.id) === String(id));
+    if (!p || Number(cart[id]) > Number(p.available_stock ?? p.stock_quantity ?? 0)) {
+      return alert('Stock has changed for one or more products. Please refresh the catalog and adjust your cart.');
+    }
+  }
+
   const cleanMobile = cleanPhone(mobile);
 
   if (cleanMobile.length !== 10) {
@@ -411,20 +439,19 @@ async function submitFinalOrder() {
     items
   };
 
-  const { error } =
-    await sb.rpc(
-      'create_checkout_order',
-      {
-        p_payload: payload
-      }
-    );
+  const { error } = await sb.rpc('create_checkout_order', { p_payload: payload });
 
   if (error) {
     console.error(error);
+    return alert(error.message || 'Order could not be saved. Please try again.');
+  }
 
-    return alert(
-      'Order could not be saved. Please try again.'
-    );
+  // Reserve stock transactionally in the database after the order is created.
+  const { error: reservationError } = await sb.rpc('reserve_order_stock', { p_order_code: orderId });
+  if (reservationError) {
+    console.error('Stock reservation failed:', reservationError);
+    await sb.from('orders').update({ status: 'cancelled', cancelled_at: new Date().toISOString() }).eq('order_id', orderId).eq('status', 'pending');
+    return alert(reservationError.message || 'Stock could not be reserved. Please refresh the catalog and try again.');
   }
 
   lastSubmittedOrder = {
