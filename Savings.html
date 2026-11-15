@@ -202,7 +202,54 @@ async function showMemberCard(memberId){
 }
 async function loadEnrollments(){
  const {data,error}=await supabaseClient.from('savings_enrollments').select('*,savings_members(customer_name,mobile_number)').order('created_at',{ascending:false});if(error)throw error;cache.enrollments=data||[];
- $('enrollments-table').innerHTML=cache.enrollments.map(e=>`<tr><td class="font-mono">${esc(e.enrollment_id)}</td><td>${esc(e.savings_members?.customer_name)}<div class="text-xs text-slate-500">${esc(e.member_id)}</div></td><td>${esc(e.snapshot_scheme_name)}</td><td>${money(e.snapshot_total_payable)}</td><td>${money(e.snapshot_bonus_value)}</td><td>${esc(e.status)}</td><td><button class="btn btn-primary" onclick="showMemberCardByEnrollment('${esc(e.enrollment_id)}')">Card</button></td></tr>`).join('');
+ $('enrollments-table').innerHTML=cache.enrollments.map(e=>`<tr><td class="font-mono">${esc(e.enrollment_id)}</td><td>${esc(e.savings_members?.customer_name)}<div class="text-xs text-slate-500">${esc(e.member_id)}</div></td><td>${esc(e.snapshot_scheme_name)}</td><td>${money(e.snapshot_total_payable)}</td><td>${money(e.snapshot_bonus_value)}</td><td>${esc(e.status)}</td><td class="space-y-1"><button class="btn btn-primary" onclick="showEnrollmentDetails('${esc(e.enrollment_id)}')">View Details</button><button class="btn btn-gold" onclick="showMemberCardByEnrollment('${esc(e.enrollment_id)}')">Card</button></td></tr>`).join('');
+}
+async function showEnrollmentDetails(enrollmentId){
+ try{
+  loading(true,'Loading member and installment details…');
+  const en=cache.enrollments.find(x=>x.enrollment_id===enrollmentId);
+  if(!en) throw new Error('Enrollment not found.');
+  const [{data:m,error:me},{data:ins,error:ie}]=await Promise.all([
+   supabaseClient.from('savings_members').select('*').eq('member_id',en.member_id).single(),
+   supabaseClient.from('savings_installments').select('*').eq('enrollment_id',enrollmentId).order('installment_number',{ascending:true})
+  ]);
+  if(me)throw me;if(ie)throw ie;
+  const rows=ins||[], paid=rows.filter(x=>String(x.payment_status).toLowerCase()==='paid'||Number(x.amount_paid)>=Number(x.amount_due)).length;
+  const totalDue=rows.reduce((a,x)=>a+Number(x.amount_due||0),0), totalPaid=rows.reduce((a,x)=>a+Number(x.amount_paid||0),0);
+  const outstanding=rows.reduce((a,x)=>a+Math.max(0,Number(x.amount_due||0)-Number(x.amount_paid||0)),0);
+  openModal('Member & Enrollment Details',`
+   <div class="space-y-4 text-sm">
+    <section class="rounded-xl border p-4"><h3 class="font-bold text-lg mb-3">Customer Details</h3>
+     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div><span class="text-slate-500">Member ID</span><div class="font-semibold">${esc(m.member_id)}</div></div>
+      <div><span class="text-slate-500">Customer Name</span><div class="font-semibold">${esc(m.customer_name)}</div></div>
+      <div><span class="text-slate-500">Mobile</span><div class="font-semibold">${esc(m.mobile_number)}</div></div>
+      <div><span class="text-slate-500">WhatsApp</span><div class="font-semibold">${esc(m.whatsapp_number||'—')}</div></div>
+      <div class="sm:col-span-2"><span class="text-slate-500">Address</span><div class="font-semibold">${esc(m.address||'—')}</div></div>
+      <div><span class="text-slate-500">District</span><div class="font-semibold">${esc(m.district||'—')}</div></div>
+      <div><span class="text-slate-500">State</span><div class="font-semibold">${esc(m.state||'—')}</div></div>
+      <div><span class="text-slate-500">Pincode</span><div class="font-semibold">${esc(m.pincode||'—')}</div></div>
+     </div>
+    </section>
+    <section class="rounded-xl border p-4"><h3 class="font-bold text-lg mb-3">Scheme & Payment Summary</h3>
+     <div class="grid grid-cols-2 gap-3">
+      <div><span class="text-slate-500">Scheme</span><div class="font-bold">${esc(en.snapshot_scheme_name)}</div></div>
+      <div><span class="text-slate-500">Enrollment ID</span><div class="font-semibold">${esc(en.enrollment_id)}</div></div>
+      <div><span class="text-slate-500">Installments Paid</span><div class="font-bold text-emerald-700">${paid} / 9</div></div>
+      <div><span class="text-slate-500">Remaining</span><div class="font-bold text-rose-700">${Math.max(0,9-paid)} / 9</div></div>
+      <div><span class="text-slate-500">Total Paid</span><div class="font-bold">${money(totalPaid)}</div></div>
+      <div><span class="text-slate-500">Balance</span><div class="font-bold text-rose-700">${money(outstanding)}</div></div>
+      <div><span class="text-slate-500">Total Scheme Payable</span><div class="font-bold">${money(en.snapshot_total_payable)}</div></div>
+      <div><span class="text-slate-500">Bonus Fireworks Value</span><div class="font-bold">${money(en.snapshot_bonus_value)}</div></div>
+     </div>
+    </section>
+    <section class="rounded-xl border p-4"><h3 class="font-bold text-lg mb-3">9 Installment Schedule</h3>
+     <div class="overflow-x-auto"><table class="w-full text-xs"><thead><tr><th>No.</th><th>Month</th><th>Due</th><th>Due Amount</th><th>Paid</th><th>Status</th></tr></thead><tbody>
+      ${rows.map(x=>`<tr><td>${x.installment_number}/9</td><td>${esc(x.installment_month)}</td><td>${esc(x.due_date)}</td><td>${money(x.amount_due)}</td><td>${money(x.amount_paid)}</td><td>${esc(x.payment_status)}</td></tr>`).join('')}
+     </tbody></table></div>
+    </section>
+   </div>`);
+ }catch(err){fail(err);}finally{loading(false);}
 }
 async function showMemberCardByEnrollment(id){if(!cache.members.length)await loadMembers();const e=cache.enrollments.find(x=>x.enrollment_id===id);if(e)showMemberCard(e.member_id);}
 async function loadInstallments(){
