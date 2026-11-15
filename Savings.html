@@ -201,8 +201,8 @@ async function showMemberCard(memberId){
  if(window.QRious)new QRious({element:$('member-qr'),value:`AMALA-SAVINGS-2027:${m.member_id}`,size:130});
 }
 async function loadEnrollments(){
- const {data,error}=await supabaseClient.from('savings_enrollments').select('*,savings_members(customer_name,mobile_number)').order('created_at',{ascending:false});if(error)throw error;cache.enrollments=data||[];
- $('enrollments-table').innerHTML=cache.enrollments.map(e=>`<tr><td class="font-mono">${esc(e.enrollment_id)}</td><td>${esc(e.savings_members?.customer_name)}<div class="text-xs text-slate-500">${esc(e.member_id)}</div></td><td>${esc(e.snapshot_scheme_name)}</td><td>${money(e.snapshot_total_payable)}</td><td>${money(e.snapshot_bonus_value)}</td><td>${esc(e.status)}</td><td class="space-y-1"><button class="btn btn-primary" onclick="showEnrollmentDetails('${esc(e.enrollment_id)}')">View Details</button><button class="btn btn-gold" onclick="showMemberCardByEnrollment('${esc(e.enrollment_id)}')">Card</button></td></tr>`).join('');
+ const {data,error}=await supabaseClient.from('savings_enrollments').select('*,savings_members(member_id,customer_name,mobile_number)').order('created_at',{ascending:false});if(error)throw error;cache.enrollments=data||[];
+ $('enrollments-table').innerHTML=cache.enrollments.map(e=>`<tr><td class="font-mono">${esc(e.enrollment_id)}</td><td>${esc(e.savings_members?.customer_name)}<div class="text-xs text-slate-500">${esc(e.savings_members?.member_id||'')}</div></td><td>${esc(e.snapshot_scheme_name)}</td><td>${money(e.snapshot_total_payable)}</td><td>${money(e.snapshot_bonus_value)}</td><td>${esc(e.status)}</td><td class="space-y-1"><button class="btn btn-primary" onclick="showEnrollmentDetails('${esc(e.enrollment_id)}')">View Details</button><button class="btn btn-gold" onclick="showMemberCardByEnrollment('${esc(e.enrollment_id)}')">Card</button></td></tr>`).join('');
 }
 async function showEnrollmentDetails(enrollmentId){
  try{
@@ -210,7 +210,7 @@ async function showEnrollmentDetails(enrollmentId){
   const en=cache.enrollments.find(x=>x.enrollment_id===enrollmentId);
   if(!en) throw new Error('Enrollment not found.');
   const [{data:m,error:me},{data:ins,error:ie}]=await Promise.all([
-   supabaseClient.from('savings_members').select('*').eq('member_id',en.member_id).single(),
+   supabaseClient.from('savings_members').select('*').eq('id',en.member_id).single(),
    supabaseClient.from('savings_installments').select('*').eq('enrollment_id',enrollmentId).order('installment_number',{ascending:true})
   ]);
   if(me)throw me;if(ie)throw ie;
