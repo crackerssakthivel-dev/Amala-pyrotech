@@ -39,13 +39,51 @@ th{background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase}
  .mainarea{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important;padding:12px!important}
  .topbar{padding:12px!important}
 }
-@media print{
- @page{size:3.5in 2in;margin:0}
- html,body{width:3.5in!important;height:2in!important;margin:0!important;padding:0!important;background:transparent!important;overflow:visible!important}
- body *{visibility:hidden!important}
- #print-area,#print-area *{visibility:visible!important}
- #print-area{position:fixed!important;left:0!important;top:0!important;width:3.5in!important;height:2in!important;min-width:3.5in!important;max-width:3.5in!important;margin:0!important;padding:0!important;box-sizing:border-box!important;overflow:hidden!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
- .no-print{display:none!important}
+@media print {
+  @page {
+    size: 3.5in 2in;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 3.5in !important;
+    height: 2in !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  #print-area,
+  #print-area * {
+    visibility: visible !important;
+  }
+
+  #print-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 3.5in !important;
+    height: 2in !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    page-break-before: avoid !important;
+    page-break-after: avoid !important;
+    break-before: avoid-page !important;
+    break-after: avoid-page !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
 }
 
 /* Membership card only: 3.5 x 2 inch visiting-card layout */
