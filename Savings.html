@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="supabase-config.js"></script>
 <script src="supabase-client.js"></script>
 <style>
@@ -412,7 +413,7 @@ th{background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase}
 </main>
 </section></div>
 
-<div id="modal" class="modal hidden"><div class="modal-card"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="font-bold text-lg">Details</h2><button onclick="closeModal()" class="text-slate-500 text-xl">&times;</button></div><div id="modal-body"></div><div class="flex justify-end gap-2 mt-5 no-print"><button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button><button class="btn bg-slate-200" onclick="closeModal()">Close</button></div></div></div>
+<div id="modal" class="modal hidden"><div class="modal-card"><div class="flex justify-between items-center mb-4"><h2 id="modal-title" class="font-bold text-lg">Details</h2><button onclick="closeModal()" class="text-slate-500 text-xl">&times;</button></div><div id="modal-body"></div><div class="flex justify-end gap-2 mt-5 no-print"><button id="download-card-image-btn" class="btn btn-gold hidden" onclick="downloadMemberCardImage()">Download Card Image</button><button class="btn btn-primary" onclick="window.print()">Print / Save PDF</button><button class="btn bg-slate-200" onclick="closeModal()">Close</button></div></div></div>
 
 <script>
 'use strict';
@@ -428,7 +429,7 @@ function fail(err){console.error(err);alert(err?.message || String(err));}
 function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"';}
 function downloadCSV(name,rows){const csv='\uFEFF'+rows.map(r=>r.map(csvCell).join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download=name;a.click();URL.revokeObjectURL(a.href);}
 function filterTable(id,q){q=q.toLowerCase();document.querySelectorAll('#'+id+' tr').forEach(r=>r.style.display=r.innerText.toLowerCase().includes(q)?'':'none');}
-function openModal(title,html){$('modal-title').textContent=title;$('modal-body').innerHTML=html;$('modal').classList.remove('hidden');}
+function openModal(title,html){$('modal-title').textContent=title;$('modal-body').innerHTML=html;$('download-card-image-btn')?.classList.add('hidden');$('modal').classList.remove('hidden');}
 function closeModal(){$('modal').classList.add('hidden');}
 function setTab(tab){
  document.querySelectorAll('.tab').forEach(x=>x.classList.add('hidden'));
@@ -481,6 +482,54 @@ async function loadMembers(){
  cache.members=await supabaseClient.from('savings_members').select('*, savings_enrollments(enrollment_id,snapshot_scheme_name)').order('created_at',{ascending:false}).then(({data,error})=>{if(error)throw error;return data||[];});
  $('members-table').innerHTML=cache.members.map(m=>{const en=m.savings_enrollments?.[0];return `<tr><td class="font-mono font-bold">${esc(m.member_id)}</td><td>${esc(m.customer_name)}</td><td>${esc(m.mobile_number)}</td><td>${esc(m.district)}</td><td>${esc(en?.snapshot_scheme_name||'—')}</td><td><button class="btn btn-primary" onclick="showMemberCard('${esc(m.member_id)}')">View Card</button></td></tr>`}).join('');
 }
+async function downloadMemberCardImage() {
+  const card = document.querySelector("#print-area .member-card");
+  if (!card) {
+    alert("Membership card is not open.");
+    return;
+  }
+  if (typeof window.html2canvas !== "function") {
+    alert("Image download library did not load. Please check your internet connection and try again.");
+    return;
+  }
+  const button = $("download-card-image-btn");
+  const oldText = button?.textContent;
+  if (button) {
+    button.disabled = true;
+    button.textContent = "Preparing image…";
+  }
+  try {
+    if (document.fonts?.ready) await document.fonts.ready;
+    await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    const canvas = await html2canvas(card, {
+      scale: 3,
+      backgroundColor: null,
+      useCORS: true,
+      allowTaint: false,
+      logging: false
+    });
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, "image/png"));
+    if (!blob) throw new Error("Could not create the card image.");
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const memberId = card.querySelector(".member-card-id")?.textContent?.trim() || "member";
+    link.href = url;
+    link.download = `membership-card-${memberId.replace(/[^a-z0-9_-]/gi, "_")}.png`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (err) {
+    console.error("Membership card image download failed:", err);
+    alert("Could not download the card image. Please try again.");
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = oldText || "Download Card Image";
+    }
+  }
+}
+
 async function showMemberCard(memberId) {
   const m = cache.members.find(x => x.member_id === memberId);
   if (!m) return;
@@ -560,6 +609,8 @@ async function showMemberCard(memberId) {
       level: "H"
     });
   }
+
+  $("download-card-image-btn")?.classList.remove("hidden");
 }
 async function loadEnrollments(){
  const {data,error}=await supabaseClient.from('savings_enrollments').select('*,savings_members(member_id,customer_name,mobile_number)').order('created_at',{ascending:false});if(error)throw error;cache.enrollments=data||[];
