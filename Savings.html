@@ -41,6 +41,42 @@ th{background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase}
  .topbar{padding:12px!important}
 }
 @media print {
+  /* Print modal content without the screen modal's height/scroll clipping */
+  .modal {
+    position: static !important;
+    inset: auto !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+    align-items: initial !important;
+    justify-content: initial !important;
+  }
+
+  .modal-card {
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  #modal-body {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
   /* All printouts use A4 paper */
   @page {
     size: A4 portrait;
@@ -88,6 +124,8 @@ th{background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase}
   }
 
   #print-area table {
+    min-width: 0 !important;
+    max-width: 100% !important;
     width: 100% !important;
     border-collapse: collapse !important;
   }
