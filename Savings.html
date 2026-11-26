@@ -40,16 +40,15 @@ th{background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase}
  .topbar{padding:12px!important}
 }
 @media print {
-  /* Default: every normal print page is A4 */
+  /* All printouts use A4 paper */
   @page {
     size: A4 portrait;
     margin: 10mm;
   }
 
-  /* Only the Membership Card gets its own physical card-size page */
   @page membership-card {
-    size: 3.5in 2in;
-    margin: 0;
+    size: A4 portrait;
+    margin: 10mm;
   }
 
   html,
@@ -101,22 +100,28 @@ th{background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase}
     display: none !important;
   }
 
-  /* Membership card only: print at 3.5 × 2 inches, not on A4 */
+  /* Membership Card: enlarged and centered on A4 */
   #print-area.member-card-print-wrap {
     page: membership-card;
-    width: 3.5in !important;
-    max-width: 3.5in !important;
-    height: 2in !important;
-    margin: 0 !important;
+    width: 190mm !important;
+    max-width: 190mm !important;
+    height: 277mm !important;
+    margin: 0 auto !important;
     padding: 0 !important;
-    overflow: hidden !important;
-    display: block !important;
+    overflow: visible !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
   }
 
   #print-area.member-card-print-wrap .member-card {
     width: 3.5in !important;
     height: 2in !important;
     margin: 0 !important;
+    flex: 0 0 auto !important;
+    transform: scale(2) !important;
+    transform-origin: center center !important;
     box-sizing: border-box !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
