@@ -570,7 +570,21 @@ async function showEnrollmentDetails(enrollmentId){
    </div>`);
  }catch(err){fail(err);}finally{loading(false);}
 }
-async function showMemberCardByEnrollment(id){if(!cache.members.length)await loadMembers();const e=cache.enrollments.find(x=>x.enrollment_id===id);if(e)showMemberCard(e.member_id);}
+async function showMemberCardByEnrollment(id) {
+  if (!cache.enrollments.length) await loadEnrollments();
+  if (!cache.members.length) await loadMembers();
+
+  const e = cache.enrollments.find(
+    x => String(x.enrollment_id) === String(id)
+  );
+
+  if (!e) {
+    alert('Enrollment not found: ' + id);
+    return;
+  }
+
+  showMemberCard(e.member_id);
+}
 async function loadInstallments(){
  let q=supabaseClient.from('savings_installments').select('*,savings_enrollments(enrollment_id,snapshot_scheme_name,savings_members(customer_name,member_id,mobile_number))').order('due_date');
  const month=$('month-filter').value;if(month)q=q.eq('installment_month',month);
