@@ -529,7 +529,7 @@ async function showEnrollmentDetails(enrollmentId){
   const en=cache.enrollments.find(x=>x.enrollment_id===enrollmentId);
   if(!en) throw new Error('Enrollment not found.');
   const [{data:m,error:me},{data:ins,error:ie}]=await Promise.all([
-   supabaseClient.from('savings_members').select('*').eq('id',en.member_id).single(),
+   supabaseClient.from('savings_members').select('*').eq('member_id',en.member_id).single(),
    supabaseClient.from('savings_installments').select('*').eq('enrollment_id',enrollmentId).order('installment_number',{ascending:true})
   ]);
   if(me)throw me;if(ie)throw ie;
