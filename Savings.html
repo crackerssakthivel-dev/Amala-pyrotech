@@ -86,30 +86,198 @@ th{background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase}
   }
 }
 
-/* Membership card only: 3.5 x 2 inch visiting-card layout */
-.member-card-print-wrap{width:3.5in;height:2in;margin:0 auto;overflow:hidden}
-.member-card{width:3.5in;height:2in;box-sizing:border-box;position:relative;overflow:hidden;padding:0.12in 0.16in;background:radial-gradient(circle at 50% 40%,#173b72 0,#0b1b38 58%,#061126 100%);border:1.5px solid #d6b56b;border-radius:0.09in;color:#fff;display:flex;flex-direction:column;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-.member-card:before{content:"";position:absolute;inset:0.055in;border:0.5px solid rgba(230,196,120,.48);border-radius:0.055in;pointer-events:none}
-.member-card-header{text-align:center;line-height:1.05;position:relative;z-index:1}
-.member-card-brand{font-size:13pt;font-weight:800;letter-spacing:1.25px;color:#fff}
-.member-card-subbrand{font-size:7pt;font-weight:700;letter-spacing:1.5px;color:#e8c979;margin-top:2px}
-.member-card-membership{font-size:5.4pt;letter-spacing:1.8px;color:#d9e5f7;margin-top:3px}
-.member-card-content{display:grid;grid-template-columns:0.82in 1fr 1.42in;align-items:center;gap:0.08in;min-height:0;position:relative;z-index:1}
-.member-card-qr-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
-#member-qr{width:0.69in!important;height:0.69in!important;background:#fff;padding:2px;border-radius:3px;box-sizing:border-box}
-.member-card-qr-wrap span{font-size:4.2pt;letter-spacing:.6px;color:#d9e5f7;white-space:nowrap}
-.member-card-logo-wrap{display:flex;align-items:center;justify-content:center;min-width:0}
-.member-card-logo{display:block;width:0.82in;height:0.82in;object-fit:contain;background:#fff;border:1px solid #e5cf91;border-radius:50%;padding:5px;box-sizing:border-box}
-.member-card-logo-fallback{width:0.82in;height:0.82in;border:1px solid #e5cf91;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#e8c979;font-weight:800;font-size:17pt}
-.member-card-details{min-width:0;border-left:1px solid rgba(232,201,121,.65);padding-left:0.09in;line-height:1.15}
-.member-card-label{font-size:4.7pt;color:#e8c979;letter-spacing:1px;font-weight:700}
-.member-card-id{font-size:7.2pt;font-weight:800;color:#fff;overflow-wrap:anywhere;margin:1px 0 3px}
-.member-card-name{font-size:7.2pt;font-weight:700;color:#fff;overflow-wrap:anywhere}
-.member-card-detail{font-size:6pt;color:#dce6f4;margin-top:2px}
-.member-card-scheme{font-size:6.2pt;font-weight:800;color:#e8c979;margin-top:3px;text-transform:uppercase}
-.member-card-period{font-size:5pt;color:#dce6f4;margin-top:2px}
-.member-card-footer{text-align:center;font-size:4.5pt;letter-spacing:1.2px;color:#e8c979;position:relative;z-index:1}
-@media(max-width:420px){.member-card-print-wrap{transform:scale(.94);transform-origin:top left;margin-left:0}}
+/* Membership Card Design */
+.member-card-print-wrap {
+  width: 3.5in;
+  height: 2in;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.member-card {
+  width: 3.5in;
+  height: 2in;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+  padding: 0.11in 0.14in;
+  color: #fff;
+  background: radial-gradient(circle at center, #123d78 0%, #071832 75%);
+  border: 1.5px solid #e2c16f;
+  border-radius: 0.09in;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.member-card::before {
+  content: "";
+  position: absolute;
+  inset: 0.055in;
+  border: 0.6px solid rgba(232, 201, 121, 0.65);
+  border-radius: 0.055in;
+  pointer-events: none;
+}
+
+.member-card-header,
+.member-card-footer {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.member-card-brand {
+  color: #fff;
+  font-size: 13pt;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  line-height: 1.05;
+}
+
+.member-card-subbrand {
+  margin-top: 2px;
+  color: #e8c979;
+  font-size: 7pt;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.member-card-membership {
+  margin-top: 3px;
+  color: #dce7f7;
+  font-size: 5.4pt;
+  letter-spacing: 1.7px;
+}
+
+.member-card-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 0.92in 1fr;
+  align-items: center;
+  gap: 0.12in;
+  min-height: 0;
+  padding: 0.07in 0.09in;
+  border: 1px solid #d9b65e;
+  border-radius: 0.055in;
+  background: rgba(4, 16, 39, 0.42);
+  overflow: hidden;
+}
+
+.member-card-watermark {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.09;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.member-card-qr-wrap,
+.member-card-details {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+
+.member-card-qr-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+}
+
+#member-qr {
+  width: 0.69in !important;
+  height: 0.69in !important;
+  padding: 2px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #e2c16f;
+  border-radius: 3px;
+}
+
+.member-card-qr-wrap span {
+  color: #e5edf9;
+  font-size: 4.2pt;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.member-card-details {
+  border-left: 1px solid rgba(232, 201, 121, 0.8);
+  padding-left: 0.1in;
+  line-height: 1.12;
+}
+
+.member-card-label {
+  color: #e8c979;
+  font-size: 4.7pt;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.member-card-id {
+  margin: 1px 0 3px;
+  color: #fff;
+  font-size: 7.2pt;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.member-card-name {
+  color: #fff;
+  font-size: 7.2pt;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.member-card-detail {
+  margin-top: 2px;
+  color: #dce6f4;
+  font-size: 6pt;
+}
+
+.member-card-scheme {
+  margin-top: 3px;
+  color: #e8c979;
+  font-size: 6.2pt;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.member-card-period {
+  margin-top: 2px;
+  color: #dce6f4;
+  font-size: 5pt;
+}
+
+.member-card-footer {
+  color: #e8c979;
+  font-size: 4.3pt;
+  letter-spacing: 0.65px;
+  line-height: 1.25;
+}
+
+.member-card-contact {
+  margin-top: 2px;
+  color: #fff;
+  font-size: 4.2pt;
+  letter-spacing: 0.3px;
+}
+
+@media (max-width: 420px) {
+  .member-card-print-wrap {
+    transform: scale(0.94);
+    transform-origin: top left;
+    margin-left: 0;
+  }
+}
 
 </style>
 </head>
