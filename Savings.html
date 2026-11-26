@@ -571,19 +571,33 @@ async function showEnrollmentDetails(enrollmentId){
  }catch(err){fail(err);}finally{loading(false);}
 }
 async function showMemberCardByEnrollment(id) {
-  if (!cache.enrollments.length) await loadEnrollments();
-  if (!cache.members.length) await loadMembers();
+  try {
+    if (!cache.enrollments.length) await loadEnrollments();
+    if (!cache.members.length) await loadMembers();
 
-  const e = cache.enrollments.find(
-    x => String(x.enrollment_id) === String(id)
-  );
+    const e = cache.enrollments.find(
+      x => String(x.enrollment_id) === String(id)
+    );
 
-  if (!e) {
-    alert('Enrollment not found: ' + id);
-    return;
+    if (!e) {
+      alert('Enrollment not found: ' + id);
+      return;
+    }
+
+    const member = cache.members.find(
+      m => String(m.id) === String(e.member_id)
+    );
+
+    if (!member) {
+      alert('Member record not found.');
+      return;
+    }
+
+    await showMemberCard(member.member_id);
+  } catch (err) {
+    console.error(err);
+    alert('Card open error: ' + (err.message || err));
   }
-
-  showMemberCard(e.member_id);
 }
 async function loadInstallments(){
  let q=supabaseClient.from('savings_installments').select('*,savings_enrollments(enrollment_id,snapshot_scheme_name,savings_members(customer_name,member_id,mobile_number))').order('due_date');
