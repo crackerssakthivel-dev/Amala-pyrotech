@@ -537,7 +537,7 @@ async function showEnrollmentDetails(enrollmentId){
   const totalDue=rows.reduce((a,x)=>a+Number(x.amount_due||0),0), totalPaid=rows.reduce((a,x)=>a+Number(x.amount_paid||0),0);
   const outstanding=rows.reduce((a,x)=>a+Math.max(0,Number(x.amount_due||0)-Number(x.amount_paid||0)),0);
   openModal('Member & Enrollment Details',`
-   <div class="space-y-4 text-sm">
+   <div id="print-area" class="space-y-4 text-sm">
     <section class="rounded-xl border p-4"><h3 class="font-bold text-lg mb-3">Customer Details</h3>
      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <div><span class="text-slate-500">Member ID</span><div class="font-semibold">${esc(m.member_id)}</div></div>
