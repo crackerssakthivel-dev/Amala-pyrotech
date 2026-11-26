@@ -39,7 +39,40 @@ th{background:#f8fafc;color:#475569;font-size:11px;text-transform:uppercase}
  .mainarea{display:block!important;height:auto!important;min-height:0!important;overflow:visible!important;padding:12px!important}
  .topbar{padding:12px!important}
 }
-@media print{body *{visibility:hidden!important}#print-area,#print-area *{visibility:visible!important}#print-area{position:absolute;inset:0;width:100%;background:white;padding:20px}.no-print{display:none!important}}
+@media print{
+ @page{size:3.5in 2in;margin:0}
+ html,body{width:3.5in!important;height:2in!important;margin:0!important;padding:0!important;background:transparent!important;overflow:visible!important}
+ body *{visibility:hidden!important}
+ #print-area,#print-area *{visibility:visible!important}
+ #print-area{position:fixed!important;left:0!important;top:0!important;width:3.5in!important;height:2in!important;min-width:3.5in!important;max-width:3.5in!important;margin:0!important;padding:0!important;box-sizing:border-box!important;overflow:hidden!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ .no-print{display:none!important}
+}
+
+/* Membership card only: 3.5 x 2 inch visiting-card layout */
+.member-card-print-wrap{width:3.5in;height:2in;margin:0 auto;overflow:hidden}
+.member-card{width:3.5in;height:2in;box-sizing:border-box;position:relative;overflow:hidden;padding:0.12in 0.16in;background:radial-gradient(circle at 50% 40%,#173b72 0,#0b1b38 58%,#061126 100%);border:1.5px solid #d6b56b;border-radius:0.09in;color:#fff;display:flex;flex-direction:column;justify-content:space-between;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.member-card:before{content:"";position:absolute;inset:0.055in;border:0.5px solid rgba(230,196,120,.48);border-radius:0.055in;pointer-events:none}
+.member-card-header{text-align:center;line-height:1.05;position:relative;z-index:1}
+.member-card-brand{font-size:13pt;font-weight:800;letter-spacing:1.25px;color:#fff}
+.member-card-subbrand{font-size:7pt;font-weight:700;letter-spacing:1.5px;color:#e8c979;margin-top:2px}
+.member-card-membership{font-size:5.4pt;letter-spacing:1.8px;color:#d9e5f7;margin-top:3px}
+.member-card-content{display:grid;grid-template-columns:0.82in 1fr 1.42in;align-items:center;gap:0.08in;min-height:0;position:relative;z-index:1}
+.member-card-qr-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+#member-qr{width:0.69in!important;height:0.69in!important;background:#fff;padding:2px;border-radius:3px;box-sizing:border-box}
+.member-card-qr-wrap span{font-size:4.2pt;letter-spacing:.6px;color:#d9e5f7;white-space:nowrap}
+.member-card-logo-wrap{display:flex;align-items:center;justify-content:center;min-width:0}
+.member-card-logo{display:block;width:0.82in;height:0.82in;object-fit:contain;background:#fff;border:1px solid #e5cf91;border-radius:50%;padding:5px;box-sizing:border-box}
+.member-card-logo-fallback{width:0.82in;height:0.82in;border:1px solid #e5cf91;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#e8c979;font-weight:800;font-size:17pt}
+.member-card-details{min-width:0;border-left:1px solid rgba(232,201,121,.65);padding-left:0.09in;line-height:1.15}
+.member-card-label{font-size:4.7pt;color:#e8c979;letter-spacing:1px;font-weight:700}
+.member-card-id{font-size:7.2pt;font-weight:800;color:#fff;overflow-wrap:anywhere;margin:1px 0 3px}
+.member-card-name{font-size:7.2pt;font-weight:700;color:#fff;overflow-wrap:anywhere}
+.member-card-detail{font-size:6pt;color:#dce6f4;margin-top:2px}
+.member-card-scheme{font-size:6.2pt;font-weight:800;color:#e8c979;margin-top:3px;text-transform:uppercase}
+.member-card-period{font-size:5pt;color:#dce6f4;margin-top:2px}
+.member-card-footer{text-align:center;font-size:4.5pt;letter-spacing:1.2px;color:#e8c979;position:relative;z-index:1}
+@media(max-width:420px){.member-card-print-wrap{transform:scale(.94);transform-origin:top left;margin-left:0}}
+
 </style>
 </head>
 <body class="bg-slate-100 text-slate-800">
@@ -197,8 +230,24 @@ async function loadMembers(){
 async function showMemberCard(memberId){
  const m=cache.members.find(x=>x.member_id===memberId);if(!m)return;
  const en=m.savings_enrollments?.[0];
- openModal('Membership Card',`<div id="print-area" class="text-center border-2 border-slate-800 rounded-xl p-6"><h2 class="text-xl font-extrabold">AMALA PYROTECH</h2><div class="text-sm text-amber-700 font-bold">SAKTHIVEL CRACKERS · 2027 MEMBERSHIP</div><canvas id="member-qr" class="mx-auto my-4"></canvas><div class="text-left text-sm space-y-2"><div>Member ID: <b>${esc(m.member_id)}</b></div><div>Name: <b>${esc(m.customer_name)}</b></div><div>Mobile: <b>${esc(m.mobile_number)}</b></div><div>Scheme: <b>${esc(en?.snapshot_scheme_name||'—')}</b></div><div>Period: <b>January–September 2027</b></div></div></div>`);
- if(window.QRious)new QRious({element:$('member-qr'),value:`AMALA-SAVINGS-2027:${m.member_id}`,size:130});
+ let logoUrl='';
+ try{
+  const {data:settings,error}=await supabaseClient.from('site_settings').select('logo_path').eq('id',1).maybeSingle();
+  if(error)throw error;
+  const path=settings?.logo_path||'';
+  if(/^https?:\/\//i.test(path)) logoUrl=path;
+  else if(path && typeof window.mediaUrl==='function') logoUrl=window.mediaUrl(path)||'';
+ }catch(err){console.warn('Membership card logo lookup failed:',err);}
+ const logoMarkup=logoUrl?`<img class="member-card-logo" src="${esc(logoUrl)}" alt="AMALA PYROTECH logo">`:`<div class="member-card-logo-fallback">AP</div>`;
+ openModal('Membership Card',`<div id="print-area" class="member-card-print-wrap"><article class="member-card">
+  <div class="member-card-header"><div class="member-card-brand">AMALA PYROTECH</div><div class="member-card-subbrand">SAKTHIVEL CRACKERS</div><div class="member-card-membership">2027 MEMBERSHIP CARD</div></div>
+  <div class="member-card-content">
+   <div class="member-card-qr-wrap"><canvas id="member-qr" aria-label="Member QR code"></canvas><span>SCAN TO VERIFY</span></div>
+   <div class="member-card-logo-wrap">${logoMarkup}</div>
+   <div class="member-card-details"><div class="member-card-label">MEMBER ID</div><div class="member-card-id">${esc(m.member_id)}</div><div class="member-card-name">${esc(m.customer_name)}</div><div class="member-card-detail">${esc(m.mobile_number)}</div><div class="member-card-scheme">${esc(en?.snapshot_scheme_name||'—')}</div><div class="member-card-period">DEC 2026 – SEP 2027</div></div>
+  </div><div class="member-card-footer">SAKTHIVEL CRACKERS · SAVINGS SCHEME</div>
+ </article></div>`);
+ if(window.QRious)new QRious({element:$('member-qr'),value:`AMALA-SAVINGS-2027:${m.member_id}`,size:150,level:'H'});
 }
 async function loadEnrollments(){
  const {data,error}=await supabaseClient.from('savings_enrollments').select('*,savings_members(member_id,customer_name,mobile_number)').order('created_at',{ascending:false});if(error)throw error;cache.enrollments=data||[];
